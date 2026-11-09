@@ -80,8 +80,8 @@ int main() {
     corridorEast->addExit({"VEST", "WEST", "vest", "west", "V", "v", "W", "w", "West", "Vest"}, corridor.get());
 
     // Legg til en item
-    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. (Verdi 2CP)"});
-    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade)"});
+    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi ", "2CP"});
+    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi ", "1SP"});
 
     //2. SPILLER-TILSTAND
     Room* currentRoom = spawnRoom.get();
