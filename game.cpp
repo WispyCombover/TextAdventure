@@ -8,15 +8,25 @@
 #include <random>
 #include <initializer_list>
 
+//TO-DO AND WISHLIST:
+// -Save state funksjon
+// -LEveling
+// -XP
+// -To hit chance
+// -Attack and damage dice
+// -Damage type piercing/slashing/bludgeoning/acid/fire/... (for ambisiøst?)
+//....
+
 //Definerer spillobjekt (gjenstander i verdenen)
 struct item {
     std::string name;
     std::string description;
     int value;
     std::string currency;
+    std::string type;  //Må kunne skille våpen fra rustning osv...
 };
 
-struct monster {   // To-do: terningkast for monsterangrep, To hit chance, og kanskje initiativ?
+struct monster {   // To-do: terningkast for monsterangrep, To hit chance, XP, og kanskje initiativ?
     std::string name;
     std::string description;
     int level;
@@ -138,7 +148,7 @@ class Room {
 void handleCombat(Room* currentRoom, Room* spawnRoom, int& playerHP, const int playerMaxHP, const int playerBaseDamage, const std::vector<item>& inventory, bool& running) {
     monster* m = currentRoom->monster.get();
     std::cout << "\n!!! SKREKK OG GRU !!!\n";
-    std::cout << "Du møter på " <<m->name <<"!\n";
+    std::cout << "Du møter på en " <<m->name <<"!\n";
     std::cout << m->description <<" (HP: " << m->hp << "/" << m->maxHp << ")\n";
     std::cout << "---------------------------------------\n";
 
@@ -172,7 +182,7 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, int& playerHP, const int p
             }
         }
         else if (combatInput == "flykt") {
-            std:cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk
+            std::cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk
             return;
         }
         else {
@@ -193,7 +203,7 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, int& playerHP, const int p
             }
         }
     }
-} )
+}
 
 int main() {
     SetConsoleOutputCP(CP_UTF8); // Sørger for å støtte norske tegn
@@ -229,13 +239,15 @@ int main() {
     corridorEast->addExit({"VEST", "West", "Vest", "vest", "west", "W", "w", "V", "v"}, corridor.get());
 
     // Legg til en item
-    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "CP"});
-    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "SP"});
+    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "CP", "Container"});
+    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "SP", "Weapon"});
 
     //2. SPILLER-TILSTAND
     Room* currentRoom = spawnRoom.get();
     std::vector<item>inventory;
 
+    int playerLvl = 1;  // Modifiseres av XP, så vi trenger en XP-teller
+    int playerXP = 0;  // Man starter selvsagt på LVL 1 - må lage en leveling tabell, og level-up mekanisme
     int playerHP = 20;  // Modifiseres av 'databrus' (healing) og andre gjenstander
     int playerMaxHP = 20;
     int playerBaseDamage = 2;  // Modifiseres av våpen og gjenstander
@@ -249,7 +261,7 @@ int main() {
     std::cout << "Du må navigere gjennom kontorlandskapet, samle gjenstander og bekjempe monstre for å finne nøklene og redde Mimir fra en sikker død og evig segfault.\n";
     std::cout << "Lykke til, vår alles fremtid ahenger av deg og ditt heltemot!\n";
     std::cout << "------------------------------------------------------------\n";
-    std::cout << "Skriv 'hjelp' for å se tilgjengelige kommandoer.\n\n";
+    std::cout << "Skriv 'hjelp' for å se tilgjengelige kommandoer.\n\n";  //Hjelpemenyen må lages
 
     //3. GAME-LOOP
     while (running) {
