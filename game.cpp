@@ -13,6 +13,7 @@ struct item {
     std::string name;
     std::string description;
     int value;
+    std::string currency;
 };
 
 struct monster {   // To-do: terningkast for monsterangrep, To hit chance, og kanskje initiativ?
@@ -62,7 +63,7 @@ class monsterManual {  //Database over tilgjengelige monstre gruppert på level
                 2, 20, 20, 5,
                 "Holder en endeløs monolog og påfører deg 'Feature Creep' -skade over tid!" //Poison damage. Enkelt å implementere?
             });
-            blueprintDatabase[2].pusb_back({
+            blueprintDatabase[2].push_back({
                 "The Jira Ticket Overlord",
                 "Et monster laget av post-it-lapper og uleste varlser. Den flytter deg konstant mellom 'In Progress' og 'To Do'.",
                 2, 25, 25, 4,
@@ -84,7 +85,7 @@ class monsterManual {  //Database over tilgjengelige monstre gruppert på level
             });
 
             //LEVEL 4
-            blueprintDatabse[4].push_back({
+            blueprintDatabase[4].push_back({
                 "Bobby Tables (The Dropper of Databases)",
                 "En beryktet skikkelse som bærer på et skilt hvor det står: '; DROP TABLE Monsters;--'.",
                 4, 75, 75, 12,
@@ -98,6 +99,18 @@ class monsterManual {  //Database over tilgjengelige monstre gruppert på level
                 5, 200, 200, 25,
                 "Kaster 'ASAP-panikk' over deg, spiser opp nattesøvnen din, og tvinger deg til å rulle ut uferdig kode i produksjon!" //Dette er mer potensiell skade enn spilleren har fra LVL1, må ha LEVEL-UP mekanikk.
             });
+        }
+
+        //Henter spesifikt monster basert på navn og level (manuell plassering)
+        std::unique_ptr<monster> getMonsterBlueprint(int level, const std::string& name) {
+            if (blueprintDatabase.find(level) !=blueprintDatabase.end()) {
+                for (const auto& m : blueprintDatabase[level]) {
+                    if (m.name == name) {
+                        return std::make_unique<monster>(m);
+                    }
+                }
+            }
+            return nullptr;
         }
 };
 
@@ -121,6 +134,66 @@ class Room {
             }
         }
 };
+
+void handleCombat(Room* currentRoom, Room* spawnRoom, int& playerHP, const int playerMaxHP, const int playerBaseDamage, const std::vector<item>& inventory, bool& running) {
+    monster* m = currentRoom->monster.get();
+    std::cout << "\n!!! SKREKK OG GRU !!!\n";
+    std::cout << "Du møter på " <<m->name <<"!\n";
+    std::cout << m->description <<" (HP: " << m->hp << "/" << m->maxHp << ")\n";
+    std::cout << "---------------------------------------\n";
+
+    while (m->hp > 0 && playerHP > 0) {
+        std::cout << "Hva gjør du? [angrip / flykt]\n> ";
+        std::string combatInput;
+        std::getline(std::cin, combatInput);
+
+        if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
+            int damageDealt = playerBaseDamage;
+
+            auto hasWeapon = std::find_if(inventory.begin(), inventory.end(), [](const item& i) {
+                return i.name == "penn";
+            });
+
+            if (hasWeapon != inventory.end()) {
+                damageDealt += 2; // Terningkast for våpentype her...
+                std::cout << "Du stikker febrilsk med pennen!\n";
+            }
+            else {
+                std::cout << "Du slår løs med knyttnevene!\n";
+            }
+
+            m->hp -= damageDealt;
+            std::cout << "Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
+
+            if (m->hp <= 0) {
+                std::cout << "Du beseiret " << m->name << "! Veien videre er klar.\n";
+                currentRoom->monster = nullptr;
+                return;
+            }
+        }
+        else if (combatInput == "flykt") {
+            std:cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk
+            return;
+        }
+        else {
+            std::cout << "Du nøler, og det koster deg dyrt...\n";
+        }
+
+        //Monsterets tur
+        if (m->hp > 0) {
+            std::cout << "\n" << m->name << " " << m->attackMessage << "\n";
+            playerHP -= m->attackDamage; //Må ha terningkast for damage, og to-hit logikk
+            std::cout << "Du tok " << m->attackDamage <<" skade! Din HP: " << playerHP << "/" << playerMaxHP << "\n";
+
+            if (playerHP <= 0) {
+                std::cout << "\n=== GAME OVER ===\n";
+                std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet og logger deg ut!\n";
+                running = false;
+                return;
+            }
+        }
+    }
+} )
 
 int main() {
     SetConsoleOutputCP(CP_UTF8); // Sørger for å støtte norske tegn
@@ -180,68 +253,6 @@ int main() {
 
     //3. GAME-LOOP
     while (running) {
-        //Sjekk om rommet inneholder et monster
-        if (currentRoom->monster && currentRoom->monster->hp > 0) {
-            monster* m = currentRoom->monster.get();
-            std::cout << "\n!!! SKREKK OG GRU !!!\n";
-            std::cout << "Du møter på " << m->name << "!\n";
-            std::cout << m->description << " (HP: " << m->hp << "/" << m->maxHp << ")\n";
-            std::cout << "-----------------------------------------------------\n";
-            std::cout << "Hva gjør du? [angrip / flykt]\n";
-
-            std::string combatInput;
-            std::getline(std::cin, combatInput);
-            // std::transform(combatInput.begin(), combatInput.end(), combatInput.begin(), ::tolower);
-
-            if (combatInput == "angrip" || combatInput == "slå") {
-                //Spilleren angriper monsteret
-                //Sjekker om spilleren har et våpen i inventaret som kan øke skaden
-                int damageDealt = playerBaseDamage;
-
-                //Sjekk etter våpen
-                auto hasWeapon = std::find_if(inventory.begin(), inventory.end(), [](const item& i) {
-                    return i.name == "penn";});
-                    if (hasWeapon != inventory.end()) {
-                        damageDealt +=2; //Penn gjør 1d4, må lage terninglogikk! Fast +2 enn så lenge.
-                        std::cout << "Du stikker febrilsk med den inntørkede pennen!\n";
-                    } else {
-                        std::cout << "Du slår løs med knyttnevene!\n";
-                    }
-
-                    m->hp -= damageDealt;
-                    std::cout << "Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
-
-                    //Sjekk om moonsteret lever
-                    if (m->hp <= 0) {
-                        std::cout << "Du beseiret " << m->name << "! Veien videre er klar.\n";
-                        currentRoom->monster = nullptr; // Fjerner monsteret fra rommet
-                        continue; //Tilbake til room descritpiojn
-                    }
-                }
-                else if (combatInput == "flykt") {
-                    //Flykt tilbake til et trygt rom
-                    std::cout << "Du får panikk, snur på hælen og løper tilbake til start!\n";
-                    currentRoom = spawnRoom.get(); //Trenger å lagre lastRoom - må lage logikk for det
-                    continue;
-                }
-                else {
-                    std::cout << "Du nøler, og det koster deg dyrt...\n";
-                }
-
-                //Monsterets tur til å angripe (om det lever)
-                if (m->hp > 0) {
-                    std::cout << "\n" << m-> name << " " << m->attackMessage << "\n";
-                    playerHP -= m->attackDamage; //Trenger noe armor-logikk for senere
-                    std::cout << "Du tok " << m->attackDamage << " skade! Din HP: " << playerHP << "/" << playerMaxHP << "\n";
-
-                    if (playerHP <= 0) {
-                        std::cout << "\n=== GAME OVER ===\n";
-                        std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet, og logger deg ut!\n";
-                        running = false;
-                    } 
-                }
-                continue; //Hopper over den vanlige rom-utforskningen når det er kamp
-        }
         std::cout << "\n---------------------------------------\n";
         std::cout << "[" << currentRoom->name << "]\n";
         std::cout << currentRoom->description << "\n";
