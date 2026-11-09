@@ -5,11 +5,14 @@
 #include <memory>
 #include <algorithm>
 #include <windows.h>
+#include <random>
+#include <initializer_list>
 
 //Definerer spillobjekt (gjenstander i verdenen)
 struct item {
     std::string name;
     std::string description;
+    int value;
 };
 
 struct monster {
@@ -35,6 +38,12 @@ class Room {
         void addExit(const std::string& direction, Room* neighbor) {
             exits[direction] = neighbor;
         }
+
+        void addExit(std::initializer_list<std::string> directions, Room* neighbor) {
+            for (const auto& direction : directions) {
+                exits[direction] = neighbor;
+            }
+        }
 };
 
 int main() {
@@ -53,20 +62,26 @@ int main() {
         "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er flere dører til tilstøtende møterom langs veggene, men lyser rødt for å indikere at de er opptatt.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake gjennom DØR til møterommet du nettopp forlot."
     );
 
+    auto corridorWest = std::make_unique<Room>(
+        "Korridoren mot vest",
+        "Du kommet til et hjørne som går videre mot NORD og inn i kontorlandskapet. Rett foran deg er der en dør. På veggen ved siden av døren ser du en kortleser med et kodepanel." //Trenger logikk for å håndtere lesing av nøkkelkort samt inntasting av kode
+    );
+
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
         "Du kommer til et lite hjørne av korridoren. Det er stille her, men du kan høre lyden av dempet prat fra at av de nærmeste møterommene. \n Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD." //Kaffemaskinen må kunne brukes til å fylle koppen med varm kaffe (Acid attack, AOE 1d4)
     );
 
     //Koble rommene sammen (retning, peker)
-    spawnRoom->addExit("DØR", corridor.get());
-    corridor->addExit("DØR", spawnRoom.get());
-    corridor->addExit("ØST", corridorEast.get());
-    corridorEast->addExit("VEST", corridor.get());
+    spawnRoom->addExit({"DØR"}, corridor.get());
+    corridor->addExit({"DØR"}, spawnRoom.get());
+    corridor->addExit({"ØST", "øst", "EAST", "east", "E", "e", "Ø", "ø", "East", "Øst"}, corridorEast.get());
+    corridor->addExit({"WEST"}, corridorWest.get());
+    corridorEast->addExit({"VEST", "WEST", "vest", "west", "V", "v", "W", "w", "West", "Vest"}, corridor.get());
 
     // Legg til en item
-    spawnRoom->items.push_back(item{"skitten kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. (Verdi 2CP)"});
-    spawnRoom->items.push_back(item{"inntørket penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade)"});
+    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. (Verdi 2CP)"});
+    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade)"});
 
     //2. SPILLER-TILSTAND
     Room* currentRoom = spawnRoom.get();
@@ -81,7 +96,7 @@ int main() {
     std::cout << "=== VELKOMMEN til MIMIRS HEMMELIGE DUNGEON CRAWLER ===\n\n";
     std::cout << "------------------------------------------------------\n\n";
     std::cout << "Det siste møtet kom med fryktelige avsløringer og overraskelser! \n";
-    std::cout << "Deadlinemonsteret(TM) har stukket av med krypteringsnøklene, og Mimir har sendt deg ut for å hente dem tilbake. \n";
+    std::cout << "Deadlinemonsteret™ har stukket av med krypteringsnøklene, og Mimir har sendt deg ut for å hente dem tilbake. \n"; 
     std::cout << "Du må navigere gjennom kontorlandskapet, samle gjenstander og bekjempe monstre for å finne nøklene og redde Mimir fra en sikker død og evig segfault.\n";
     std::cout << "Lykke til, vår alles fremtid ahenger av deg og ditt heltemot!\n";
     std::cout << "------------------------------------------------------------\n";
@@ -109,7 +124,7 @@ int main() {
 
                 //Sjekk etter våpen
                 auto hasWeapon = std::find_if(inventory.begin(), inventory.end(), [](const item& i) {
-                    return i.name == "inntørket penn";});
+                    return i.name == "penn";});
                     if (hasWeapon != inventory.end()) {
                         damageDealt +=2; //Penn gjør 1d4, må lage terninglogikk! Fast +2 enn så lenge.
                         std::cout << "Du stikker febrilsk med den inntørkede pennen!\n";
