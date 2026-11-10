@@ -7,14 +7,13 @@
 #include <windows.h>
 #include <random>
 #include <initializer_list>
+#include <fstream>
 
 //TO-DO AND WISHLIST:
-// -Save state funksjon
-// -LEveling
-// -XP
+// -Save/load funksjon
 // -To hit chance
-// -Attack and damage dice
-// -Damage type piercing/slashing/bludgeoning/acid/fire/... (for ambisiøst?)
+// -lastRoom-logikk
+// -Damage type piercing/slashing/bludgeoning/acid/fire/...
 // -Dialogsystem for NPCer (keep it simple ... eller gå full tilt og integrer Mimir?)
 // -Når vi har NPCer ... kan vi også ha merchants?
 //....
@@ -37,7 +36,12 @@ struct item {
     std::string type;         //"Weapon", "Container", "Armour", etc.
     int damageDiceSides = 0;  //4 for D4, 6 for D6, 8 for D8...
     int damageDiceCount = 0;  // Antall terninger å kaste
-    std::string damageType;   // "Piercing", "Bludgeoning", "Acid", "Fire".
+    std::string damageType;   // "Piercing", "Bludgeoning", "Acid", "Fire", etc.
+    int extraDiceSides = 0;   // Dersom gjenstanden er modifisert for ekstra dmg
+    int extraDiceCount = 0;
+    std::string extraDamageType = "";
+    bool isFilled = false;
+    bool throwable = false;
 };
 
 //Definerer monstre
@@ -65,12 +69,13 @@ struct player {
     int playerLvl = 1;              // Modifiseres av XP, så vi trenger en XP-teller
     int playerXP = 0;               // Man starter selvsagt på LVL 1 - må lage en leveling tabell, og level-up mekanisme
     int playerHP = 20;              // Modifiseres av 'databrus' (healing) og andre gjenstander
-    int playerMaxHP = 20;           // Modifiseres av level. Level up trigger HP-up via terningkast ... d8? Ikke d10...tror jeg
+    int playerMaxHP = 20;           // Modifiseres av level. Level up trigger HP-up via terningkast ... d10...tror jeg
     int playerBaseDamage = 2;       // Modifiseres av våpen og gjenstander
     int xpToNextLevel = 100;        // Hvor mye XP kreves for level 2 og videre
     int playerAC = 0;               // Påvirker to-hit-chance. AC = Armour Class
-
     std::shared_ptr<item> equippedWeapon = nullptr;   // nullptr = knyttnever
+
+    Room* lastRoom = nullptr;       // Holder på det siste rommet spilleren var i
 
     //Funksjon for å håndtere level up
     void gainXp(int amount) {
@@ -83,10 +88,10 @@ struct player {
             xpToNextLevel = static_cast<int>(xpToNextLevel * 1.5); //Krever mer for neste level - må sikkert tweake balansen
             
             //Stats øker ved level up
-            playerMaxHP += 15;       //Dette bør vel strengt tatt følge D&D regler?
-            playerHP = playerMaxHP;  //Full heal ved level up (eller er det for billig?)
-            playerBaseDamage += 3;   //Virker greit med bare never, eller?
-            playerAC += 1;           //For lite?
+            playerMaxHP += rollDice(10)+1;       //Dette bør vel strengt tatt følge D&D regler?
+            playerHP = playerMaxHP;           //Full heal ved level up (eller er det for billig?)
+            playerBaseDamage += 3;            //Virker greit med bare never, eller?
+            playerAC += 1;                    //For lite?
 
             std::cout << "\n🎉 LEVEL UP! Du er nå på level " << playerLvl << "!\n";
             std::cout << "HP økte til " << playerMaxHP << ", og din base damage er nå " << playerBaseDamage << ".\n";
@@ -227,7 +232,7 @@ class Room {
         }
 };
 
-void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vector<std::shared_ptr<item>& inventory, bool& running) {
+void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vector<std::shared_ptr<item>>& inventory, bool& running) {
     monster* m = currentRoom->monster.get();
     std::cout << "\n!!! SKREKK OG GRU !!!\n";
     std::cout << "Du møter på en " <<m->name <<"!\n";
@@ -240,38 +245,66 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vect
         std::getline(std::cin, combatInput);
 
         if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
-            int playerRoll = rollD20();
-            int targetAC = m->monsterAC + m->level;  
-            int damageDealt = p.playerBaseDamage;
-            std::string usedWeaponName = "knyttnevene";
-            std::string currentDamageType = "Bludgeoning";
+            int playerAttackRoll = rollDice(20);
+            int attackBonus = p.playerLvl; //Usikker på om jeg vil gi såpass med bonus uten at spilleren har et magisk våpen
+            int totalAttack = playerAttackRoll + attackBonus;
 
-            //Vi sjekker om spilleren har aktivert et våpen på forhånd
-            if (p.equippedWeapon != nullptr) {
-                usedWeaponName = p.equippedWeapon->name;
-                currentDamageType = p.equippedWeapon->damageType;
+            int targetAC = m->monsterAC + m->level;  //Kanskje monstrene blir for tøffe med +lvl modifier?
 
-                int weaponDamage = 0;
-                for (int i = 0; i < p.equippedWeapon->damageDiceCount; ++i) {
-                    weaponDamage += rollDice(p.equippedWeapon->damageDiceSides);
+            std::cout << "Du triller en D20 for å treffe... du fikk " << playerAttackRoll << " (+ " attackBonus << " bonus) = " << totalAttack << " mot AC " << targetAC << ".\n";
+
+            if (totalAttack >= targetAC) {
+                int bonusDamage = 0;
+                // Treff! Beregner skade.
+                if (playerAttackRoll == 20) {        //MÅ jo ha med crits!  .... som betyr at jeg også må ha med fumbles!
+                    bonusDamage = rollDice(8);   //Er dette fair? Eller bør den revurderes?
                 }
 
-                damageDealt += weaponDamage;
-                std::cout << "Du angriper med din " << usedWeaponName << "!\n";
-            } else {
-                std::cout << "Du har ikke valgt et våpen, og slår løs med bare !\n";
-            }
-            m->hp -= damageDealt;
-            std::cout << "Du traff! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
+                int damageDealt = p.playerBaseDamage + bonusDamage;
+                std::string usedWeaponName = "knyttnevene";
+                std::string currentDamageType = "Bludgeoning";
 
-            if (m->hp <= 0) {
-                std::cout << "Du beseiret " << m->name << "! Veien videre er klar.\n";
-                currentRoom->monster = nullptr;
-                return;
+                //Sjekker om spilleren har aktivert et våpen på forhånd
+                if (p.equippedWeapon != nullptr) {
+                    usedWeaponName = p.equippedWeapon->name;
+                    currentDamageType = p.equippedWeapon->damageType;
+
+                    int weaponDamage = 0;
+                    for (int i = 0; i < p.equippedWeapon->damageDiceCount; ++i) {
+                        weaponDamage += rollDice(p.equippedWeapon->damageDiceSides);
+                    }
+
+                    damageDealt += weaponDamage;
+                    std::cout << "Du angriper med din " << usedWeaponName << "!\n";
+                } else {
+                    std::cout << "Du har ikke valgt et våpen, og slår løs med bare !\n";
+                }
+                m->hp -= damageDealt;
+                if (playerAttackRoll == 20) {
+                    std::cout << "CRITICAL HIT! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
+                } else {
+                    std::cout << "Du traff! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
+                }
+                if (m->hp <= 0) {
+                    std::cout << "Du beseiret " << m->name << "! Veien videre er klar.\n";
+                    p.gainXp(m->xpReward);  //Gir spilleren XP
+                    currentRoom->monster = nullptr;
+                    return;
+                }
+            } else {
+                //FUMBLES!
+                if (playerAttackRoll == 1) {
+                    std::cout << "FUMBLE! Du snubler i dine egne argumenter, mister balansen og skader deg selv!\n";
+                    p.playerHP -= 2;  //Mister 2HP på en fumble - kan revideres
+                    std::cout << "Du tok 2 skade. Din HP: " << p.playerHP "/" << p.playerMaxHP << "\n";
+                } else {
+                    std::cout << "Bom! Angrepet ditt preller av eller blir blokkert!.\n";
+                }
             }
         }
         else if (combatInput == "flykt" || combatInput == "løp" || combatInput == "røm") {
             std::cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk
+            currentRoom = p.lastRoom;
             return;
         }
         else {
@@ -281,22 +314,86 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vect
         //Monsterets tur
         if (m->hp > 0) {
             std::cout << "\n" << m->name << " " << m->attackMessage << "\n";
-            p.playerHP -= m->attackDamage; //Må ha terningkast for damage, og to-hit logikk
-            std::cout << "Du tok " << m->attackDamage <<" skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
 
-            if (p.playerHP <= 0) {
-                std::cout << "\n=== GAME OVER ===\n";
-                std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet og logger deg ut!\n";
-                running = false;
-                return;
+            int monsterAttackRoll = rollDice(20);
+            int monsterTotalAttack = monsterAttackRoll + m->level;  //Level bonus
+
+            std::cout << m->name << " triller for å treffe deg... Det fikk " << monsterTotalAttack << " mot din AC " << p.playerAC << ".\n";
+
+            if (monsterTotalAttack >= p.playerAC) {
+
+                int monsterBonusDamage = 0;
+                if (monsterAttackRoll == 20) {
+                    int monsterBonusDamage = rollDice(8);
+                }
+                //Monsteret treffer
+                p.playerHP -= m->attackDamage + monsterBonusDamage;
+                if (monsterAttackRoll == 20) {
+                    std::cout << "CRITICAL HIT! Du tok " << m->attackDamage + monsterBonusDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
+                } else {
+                    std::cout << "AU! Du tok " << m->attackDamage + monsterBonusDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
+                }
+                if (p.playerHP <= 0) {
+                    std::cout << "\n=== GAME OVER ===\n";
+                    std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet og logger deg ut!\n";
+                    running = false;
+                    return;
+                }      
+            } else {
+                std::cout << " Flaks! Du dukker unna angrepet til " << m->name << ".\n";
             }
         }
     }
 }
 
+void saveGame(const player& p, const Room* currentRoom) {
+    std::ofstream saveFile("savefile.txt");
+    if (saveFile.is_open()) {
+        saveFile << p.playerLvl << "\n";
+        saveFile << p.playerXP << "\n";
+        saveFile << p.playerHP << "\n";
+        saveFile << p.playerMaxHP << "\n";
+        saveFile << p.playerBaseDamage << "\n";
+        saveFile << p.playerAC << "\n";
+        saveFile << currentRoom->name << "\n";
+
+        saveFile.close();
+        std::cout << " Spillet ble lagret!\n";
+    } else {
+        std::cout << "Feil: Kunne ikke opprette lagringsfil.\n";
+    }
+}
+
+bool loadGame(player& p, Room*& currentRoom, const std::vector<std::unique_ptr<Room>>& allRooms) {
+    std::ifstream loadFile("savefile.txt");
+    if (!loadFile.is_open()) {
+        return false;  //Finner ingen lagringsfil
+    }
+
+    std::string roomName;
+    loadFile >> p.playerLvl;
+    loadFile >> p.playerXP;
+    loadFile >> p.playerHP;
+    loadFile >> p.playerMaxHP;
+    loadFile >> p.playerBaseDamage;
+    loadFile >> p.playerAC;
+    loadFile.ignore();
+    std::getline(loadFile, roomName);
+    //Finn riktig rom
+    for (const auto& room : allRooms) {
+        if (room->name == roomName) {
+            currentRoom = room.get();
+            break;
+        }
+    }
+    loadFile.close();
+    return true;
+}
+
 int main() {
     SetConsoleOutputCP(CP_UTF8); // Sørger for å støtte norske tegn
     SetConsoleCP(CP_UTF8); // Sørger for å støtte norske tegn
+    std::vector<std::unique_ptr<Room>>> allRooms;
 
     //1. VERDENSBYGGING (DM-ing)
     //Prøver å bruke unique_ptr for å håndtere minne automatisk - manuell minnehåndtering er fremdeles innmari skummelt!
@@ -328,8 +425,8 @@ int main() {
     corridorEast->addExit({"VEST", "West", "Vest", "vest", "west", "W", "w", "V", "v"}, corridor.get());
 
     // Legg til en item
-    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "CP", "Container"});
-    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "SP", "Weapon"});
+    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "CP", "Weapon", 2, 1, "Bludgeoning", 0, 0, "", false});
+    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "SP", "Weapon", 4, 1, "Piercing"});
 
     // Random encounters
     monsterManual manual;
@@ -346,6 +443,7 @@ int main() {
     std::cout << "Det siste møtet kom med fryktelige avsløringer og overraskelser! \n";
     std::cout << "Deadlinemonsteret™ har stukket av med krypteringsnøklene, og Mimir har sendt deg ut for å hente dem tilbake. \n";
     std::cout << "Du må navigere gjennom kontorlandskapet, samle gjenstander og bekjempe monstre for å finne nøklene og redde Mimir fra en sikker død og evig segfault.\n";
+    std::cout << "Du slenger din trofaste laptop-sekk på ryggen, og er klar for å ta til på eventyret! \n";
     std::cout << "Lykke til, vår alles fremtid ahenger av deg og ditt heltemot!\n";
     std::cout << "------------------------------------------------------------\n";
     std::cout << "Skriv 'hjelp' for å se tilgjengelige kommandoer.\n\n";  //Hjelpemenyen må lages
@@ -379,6 +477,7 @@ int main() {
         std::string direction = input.substr(spacePos + 1); //Henter alt etter mellomrommet
 
         if (currentRoom->exits.find(direction) != currentRoom->exits.end()) {
+            p.lastRoom = currentRoom;
             currentRoom = currentRoom->exits[direction];
         } else {
             std::cout << "Du kan ikke gå den veien.\nTilgjengelige utveier er: ";
@@ -412,6 +511,42 @@ int main() {
             std::cout << "I sekken din har du:\n";
             for (const auto& itemPtr : inventory) {
                 std::cout << " - " << itemPtr->name << " (" << itemPtr->description << ")\n";
+            }
+        }
+    }
+    else if (input == "lagre" || input == "save") {
+        saveGame(p, currentRoom);
+    }
+    else if (input == "load" || input == "last") {
+        if (loadGame(p, currentRoom, allRooms)) {
+            std::cout << "Lagringsfil lastet inn! Du er i " << currentRoom->name << ".\n";            
+        } else {
+            std::cout << "Ingen lagringsfil ble funnet.\n";
+        }
+    }
+    else if (input == "fyll kopp" || input == "bruk kaffemaskin") {
+        if (currentRoom->name != "Korridoren mot øst") {
+            std::cout << "Det er ingen kaffemaskin her.\n";
+        } else {
+            //Sjekker om spilleren har en kaffekopp i inventaret
+            auto it = std::find_if(inventory.begin(), inventory.end(), [](const std::shared_ptr<item>& i) {
+                return i->name == "kaffekopp";
+            });
+
+            if (it != inventory.end()) {
+                if ((*it)->isFilled) {
+                    std::cout << "Koppen er allerede full av rykende fersk kaffe!\n";
+                } else {
+                    (*it)->isFilled = true;
+                    (*it)->description = "En kaffekopp fylt med rykende fersk, varm og etsende trakterkaffe! (1d2 bludgeoning + 1d4 acid).\n";
+                    (*it)->extraDiceSides = 4;
+                    (*it)->extraDiceCount = 1;
+                    (*it)->extraDamageType = "Acid";
+
+                    std::cout << "*BRRrrrrrzzzzzt* Du fyller kaffekoppen med beksvart, rykende varm  kontorkaffe! Den lukter etsende, men også oppfriskende.\n";
+                }
+            } else {
+                std::cout << "Du har ingen kaffekopp å fylle. Kanskje du finner en på et møterom eller noe?\n";
             }
         }
     }
