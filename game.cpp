@@ -10,12 +10,14 @@
 #include <fstream>
 
 //TO-DO AND WISHLIST:
-// -Save/load funksjon
-// -To hit chance
-// -lastRoom-logikk
-// -Damage type piercing/slashing/bludgeoning/acid/fire/...
-// -Dialogsystem for NPCer (keep it simple ... eller gå full tilt og integrer Mimir?)
+// -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
+// -Potions (Monster(TM) i forskjellige farger)
+// -Dialogsystem for NPCer (keep it simple)
 // -Når vi har NPCer ... kan vi også ha merchants?
+// -Romnumre til møterommene som minneadresser (tilgjengelige rom skal ha den faktiske minneadressen som rommet ligger i)
+// -Nøkkelkort og adgangskoder
+// -Puzzles! Klart vi må ha puzzles!
+// -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
 //....
 
 //Definerer terningkast - D&D regler
@@ -33,7 +35,7 @@ struct item {
     std::string description;
     int value;
     std::string currency;
-    std::string type;         //"Weapon", "Container", "Armour", etc.
+    std::string type;         //"Weapon", "Container", "Armour", "Potion", etc.
     int damageDiceSides = 0;  //4 for D4, 6 for D6, 8 for D8...
     int damageDiceCount = 0;  // Antall terninger å kaste
     std::string damageType;   // "Piercing", "Bludgeoning", "Acid", "Fire", etc.
@@ -63,6 +65,27 @@ struct NPC {   // To-do: dialoglogikk
     std::string description;
 };
 
+// Definererr rom 
+class Room {
+    public:
+        std::string name;
+        std::string description;
+        std::map<std::string, Room*> exits; //Peker til tilstøtende rom
+        std::vector<item>items;
+        std::unique_ptr<monster> monster; //NULLPTR for rom uten monster
+
+        Room(std::string n, std::string d) : name(n), description(d) {}
+        
+        void addExit(const std::string& direction, Room* neighbor) {
+            exits[direction] = neighbor;
+        }
+        void addExit(std::initializer_list<std::string> directions, Room* neighbor)  {
+            for (const auto& direction : directions) {
+                exits[direction] = neighbor;
+            }
+        }
+};
+
 //Definerer spilleren
 struct player {
     std::string name;
@@ -88,7 +111,7 @@ struct player {
             xpToNextLevel = static_cast<int>(xpToNextLevel * 1.5); //Krever mer for neste level - må sikkert tweake balansen
             
             //Stats øker ved level up
-            playerMaxHP += rollDice(10)+1;       //Dette bør vel strengt tatt følge D&D regler?
+            playerMaxHP += rollDice(10)+1;    //Dette bør vel strengt tatt følge D&D regler?
             playerHP = playerMaxHP;           //Full heal ved level up (eller er det for billig?)
             playerBaseDamage += 3;            //Virker greit med bare never, eller?
             playerAC += 1;                    //For lite?
@@ -211,27 +234,6 @@ class monsterManual {  //Database over tilgjengelige monstre gruppert på level
         }
 };
 
-// Definererr rom 
-class Room {
-    public:
-        std::string name;
-        std::string description;
-        std::map<std::string, Room*> exits; //Peker til tilstøtende rom
-        std::vector<item>items;
-        std::unique_ptr<monster> monster; //NULLPTR for rom uten monster
-
-        Room(std::string n, std::string d) : name(n), description(d) {}
-        
-        void addExit(const std::string& direction, Room* neighbor) {
-            exits[direction] = neighbor;
-        }
-        void addExit(std::initializer_list<std::string> directions, Room* neighbor)  {
-            for (const auto& direction : directions) {
-                exits[direction] = neighbor;
-            }
-        }
-};
-
 void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vector<std::shared_ptr<item>>& inventory, bool& running) {
     monster* m = currentRoom->monster.get();
     std::cout << "\n!!! SKREKK OG GRU !!!\n";
@@ -257,7 +259,7 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vect
                 int bonusDamage = 0;
                 // Treff! Beregner skade.
                 if (playerAttackRoll == 20) {        //MÅ jo ha med crits!  .... som betyr at jeg også må ha med fumbles!
-                    bonusDamage = rollDice(8);   //Er dette fair? Eller bør den revurderes?
+                    bonusDamage = rollDice(8);       //Er dette fair? Eller bør den revurderes?
                 }
 
                 int damageDealt = p.playerBaseDamage + bonusDamage;
@@ -277,7 +279,7 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vect
                     damageDealt += weaponDamage;
                     std::cout << "Du angriper med din " << usedWeaponName << "!\n";
                 } else {
-                    std::cout << "Du har ikke valgt et våpen, og slår løs med bare !\n";
+                    std::cout << "Du har ikke valgt et våpen, og slår løs med bare knyttnevene!\n";
                 }
                 m->hp -= damageDealt;
                 if (playerAttackRoll == 20) {
@@ -296,7 +298,7 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vect
                 if (playerAttackRoll == 1) {
                     std::cout << "FUMBLE! Du snubler i dine egne argumenter, mister balansen og skader deg selv!\n";
                     p.playerHP -= 2;  //Mister 2HP på en fumble - kan revideres
-                    std::cout << "Du tok 2 skade. Din HP: " << p.playerHP "/" << p.playerMaxHP << "\n";
+                    std::cout << "Du tok 2 skade. Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
                 } else {
                     std::cout << "Bom! Angrepet ditt preller av eller blir blokkert!.\n";
                 }
@@ -324,14 +326,15 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vect
 
                 int monsterBonusDamage = 0;
                 if (monsterAttackRoll == 20) {
-                    int monsterBonusDamage = rollDice(8);
+                    monsterBonusDamage = rollDice(8);
                 }
+                int totalMonsterDamage = m->attackDamage + monsterBonusDamage;
                 //Monsteret treffer
-                p.playerHP -= m->attackDamage + monsterBonusDamage;
+                p.playerHP -= totalMonsterDamage;
                 if (monsterAttackRoll == 20) {
-                    std::cout << "CRITICAL HIT! Du tok " << m->attackDamage + monsterBonusDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
+                    std::cout << "CRITICAL HIT! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
                 } else {
-                    std::cout << "AU! Du tok " << m->attackDamage + monsterBonusDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
+                    std::cout << "AU! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
                 }
                 if (p.playerHP <= 0) {
                     std::cout << "\n=== GAME OVER ===\n";
@@ -392,8 +395,9 @@ bool loadGame(player& p, Room*& currentRoom, const std::vector<std::unique_ptr<R
 
 int main() {
     SetConsoleOutputCP(CP_UTF8); // Sørger for å støtte norske tegn
-    SetConsoleCP(CP_UTF8); // Sørger for å støtte norske tegn
-    std::vector<std::unique_ptr<Room>>> allRooms;
+    SetConsoleCP(CP_UTF8);       // Sørger for å støtte norske tegn
+    std::vector<std::unique_ptr<Room>> allRooms;
+    player p;
 
     //1. VERDENSBYGGING (DM-ing)
     //Prøver å bruke unique_ptr for å håndtere minne automatisk - manuell minnehåndtering er fremdeles innmari skummelt!
@@ -432,10 +436,16 @@ int main() {
     monsterManual manual;
     corridorEast->monster = manual.getRandomMonster(1);  // Spawner et tilfeldig level 1 monster i østkorridoren
 
-    //2. SPILLER-TILSTAND
-    Room* currentRoom = spawnRoom.get();
-    std::vector<std:shared_ptr<item>> inventory;
+    //Legger rommene inn i allRooms vektoren for lagring og minnehåndtering
+    allRooms.push_back(std::move(spawnRoom));
+    allRooms.push_back(std::move(corridor));
+    allRooms.push_back(std::move(corridorWest));
+    allRooms.push_back(std::move(corridorEast));
 
+    Room* currentRoom = allRooms[0].get();  //Setter spawnRoom som ... vel ... spawn.
+    std::vector<std:shared_ptr> inventory;
+
+    //2. SPILLER-TILSTAND
     bool running = true;
 
     std::cout << "=== VELKOMMEN til MIMIRS HEMMELIGE DUNGEON CRAWLER ===\n\n";
