@@ -62,15 +62,15 @@ struct NPC {   // To-do: dialoglogikk
 //Definerer spilleren
 struct player {
     std::string name;
-    int playerLvl = 1;         // Modifiseres av XP, så vi trenger en XP-teller
-    int playerXP = 0;          // Man starter selvsagt på LVL 1 - må lage en leveling tabell, og level-up mekanisme
-    int playerHP;              // Modifiseres av 'databrus' (healing) og andre gjenstander
-    int playerMaxHP;           // Modifiseres av level. Level up trigger HP-up via terningkast ... d8? Ikke d10...tror jeg
-    int playerBaseDamage;      // Modifiseres av våpen og gjenstander
-    int xpToNextLevel = 100;   // Hvor mye XP kreves for level 2 og videre
-    int playerAC = 0;          // Påvirker to-hit-chance. AC = Armour Class
+    int playerLvl = 1;              // Modifiseres av XP, så vi trenger en XP-teller
+    int playerXP = 0;               // Man starter selvsagt på LVL 1 - må lage en leveling tabell, og level-up mekanisme
+    int playerHP = 20;              // Modifiseres av 'databrus' (healing) og andre gjenstander
+    int playerMaxHP = 20;           // Modifiseres av level. Level up trigger HP-up via terningkast ... d8? Ikke d10...tror jeg
+    int playerBaseDamage = 2;       // Modifiseres av våpen og gjenstander
+    int xpToNextLevel = 100;        // Hvor mye XP kreves for level 2 og videre
+    int playerAC = 0;               // Påvirker to-hit-chance. AC = Armour Class
 
-    item* equippedWeapon = nullptr;   // nullptr = knyttnever
+    std::shared_ptr<item> equippedWeapon = nullptr;   // nullptr = knyttnever
 
     //Funksjon for å håndtere level up
     void gainXp(int amount) {
@@ -227,7 +227,7 @@ class Room {
         }
 };
 
-void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vector<item>& inventory, bool& running) {
+void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vector<std::shared_ptr<item>& inventory, bool& running) {
     monster* m = currentRoom->monster.get();
     std::cout << "\n!!! SKREKK OG GRU !!!\n";
     std::cout << "Du møter på en " <<m->name <<"!\n";
@@ -337,7 +337,7 @@ int main() {
 
     //2. SPILLER-TILSTAND
     Room* currentRoom = spawnRoom.get();
-    std::vector<item>inventory;
+    std::vector<std:shared_ptr<item>> inventory;
 
     bool running = true;
 
@@ -368,9 +368,6 @@ int main() {
     std::string input;
     std::getline(std::cin, input);
 
-    //Enkel parsing: konverter til små bokstaver for å unngå problemer med Caps-lock - denne sliter med norske tegn, må se etter fiks
-    // std::transform(input.begin(), input.end(), input.begin(), ::tolower);
-
     //Kommandotolk (parser)
     if (input == "avslutt" || input == "exit" || input == "quit") {
         running = false;
@@ -398,7 +395,7 @@ int main() {
         auto it = std::find_if(currentRoom->items.begin(), currentRoom->items.end(), [&itemName](const item& item) {return item.name == itemName;});
     
         if (it != currentRoom->items.end()) {
-            inventory.push_back(*it);
+            inventory.push_back(std::make_shared<item>(*it));
             std::cout << "Du plukket opp: " << it->name << "\n";
             currentRoom->items.erase(it); //Fjerner gjenstanden fra rommet
         } else {
@@ -409,9 +406,12 @@ int main() {
         if (inventory.empty()) {
             std::cout << "Sekken din er tom.\n";
         } else {
+            if (p.equippedWeapon != nullptr) {
+                std::cout << "[ Aktivt våpen: " << p.equippedWeapon->name << " ]\n";
+            }
             std::cout << "I sekken din har du:\n";
-            for (const auto& item : inventory) {
-                std::cout << " - " << item.name << " (" << item.description << ")\n";
+            for (const auto& itemPtr : inventory) {
+                std::cout << " - " << itemPtr->name << " (" << itemPtr->description << ")\n";
             }
         }
     }
@@ -421,12 +421,12 @@ int main() {
         std::string weaponName = input.substr(spacePos +1);
 
         //Se om spilleren har våpenet i inventaret
-        auto it = std::find_if(inventory.begin(), inventory.end(), [&weaponName](const item& i) {
+        auto it = std::find_if(inventory.begin(), inventory.end(), [&weaponName](const std::shared_ptr<item>& i) {
             return i.name == weaponName && i.type == "weapon";
         });
 
         if (it != inventory.end()) {
-            p.equippedWeapon = &(*it);
+            p.equippedWeapon = *it;
             std::cout << "Du bruker nå: " << p.equippedWeapon->name << "!\n";
             std::cout << "Beskrivelse: " << p.equippedWeapon->description << "\n";
         } else {
