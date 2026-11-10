@@ -19,44 +19,14 @@
 // -Når vi har NPCer ... kan vi også ha merchants?
 //....
 
-//Definerer terningkast - D&D regler - dette er kanskje overkill, men greit å ha dem i tilfelle
-int rollD20() {
+//Definerer terningkast - D&D regler
+int rollDice(int sides) {
+    if (sides <= 0) return 0;
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 20);
+    std::uniform_int_distribution<> dis(1, sides);
     return dis(gen);
 }
-int rollD12() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 12);
-    return dis(gen);
-}
-int rollD10() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 10);
-    return dis(gen);
-}
-int rollD8() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 8);
-    return dis(gen);
-}
-int rollD6() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 6);
-    return dis(gen);
-}
-int rollD4() {
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(1, 4);
-    return dis(gen);
-}
-
 
 //Definerer spillobjekt (gjenstander i verdenen)
 struct item {
@@ -64,7 +34,10 @@ struct item {
     std::string description;
     int value;
     std::string currency;
-    std::string type;  //Må kunne skille våpen fra rustning osv...
+    std::string type;         //"Weapon", "Container", "Armour", etc.
+    int damageDiceSides = 0;  //4 for D4, 6 for D6, 8 for D8...
+    int damageDiceCount = 0;  // Antall terninger å kaste
+    std::string damageType;   // "Piercing", "Bludgeoning", "Acid", "Fire".
 };
 
 //Definerer monstre
@@ -96,6 +69,8 @@ struct player {
     int playerBaseDamage;      // Modifiseres av våpen og gjenstander
     int xpToNextLevel = 100;   // Hvor mye XP kreves for level 2 og videre
     int playerAC = 0;          // Påvirker to-hit-chance. AC = Armour Class
+
+    item* equippedWeapon = nullptr;   // nullptr = knyttnever
 
     //Funksjon for å håndtere level up
     void gainXp(int amount) {
@@ -252,37 +227,42 @@ class Room {
         }
 };
 
-void handleCombat(Room* currentRoom, Room* spawnRoom, int& playerHP, const int playerMaxHP, const int playerBaseDamage, const std::vector<item>& inventory, bool& running, player& p) {
+void handleCombat(Room* currentRoom, Room* spawnRoom, player& p, const std::vector<item>& inventory, bool& running) {
     monster* m = currentRoom->monster.get();
     std::cout << "\n!!! SKREKK OG GRU !!!\n";
     std::cout << "Du møter på en " <<m->name <<"!\n";
     std::cout << m->description <<" (HP: " << m->hp << "/" << m->maxHp << ")\n";
     std::cout << "---------------------------------------\n";
 
-    while (m->hp > 0 && playerHP > 0) {
+    while (m->hp > 0 && p.playerHP > 0) {
         std::cout << "Hva gjør du? [angrip / flykt]\n> ";
         std::string combatInput;
         std::getline(std::cin, combatInput);
 
         if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
             int playerRoll = rollD20();
-            int targetAC = monsterAC + level;  //HER ER DET NOE GALT! FIKS DET - I MORGEN!
-            int damageDealt = playerBaseDamage;
+            int targetAC = m->monsterAC + m->level;  
+            int damageDealt = p.playerBaseDamage;
+            std::string usedWeaponName = "knyttnevene";
+            std::string currentDamageType = "Bludgeoning";
 
-            auto hasWeapon = std::find_if(inventory.begin(), inventory.end(), [](const item& i) {
-                return i.name == "penn";
-            });
+            //Vi sjekker om spilleren har aktivert et våpen på forhånd
+            if (p.equippedWeapon != nullptr) {
+                usedWeaponName = p.equippedWeapon->name;
+                currentDamageType = p.equippedWeapon->damageType;
 
-            if (hasWeapon != inventory.end()) {
-                damageDealt += 2; // Terningkast for våpentype her...
-                std::cout << "Du stikker febrilsk med pennen!\n";
+                int weaponDamage = 0;
+                for (int i = 0; i < p.equippedWeapon->damageDiceCount; ++i) {
+                    weaponDamage += rollDice(p.equippedWeapon->damageDiceSides);
+                }
+
+                damageDealt += weaponDamage;
+                std::cout << "Du angriper med din " << usedWeaponName << "!\n";
+            } else {
+                std::cout << "Du har ikke valgt et våpen, og slår løs med bare !\n";
             }
-            else {
-                std::cout << "Du slår løs med knyttnevene!\n";
-            }
-
             m->hp -= damageDealt;
-            std::cout << "Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
+            std::cout << "Du traff! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
 
             if (m->hp <= 0) {
                 std::cout << "Du beseiret " << m->name << "! Veien videre er klar.\n";
@@ -301,10 +281,10 @@ void handleCombat(Room* currentRoom, Room* spawnRoom, int& playerHP, const int p
         //Monsterets tur
         if (m->hp > 0) {
             std::cout << "\n" << m->name << " " << m->attackMessage << "\n";
-            playerHP -= m->attackDamage; //Må ha terningkast for damage, og to-hit logikk
-            std::cout << "Du tok " << m->attackDamage <<" skade! Din HP: " << playerHP << "/" << playerMaxHP << "\n";
+            p.playerHP -= m->attackDamage; //Må ha terningkast for damage, og to-hit logikk
+            std::cout << "Du tok " << m->attackDamage <<" skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
 
-            if (playerHP <= 0) {
+            if (p.playerHP <= 0) {
                 std::cout << "\n=== GAME OVER ===\n";
                 std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet og logger deg ut!\n";
                 running = false;
@@ -433,6 +413,25 @@ int main() {
             for (const auto& item : inventory) {
                 std::cout << " - " << item.name << " (" << item.description << ")\n";
             }
+        }
+    }
+    //BRUK VÅPEN
+    else if (input.rfind("bruk", 0) == 0) {
+        size_t spacePos = input.find(' ');
+        std::string weaponName = input.substr(spacePos +1);
+
+        //Se om spilleren har våpenet i inventaret
+        auto it = std::find_if(inventory.begin(), inventory.end(), [&weaponName](const item& i) {
+            return i.name == weaponName && i.type == "weapon";
+        });
+
+        if (it != inventory.end()) {
+            p.equippedWeapon = &(*it);
+            std::cout << "Du bruker nå: " << p.equippedWeapon->name << "!\n";
+            std::cout << "Beskrivelse: " << p.equippedWeapon->description << "\n";
+        } else {
+            std::cout << "Du har ingen '" << weaponName << "' som kan brukes som våpen i inventaret ditt.\n";
+        }
         }
     }
     else {
