@@ -10,7 +10,7 @@
                 "/nologo",
                 "/utf-8",
                 "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
-                "${file}"
+                "${workspaceFolder}/*.cpp"
             ],
             "options": {
                 "cwd": "${fileDirname}"
