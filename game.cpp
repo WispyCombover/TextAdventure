@@ -10,6 +10,7 @@
 #include <fstream>
 
 //TO-DO AND WISHLIST:
+// -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
 // -Potions (Monster(TM) i forskjellige farger)
 // -Dialogsystem for NPCer (keep it simple)
@@ -18,6 +19,7 @@
 // -Nøkkelkort og adgangskoder
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
+// -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!
 //....
 
 //Definerer terningkast - D&D regler
@@ -95,7 +97,7 @@ struct player {
     int playerMaxHP = 20;           // Modifiseres av level. Level up trigger HP-up via terningkast ... d10...tror jeg
     int playerBaseDamage = 2;       // Modifiseres av våpen og gjenstander
     int xpToNextLevel = 100;        // Hvor mye XP kreves for level 2 og videre
-    int playerAC = 0;               // Påvirker to-hit-chance. AC = Armour Class
+    int playerAC = 10;              // Påvirker to-hit-chance. AC = Armour Class.  Igjen, D&D-regler. Unarmoured = AC 10   Hva er passende armour i et spill som dette?
     std::shared_ptr<item> equippedWeapon = nullptr;   // nullptr = knyttnever
 
     Room* lastRoom = nullptr;       // Holder på det siste rommet spilleren var i
@@ -280,7 +282,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                     damage += rollDice(thrownItem->damageDiceSides);
                 }
                 if (thrownItem->isFilled) {
-                    //Koppen er full: gjør ekstra acid damage
+                    //Koppen er full: gjør ekstra acid damage  Hmmm, dette fungerer for nå, men ønsker å utvide med flere forskjellige throwables!
                     int acidDamage = rollDice(6);
                     damage += acidDamage;
                     std::cout << "PLASK! " << thrownItem->name << " var full av glovarm kontorkaffe!\n";
@@ -339,7 +341,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 int bonusDamage = 0;
                 // Treff! Beregner skade.
                 if (playerAttackRoll == 20) {        //MÅ jo ha med crits!  .... som betyr at jeg også må ha med fumbles!
-                    bonusDamage = rollDice(8);       //Er dette fair? Eller bør den revurderes?
+                    bonusDamage = rollDice(8);       //Er dette fair? Eller bør den revurderes?  D&D-regler sier man skal doble dmg ved crit...
                 }
 
                 int damageDealt = p.playerBaseDamage + bonusDamage;
@@ -386,7 +388,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
         }
         else if (combatInput == "flykt" || combatInput == "løp" || combatInput == "røm") {
             if (p.lastRoom != nullptr) {
-                std::cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk
+                std::cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk. Lasroom-logikk er inne!
                 currentRoom = p.lastRoom;
                 return true;
             } else {
@@ -564,8 +566,8 @@ int main() {
     corridorEast->addExit({"VEST", "West", "Vest", "vest", "west", "W", "w", "V", "v"}, corridor.get());
 
     // Legg til en item
-    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "kB", "Weapon", 2, 1, "Bludgeoning", 0, 0, true, false});
-    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "MB", "Weapon", 4, 1, "Piercing", 0, 0, false, false});
+    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "kB", "Weapon", 2, 1, "Bludgeoning", 0, 0, "acid", true, false});
+    spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "MB", "Weapon", 4, 1, "Piercing", 0, 0, "", false, false});
 
     // Random encounters
     monsterManual manual;
@@ -623,6 +625,7 @@ int main() {
         running = false;
         std::cout << "Spillet avsluttes... Mimir returnerer til normal drift.\n";
     }
+    //NAVIGASJON
     else if (input.rfind("gå ", 0) == 0) { //Sjekker om kommandoen starter med "gå"
         //Finner første mellomrom etter "gå " for å hente retningen
         size_t spacePos = input.find(' ');
@@ -639,6 +642,7 @@ int main() {
             std::cout << "\n";
         }
     }
+    //PLUKK OPP GJENSTANDER
     else if (input.rfind("ta ", 0) == 0) {
         size_t spacePos = input.find(' ');
         std::string itemName = input.substr(spacePos +1); //Henter alt etter mellomrommet
@@ -653,6 +657,7 @@ int main() {
             std::cout << "Den gjenstanden finnes ikke her.\n";
         }
     }
+    //SJEKK INVENTAR
     else if (input == "inventory" || input == "inv" || input == "i" || input == "inventar" || input == "se sekk") {
         if (inventory.empty()) {
             std::cout << "Sekken din er tom.\n";
@@ -666,9 +671,11 @@ int main() {
             }
         }
     }
+    //SAVE GAME
     else if (input == "lagre" || input == "save") {
         saveGame(p, currentRoom, inventory);
     }
+    //LOAD GAME
     else if (input == "load" || input == "last") {
         if (loadGame(p, currentRoom, allRooms, inventory)) {
             std::cout << "Lagringsfil lastet inn! Du er i " << currentRoom->name << ".\n";            
@@ -676,6 +683,7 @@ int main() {
             std::cout << "Ingen lagringsfil ble funnet.\n";
         }
     }
+    //FYLL KOPP - denne må generaliseres for å passe til flere typer containers og andre ting å fylle dem med
     else if (input == "fyll kopp" || input == "bruk kaffemaskin") {
         if (currentRoom->name != "Korridoren mot øst") {
             std::cout << "Det er ingen kaffemaskin her.\n";
@@ -720,6 +728,21 @@ int main() {
             std::cout << "Du har ingen '" << weaponName << "' som kan brukes som våpen i inventaret ditt.\n";
         }
     }
+    //HJELPEMENY
+    else if (input == "hjelp" || input == "help") {
+        std::cout << " <TITTEL PÅ SPILL HER> er et humoristisk teksteventyr bygget på lesten av klassisk fantasy og med 'lette' D&D-regler.\n";
+        std::cout << " Det fungerer slik at etter hvert som du navigerer rundt i spillverdenen får du opp en beskrivelse av hva du ser.\n";
+        std::cout << " Det vil også stå hvor du potensielt kan bevege deg videre.\n";
+        std::cout << " ---------------------------------------------------------------------------------------------------------------- \n";
+        std::cout << " Måten du interagerer med spillverdenen på er via tekstkommandoer av typen: <verb> <objekt> \n";
+        std::cout << " For eksempel: ta kopp\n\n";
+        std::cout << " I tillegg har du noen faste kommandoer som kan hjelpe:\n\n";
+        std::cout << " Inventory/inventory/inventar/inv/i/se sekk - åpner inventaret og lister ut innhold\n";
+        std::cout << " Avslutt/quit/avslutt - avslutter spillet.\n";
+        std::cout << " Save/save/lagre - Lagrer spillet der du står.\n";
+        std::cout << " Load/load/last - Laster inn tidligere lagret spill.\n";
+    }
+    //UKJENT KOMMANDO
     else {
         std::cout << "Ukjent kommando. Prøv 'gå [retning]', 'ta [gjenstand]', 'inventory', eller 'avslutt'.\n";
     }
