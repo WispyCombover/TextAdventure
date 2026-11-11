@@ -12,14 +12,16 @@
 //TO-DO AND WISHLIST:
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
-// -Potions (Monster(TM) i forskjellige farger)
+// -Potions (Monster(TM) i forskjellige farger - rød Monster = Heal, blå Monster = Mana, hvit Monster = Haste...)
 // -Dialogsystem for NPCer (keep it simple)
 // -Når vi har NPCer ... kan vi også ha merchants?
-// -Romnumre til møterommene som minneadresser (tilgjengelige rom skal ha den faktiske minneadressen som rommet ligger i)
+// -Romnumre til møterommene refererer til minneadresser (tilgjengelige rom skal ha den faktiske minneadressen som rommet ligger i som romnummer)
 // -Nøkkelkort og adgangskoder
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
 // -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!
+// -Rundeteller/tickers. Dersom kaffen kan drikkes kan den gi en midlertidig Hit-bonus som går over etter, tja, 1d6 ticks? Eller mer?
+// -Er vel snart på tide å splitte koden så den blir mer håndterbar?
 //....
 
 //Definerer terningkast - D&D regler
@@ -545,7 +547,7 @@ int main() {
 
     auto corridor = std::make_unique<Room>(
         "Korridoren",
-        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er flere dører til tilstøtende møterom langs veggene, men lyser rødt for å indikere at de er opptatt.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake gjennom DØR til møterommet du nettopp forlot."
+        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er flere dører til tilstøtende møterom langs veggene. På dørene til møterommene står der romnumre som.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake gjennom DØR til møterommet du nettopp forlot."
     );
 
     auto corridorWest = std::make_unique<Room>(
@@ -566,7 +568,7 @@ int main() {
     corridorEast->addExit({"VEST", "West", "Vest", "vest", "west", "W", "w", "V", "v"}, corridor.get());
 
     // Legg til en item
-    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "kB", "Weapon", 2, 1, "Bludgeoning", 0, 0, "acid", true, false});
+    spawnRoom->items.push_back(item{"kaffekopp", "En mye brukt kaffekopp som noen har glemt igjen. Innsiden er misfarget av gammel kaffe. Verdi: ", 2, "kB", "Weapon", 2, 1, "Bludgeoning", 0, 0, "acid", false, true});
     spawnRoom->items.push_back(item{"penn", "En vanlig BIC-penn som har tørket inn. Improvisert stikkvåpen (1d4 skade). Verdi: ", 1, "MB", "Weapon", 4, 1, "Piercing", 0, 0, "", false, false});
 
     // Random encounters
@@ -703,11 +705,23 @@ int main() {
                     (*it)->extraDiceCount = 1;
                     (*it)->extraDamageType = "Acid";
 
-                    std::cout << "*BRRrrrrrzzzzzt* Du fyller kaffekoppen med beksvart, rykende varm  kontorkaffe! Den lukter etsende, men også oppfriskende.\n";
+                    std::cout << "*BRRrrrrrzzzzzt* Du fyller kaffekoppen med beksvart, rykende varm kontorkaffe! Den lukter etsende, men også oppfriskende.\n";
                 }
             } else {
                 std::cout << "Du har ingen kaffekopp å fylle. Kanskje du finner en på et møterom eller noe?\n";
             }
+        }
+    }
+    //DRIKK KAFFE
+    else if (input == "drikk kaffe") {
+        auto it = std::find_if(inventory.begin(), inventory.end(), [](const std::shared_ptr<item>& i) {
+            return i->name == "kaffekopp";
+        });
+        if ((*it)->isFilled) {
+            std::cout << "Du drikker den varme kontorkaffen og kjenner hvordan du blir oppkvikket!\n";
+            //LEGG INN BONUSEFFEKT HER: +1d4 pluss på to-hit dice, og kanskje +1 på damage? Må ha rundeteller. Buff varighet: 3 runder? 4?
+        } else {
+            std::cout << "Koppen er tom. Du må finne en kaffemaskin!\n";
         }
     }
     //BRUK VÅPEN
