@@ -115,13 +115,11 @@ bool processCommand(
         std::string drinkTarget = target.empty() ? "kaffekopp" : target;
         handleUse(drinkTarget, p, currentRoom, inventory);
     }
-    else if (input == "se" || input == "look") {
-        std::cout << "[]" << currentRoom->name << "]\n" << currentRoom->description << "\n";
-        if (!currentRoom->items.empty()) {
-            std::cout << "Du ser følgende gjenstander her:\n";
-            for (const auto& it : currentRoom->items) {
-                std::cout <<"- " << it.name << "\n";
-            }
+    else if (verb == "se" || verb == "look") {
+        if (target.empty()) {
+            std::cout << "[]" << currentRoom->name << "]\n" << currentRoom->description << "\n";
+        } else {
+            handleUse(target, p, currentRoom, inventory);
         }
     }
     else if (input == "inventar" || input == "sekk" || input == "i") {
@@ -142,7 +140,7 @@ bool processCommand(
             std::cout << "Spillet ble lastet inn.\n";
         else    std::cout << "Fant ingen lagringsfil.\n";
     }
-    else if (input == "fyll kopp" || input == "bruk kaffemaskin") {
+    else if (input == "fyll kopp") {   //Denne må generaliseres litt mer. Må støtte flere containers og flere væsker å fylle dem med
         if (currentRoom->name != "Korridoren mot øst") {
             std::cout << "Det er ingen kaffemaskin her.\n";
         } else {
