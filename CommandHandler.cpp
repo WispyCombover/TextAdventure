@@ -117,7 +117,7 @@ bool processCommand(
     }
     else if (verb == "se" || verb == "look") {
         if (target.empty()) {
-            std::cout << "[]" << currentRoom->name << "]\n" << currentRoom->description << "\n";
+            std::cout << "[" << currentRoom->name << "]\n" << currentRoom->description << "\n";
         } else {
             handleUse(target, p, currentRoom, inventory);
         }

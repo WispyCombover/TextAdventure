@@ -22,13 +22,13 @@
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
 // -Potions (Monster(TM) i forskjellige farger - rød Monster = Heal, blå Monster = Mana, hvit Monster = Haste...)
-// -Dialogsystem for NPCer (keep it simple)
+// -Dialogsystem for NPCer (keep it simple)  WIP
 // -Når vi har NPCer ... kan vi også ha merchants?
 // -Romnumre til møterommene refererer til minneadresser (tilgjengelige rom skal ha den faktiske minneadressen som rommet ligger i som romnummer)
 // -Nøkkelkort og adgangskoder
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
-// -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!
+// -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!  DONE!
 // -Rundeteller/tickers. Dersom kaffen kan drikkes kan den gi en midlertidig Hit-bonus som går over etter, tja, 1d4 ticks? Eller mer?
 //....
 
