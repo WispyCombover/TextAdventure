@@ -3,7 +3,7 @@
 #include <iomanip>
 #include <sstream>
 
-long long convrtToKB(long long amount, const std::string& unit) {
+long long convertToKB(long long amount, const std::string& unit) {
     std::string u = toLowerNorwegian(unit);
     if (u == "mb") return amount * 1024LL;
     if (u == "gb") return amount * 1024LL * 1024LL;
@@ -19,15 +19,16 @@ std::string formatDataCurrency(long long kb) {
     const long long GB = MB * 1024LL;
     const long long TB = GB * 1024LL;
 
-    if (kv >= TB) {
+    if (kb >= TB) {
         oss << (static_cast<double>(kb) / TB) << " TB";
     } else if (kb >= GB) {
         oss << (static_cast<double>(kb) / GB) << " GB";
     } else if (kb >= MB) {
         oss << (static_cast<double>(kb) / MB) << " MB";
     } else {
-        return oss.str();
+        return std::to_string(kb) + " kB";
     }
+    return oss.str();
 }
 
 int rollDice(int sides) {

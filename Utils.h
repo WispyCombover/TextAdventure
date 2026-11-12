@@ -4,7 +4,7 @@
 
 int rollDice(int sides);
 
-long long convetToKB(long long amount, const std::string& unit);
+long long convertToKB(long long amount, const std::string& unit);
 std::string formatDataCurrency(long long kb);
 
 inline std::string toLowerNorwegian(std::string text) {
