@@ -6,6 +6,8 @@
 #include "Room.h"
 #include "Item.h"
 
+void printRoomDescription(const Room* room);
+
 bool processCommand(
     const std::string& input,
     player &p,

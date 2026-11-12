@@ -15,4 +15,5 @@ struct item {
     std::string extraDamageType = "";
     bool isFilled = false;
     bool throwable = false;
+    bool isQuestItem = false;  //Sett denne til true på kritiske items
 };

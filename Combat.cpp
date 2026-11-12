@@ -4,6 +4,8 @@
 #include <iostream>
 #include <algorithm>
 
+#include "CommandHandler.h"
+
 bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<item>>& inventory) {
     monster* m = currentRoom->monster.get();
     if (!m) return true; //Ingen monstre her, spillet fortsetter
@@ -66,7 +68,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 m->hp -= damage;
                 std::cout << "Totalt gjorde kastet " << damage << " skade på " << m->name << ".\n";
             } else {
-                std::cout << "Du bomet grovt! " << thrownItem->name << " seilte forbi monsteret.\n";
+                std::cout << "Du bommet grovt! " << thrownItem->name << " seilte forbi monsteret.\n";
             }
 
             //Sjanse for at koppen knuser 60%?  Hmmm, dette fungerer for nå, men ønsker å utvide med flere forskjellige throwables!
@@ -158,6 +160,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
             if (p.lastRoom != nullptr) {
                 std::cout << "Du får panikk, snur på hælen og løper tilbake til start!\n"; // Trenger lastRoom logikk. Lasroom-logikk er inne!
                 currentRoom = p.lastRoom;
+                printRoomDescription(currentRoom);
                 return true;
             } else {
                 std::cout << "Det er ingen steder å flykte! Du må kjempe!\n";
@@ -169,7 +172,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
 
         //Monsterets tur
         if (m->hp > 0) {
-            std::cout << "\n" << m->name << " " << m->attackMessage << "\n";
+            std::cout << m->name << " " << m->attackMessage << "\n";
 
             int monsterAttackRoll = rollDice(20);
             int monsterTotalAttack = monsterAttackRoll + m->level;  //Level bonus
@@ -196,7 +199,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                     return false;
                 }      
             } else {
-                std::cout << " Flaks! Du dukker unna angrepet til " << m->name << ".\n";
+                std::cout << "Flaks! Du dukker unna angrepet til " << m->name << ".\n";
             }
         }
     }
