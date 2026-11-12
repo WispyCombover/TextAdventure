@@ -1,6 +1,6 @@
 #include "CommandHandler.h"
 #include "Combat.h"
-#include "SaveLoad.h"
+#include "saveLoad.h"
 #include <iostream>
 #include <algorithm>
 
@@ -15,7 +15,7 @@ namespace {
         }
     }
 
-    void handleTake(const std::string& itemName, Room* currentRoom, std::vector<std::shared_ptr<item>& inventory) {
+    void handleTake(const std::string& itemName, Room* currentRoom, std::vector<std::shared_ptr<item>>& inventory) {
         auto it = std::find_if(currentRoom->items.begin(), currentRoom->items.end(), [&itemName](const item& item) {
             return item.name == itemName;
         });
@@ -116,13 +116,31 @@ bool processCommand(
         handleUse(drinkTarget, p, currentRoom, inventory);
     }
     else if (input == "se" || input == "look") {
-        // ... skriv ut rombeskrivelse og gjenstander ...
+        std::cout << "[]" << currentRoom->name << "]\n" << currentRoom->description << "\n";
+        if (!currentRoom->items.empty()) {
+            std::cout << "Du ser følgende gjenstander her:\n";
+            for (const auto& it : currentRoom->items) {
+                std::cout <<"- " << it.name << "\n";
+            }
+        }
     }
     else if (input == "inventar" || input == "sekk" || input == "i") {
-        // ... skriv ut inventaret ...
+        if (inventory.empty()) {
+            std::cout << "Sekken din er tom.\n";
+        } else {
+            std::cout << "I sekken har du:\n";
+            for (const auto& it : inventory) {
+                std::cout << "- " << it->name << (it->isFilled ? " (full)" : "") << "\n";
+            }
+        }
     }
     else if (input == "lagre" || input == "save") {
         saveGame(p, currentRoom, inventory);
+    }
+    else if (input == "last" || input == "load") {
+        if (loadGame(p, currentRoom, allRooms, inventory))
+            std::cout << "Spillet ble lastet inn.\n";
+        else    std::cout << "Fant ingen lagringsfil.\n";
     }
     else if (input == "fyll kopp" || input == "bruk kaffemaskin") {
         if (currentRoom->name != "Korridoren mot øst") {
@@ -169,9 +187,5 @@ bool processCommand(
     else {
         std::cout << "Ukjent kommando. Prøv 'gå [retning]', 'ta [gjenstand]', 'inventory', eller 'avslutt'.\n";
     }
-    else {
-        std::cout << "Jeg forstår ikke '" << input << "'. Skriv 'hjelp' for kommandoer.\n";
-    }
-
     return true;
 }

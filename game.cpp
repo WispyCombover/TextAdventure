@@ -131,7 +131,7 @@ std::cout << "Skriv 'hjelp' for kommandoer (eller 'panikk' for å gråte stille)
         std::cout << currentRoom->description << "\n";
     
     if (!currentRoom->items.empty()) {
-        std::cout << "Du ser følgende gjenstander her:\n";
+        std::cout << "\nDu ser følgende gjenstander her:\n";
         for (const auto& item : currentRoom->items) {
             std::cout << "- " << item.name << "\n";
         }
@@ -145,13 +145,12 @@ std::cout << "Skriv 'hjelp' for kommandoer (eller 'panikk' for å gråte stille)
     }
 
     // Vent på kommando fra spilleren
-    std::cout << "\nHva vil du gjøre? > ";
+    std::cout << "\n\nHva vil du gjøre? > ";
     std::string input;
     std::getline(std::cin, input);
-
-    
-    //FYLL KOPP - denne må generaliseres for å passe til flere typer containers og andre ting å fylle dem med
-    
+    if (!processCommand(input, p, currentRoom, allRooms, inventory)) {
+        running = false;
+    }  
 }
     return 0;
 }

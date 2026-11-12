@@ -9,7 +9,7 @@
 bool processCommand(
     const std::string& input,
     player &p,
-    Room* currentRoom,
+    Room*& currentRoom,
     const std::vector<std::unique_ptr<Room>>& allRooms,
     std::vector<std::shared_ptr<item>>& inventory
 );
