@@ -1,4 +1,6 @@
 #include "NPC.h"
+#include "Item.h"
+#include "Utils.h"
 
 std::unique_ptr<NPC> createFirewallGuru(const player& p) {
     auto guru = std::make_unique<NPC>();
@@ -12,7 +14,7 @@ std::unique_ptr<NPC> createFirewallGuru(const player& p) {
     guru->dialogueTree.push_back({
         "Hvem der? Jeg holder på å patche en zero-day i kaffetrakteren. Hva vil du?",
         {
-            {"Jeg er " + playerName + ". Jeg jakter på Deadlinemonsteret. Har du sett det?", 1, false},
+            {"Jeg er " + playerName + ". Jeg jakter på Deadlinemonsteret™. Har du sett det?", 1, false},
             {"Har du noe utstyr til salgs?", 2, true},
             {"Beklager forstyrrelsen. (Avslutt samtalen)", -1, false}
         }
@@ -36,8 +38,8 @@ std::unique_ptr<NPC> createFirewallGuru(const player& p) {
     });
 
     //Legg til varer i butikken her
-    guru->shopInventory.push_back(item{"Mekanisk tastatur", "Bråkete, men presist og dødelig (1d8 bludgeoning).", 500, "kb", "weapon", 8, 1, "Bludgeoning", 0, 0, "", false, false});
-    guru->shopInventory.push_back(item{"Rød Monster™", "Gjenoppretter 25HP.", 2, "MB", "consumable", 0, 0, "", false, false});
+    guru->shopInventory.push_back(getItem("mekanisk tastatur"));
+    guru->shopInventory.push_back(getItem("rød monster"));
 
     return guru;
 }

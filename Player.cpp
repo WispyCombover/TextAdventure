@@ -16,6 +16,9 @@ void player::gainXp(int amount) {
         playerBaseDamage += 3;
         playerAC += 1;
 
+        playerMaxMana += 3;
+        playerMana = playerMaxMana;
+
         std::cout << "\n🎉 LEVEL UP! Du er nå på level " << playerLvl << "!\n";
         std::cout << "HP økte til " << playerMaxHP << ", og din base damage er nå " << playerBaseDamage << ".\n";
     }

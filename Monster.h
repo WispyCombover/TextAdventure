@@ -4,6 +4,12 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include "Item.h"
+
+struct lootEntry {
+    item dropItem;
+    int dropChancePercent;  // 1 - 100
+};
 
 struct monster {
     std::string name;
@@ -15,6 +21,11 @@ struct monster {
     int xpReward;
     int monsterAC;
     std::string attackMessage;
+
+    //LOOT
+    long long minDataReward = 0;  // I ant kB
+    long long maxDataReward = 0;  // I ant kB
+    std::vector<lootEntry> lootTable;
 };
 
 class monsterManual {

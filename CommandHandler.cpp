@@ -6,10 +6,54 @@
 #include "Room.h"
 #include "WorldBuilder.h"
 #include "Player.h"
+#include "Item.h"
 #include <iostream>
 #include <algorithm>
 #include <string>
 #include <limits>
+
+void useConsumable(player& p, const item& it) {
+    int amount = it.effectFlatBonus;
+    for (int i = 0; i < it.effectDiceCount; ++i) {
+        amount += rollDice(it.effectDiceSides);
+    }
+
+    // Viser flavourtext om den finnes
+    if (!it.consumeText.empty()) {
+        std::cout << it.consumeText << "\n";
+    }
+
+    //Kjør effekt
+    switch (it.effect) {
+        case itemEffect::healHp: {
+            int oldHp = p.playerHP;
+            p.playerHP = std::min(p.playerMaxHP, p.playerHP + amount);
+            std::cout << "Du gjenvinner " << (p.playerHP - oldHp) << " HP! (" << p.playerHP << "/" << p.playerMaxHP << ")\n";
+            break;
+        }
+        case itemEffect::restoreMana: {
+            int oldMana = p.playerMana;
+            p.playerMana = std::min(p.playerMaxMana, p.playerMana + amount);
+            std::cout << "Du gjenvinner " << (p.playerMana - oldMana) << " Mana! (" << p.playerMana << "/" << p.playerMaxMana << ")\n";
+            break;
+        }
+        case itemEffect::caffeineRush: {
+            p.playerHP = std::min(p.playerMaxHP, p.playerHP + amount);
+            p.addEffect(StatusType::caffeineRush, "Koffeinsjokk", 3, 2);
+            std::cout << "Du får +" << amount << " HP og [Koffeinsjokk] (+2 angrep/skade) i 3 runder!\n";
+            break;
+        }
+        case itemEffect::sugarCrash: {
+            p.playerHP = std::max(0, p.playerHP - amount);
+            std::cout << "Du tar " << amount << " poison-damage! (" << p.playerHP << "/" << p.playerMaxHP << ")\n";
+            break;
+        }
+        case itemEffect::none:
+        default:
+            std::cout << "Det skjer egentlig ingenting.\n";
+            break;
+    }
+}
 
 void buyFromMerchant(NPC &npc, player &p, std::vector<std::shared_ptr<item>> &inventory)
 {
@@ -318,9 +362,18 @@ namespace
 
         if (currentRoom->exits.count(cleanDir))
         {
-            p.lastRoom = currentRoom;
-            currentRoom = currentRoom->exits[cleanDir];
-            std::cout << "\nDu går mot " << cleanDir << ".\n";
+            Exit &exit = currentRoom->exits[cleanDir];
+            if (exit.isLocked)
+            {
+                std::cout << "Døren er låst.\n";
+                return;
+            }
+            if (exit.hasDoor && !exit.isOpen)
+            {
+                std::cout << "Døren er lukket. Du må åpne den først.\n";
+                return;
+            }
+            currentRoom = exit.destination;
             printRoomDescription(currentRoom);
         }
         else
@@ -339,11 +392,17 @@ namespace
             inventory.push_back(std::make_shared<item>(*it));
             std::cout << "Du plukket opp: " << it->name << "\n";
             currentRoom->items.erase(it);
+            return;
         }
-        else
+        for (const auto &[key, desc] : currentRoom->scenery)
         {
-            std::cout << "Den gjenstanden finnes ikke her.\n";
+            if (key.find(cleanInput) != std::string::npos)
+            {
+                std::cout << "Du kan ikke ta med deg " << key << " i sekken!\n";
+                return;
+            }
         }
+        std::cout << "Den gjenstanden finnes ikke her.\n";
     }
     void handleUse(const std::string &itemName, player &p, Room *currentRoom, std::vector<std::shared_ptr<item>> &inventory)
     {
@@ -434,6 +493,141 @@ namespace
             std::cout << "Det er ingenting å fylle " << container->name << " med her.\n";
         }
     }
+    void printItemDetails(const item &it)
+    {
+        std::cout << it.name << ": " << it.description;
+        if (it.value > 0)
+        {
+            long long valKB = convertToKB(it.value, it.currency);
+            std::cout << " (Estimert verdi: " << formatDataCurrency(valKB) << ")";
+        }
+        std::cout << "\n";
+    }
+    void handleLook(const std::string &targetName, Room *currentRoom, const std::vector<std::shared_ptr<item>> & inventory)
+    {
+        if (targetName.empty())
+        {
+            printRoomDescription(currentRoom);
+            return;
+        }
+
+        std::string cleanTarget = toLowerNorwegian(targetName);
+        //Fjern fyllord
+        if (cleanTarget.rfind("på", 0) == 0)
+        {
+            cleanTarget = cleanTarget.substr(3);
+        }
+        //Sjekk items i sekken
+        auto invIt = std::find_if(inventory.begin(), inventory.end(), [&cleanTarget](const std::shared_ptr<item> &i) {
+            return toLowerNorwegian(i->name) == cleanTarget; });
+        if (invIt != inventory.end())
+        {
+            printItemDetails(**invIt); 
+            return;
+        }
+        //Sjekk items i rommet
+        auto roomIt = std::find_if(currentRoom->items.begin(), currentRoom->items.end(), [&cleanTarget](const item &i) { return toLowerNorwegian(i.name) == cleanTarget; });
+
+        if (roomIt != currentRoom->items.end())
+        {
+            printItemDetails(*roomIt);
+            return;
+        }
+        //Sjekk NPCer
+        for (const auto &npc : currentRoom->npcs)
+        {
+            if (toLowerNorwegian(npc->name).find(cleanTarget) != std::string::npos)
+            {
+                std::cout << "Du ser nærmere på " << npc->name << ". Hen ser opptatt ut.\n";
+                return;
+            }
+        }
+        //Sjekk utganger
+        if (currentRoom->exits.count(cleanTarget))
+        {
+            const Exit &exit = currentRoom->exits[cleanTarget];
+            if (!exit.description.empty())
+            {
+                std::cout << exit.description << " ";
+            }
+            if (exit.hasDoor)
+            {
+                std::cout << "Døren er " << (exit.isLocked ? "låst." : (exit.isOpen ? "åpen." : "lukket.")) << "\n";
+            }
+            else
+            {
+                std::cout << "Veien ligger åpen mot " << exit.destination->name << ".\n";
+            }
+            return;
+        }
+        //Sjekk scenery-objekter
+        for (const auto &[key, desc] : currentRoom->scenery)
+        {
+            if (key.find(cleanTarget) != std::string::npos || cleanTarget.find(key) != std::string::npos)
+            {
+                std::cout << desc << "\n";
+                return;
+            }
+        }
+        //Fallback
+        std::cout << "Du ser ingenting spesielt ved '" << targetName << "'.\n";
+    }
+    void handleOpen(const std::string &targetName, Room *currentRoom)
+    {
+        std::string cleanTarget = toLowerNorwegian(targetName);
+        if (!currentRoom->exits.count(cleanTarget))
+        {
+            std::cout << "Det er ingen '" << targetName << "' å åpne her.\n";
+            return;
+        }
+
+        Exit &exit = currentRoom->exits[cleanTarget];
+        if (!exit.hasDoor)
+        {
+            std::cout << "Det er ingen dør der, veien er allerede åpen.\n"; 
+        }
+        else if (exit.isLocked)
+        {
+            std::cout << "Døren er låst. Du må låse den opp først.\n";
+        }
+        else if (exit.isOpen)
+        {
+            std::cout << "Døren er allerede åpen.\n";
+        }
+        else
+        {
+            exit.isOpen = true;
+            std::cout << "Du åpner døren mot " << exit.destination->name << ".\n";
+        }
+    }
+
+    void handleUnlock(const std::string &targetName, Room *currentRoom, const std::vector<std::shared_ptr<item>> &inventory)
+    {
+        std::string cleanTarget = toLowerNorwegian(targetName);
+        if (!currentRoom->exits.count(cleanTarget))
+        {
+            std::cout << "Det er ingen '" << targetName << "' å låse opp her.\n";
+            return;
+        }
+
+        Exit &exit = currentRoom->exits[cleanTarget];
+        if (!exit.isLocked)
+        {
+            std::cout << "Den er ikke låst.\n";
+            return;
+        }
+        //Sjekk om spilleren har riktig nøkkel i sekken
+        auto keyIt = std::find_if(inventory.begin(), inventory.end(), [&exit](const std::shared_ptr<item> &i) { return toLowerNorwegian(i->name).find(exit.keyName) != std::string::npos; });
+        if (keyIt != inventory.end())
+        {
+            exit.isLocked = false;
+            std::cout << "Du bruker " << (*keyIt)->name << " og låser opp døren!\n";
+        }
+        else
+        {
+            std::cout << "Du mangler riktig nøkkel eller adgangskort for å låse opp denne.\n";
+        }
+    }
 }
 bool processCommand(
     const std::string &input,
@@ -465,6 +659,32 @@ bool processCommand(
         else
         {
             handleMove(target, p, currentRoom);
+        }
+    }
+    else if (verb == "åpne" || verb == "open")
+    {
+        if (target.empty())
+        {
+            std::cout << "Hva vil du åpne?\n";
+        }
+        else
+        {
+            handleOpen(target, currentRoom);
+        }
+    }
+    else if (lowerInput.rfind("lås opp", 0) == 0 || verb == "unlock")
+    {
+        if (lowerInput.rfind("lås opp", 0) == 0)
+        {
+            target = (input.length() > 8) ? input.substr(8) : "";
+        }
+
+        if (target.empty())
+        {
+            std::cout << "Hva vil du låse opp?\n";
+        }
+        else{
+            handleUnlock(target, currentRoom, inventory);
         }
     }
     else if (verb == "ta" || verb == "take")
@@ -513,7 +733,7 @@ bool processCommand(
         }
         else
         {
-            handleUse(target, p, currentRoom, inventory);
+            handleLook(target, currentRoom, inventory);
         }
     }
     else if (lowerInput == "inventar" || lowerInput == "sekk" || lowerInput == "i")

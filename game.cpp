@@ -19,6 +19,7 @@
 #include "CommandHandler.h"
 #include "WorldBuilder.h"
 #include "NPC.h"
+#include "Spells.h"
 
 //TO-DO AND WISHLIST:
 // -Ikke gå rett på spillet fra introteksten. I stedet krev "start" for å starte, og deretter må spilleren angi navn (for vi har en player->name)
@@ -27,8 +28,10 @@
 // -Potions (Monster(TM) i forskjellige farger - rød Monster = Heal, blå Monster = Mana, hvit Monster = Haste...)
 // -Dialogsystem for NPCer (keep it simple)  WIP
 // -Merchants WIP
+// -Spells! WIP -> Spellcastingsystem er nå inne. Mangler spellbook
 // -Romnumre til møterommene refererer til minneadresser (tilgjengelige rom skal ha den faktiske minneadressen som rommet ligger i som romnummer)
 // -Nøkkelkort og adgangskoder
+// -Interaktive dører (åpne, låste ... )
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
 // -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!  DONE!
@@ -44,8 +47,6 @@ int main() {
     std::vector<std::shared_ptr<item>> inventory;
 
     Room* currentRoom = buildWorld(allRooms);
-
-
 
     //2. SPILLER-TILSTAND
     bool running = true;

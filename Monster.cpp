@@ -1,4 +1,5 @@
 #include "Monster.h"
+#include "Item.h"
 
 monsterManual::monsterManual() {
     // Starter RNG (Mersenne Twister)
@@ -16,7 +17,13 @@ monsterManual::monsterManual() {
         .attackDamage = 4, 
         .xpReward = 5, 
         .monsterAC = 10,
-        .attackMessage = "Kaster en 'Git Push Force' som korrumperer filene dine!"
+        .attackMessage = "Kaster en 'Git Push Force' som korrumperer filene dine!",
+        .minDataReward = 128,
+        .maxDataReward = 512,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 5 }
+        }
     });
     blueprintDatabase[1].push_back({
         .name = "The Cookie Banner",

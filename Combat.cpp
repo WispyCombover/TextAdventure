@@ -1,6 +1,7 @@
 #include "Combat.h"
 #include "Utils.h"
 #include "Monster.h"
+#include "Spells.h"
 #include <iostream>
 #include <algorithm>
 
@@ -16,7 +17,11 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
     std::cout << "---------------------------------------\n";
 
     while (m->hp > 0 && p.playerHP > 0) {
-        std::cout << "Hva gjør du? [angrip / flykt / kast <gjenstand>]\n> ";
+        std::cout << "Hva gjør du? [angrip / flykt / kast <gjenstand>\n> ";
+        if (hasSpellbook(inventory)) {
+            std::cout << " / cast <formel>";
+        }
+        std::cout << "]\n> ";
         std::string combatInput;
         std::getline(std::cin, combatInput);
 
@@ -98,10 +103,32 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 return true;
             }
         }
+        else if (combatInput == "cast" || combatInput.rfind("cast ", 0) == 0) {
+            if (combatInput == "cast") {
+                listSpells(p, inventory);
+                continue;
+            }
+            castResult r = castSpell(p, combatInput.substr(5), m, currentRoom, inventory);
+
+            if (!spellUsedTurn(r)) continue;   //Feil input gjør ikke at man mister runden
+
+            if (r == castResult::PlayerDied) {
+                std::cout << "\n=== GAME OVER ===\n";
+                std::cout << "Du døde av din egen trylleformel. Mimir logger deg ut, og du tør sverge på at du så ham riste på hodet.\n";
+                return false;
+            }
+            if (m->hp <= 0) {
+                std::cout << "Du beseiret " << m->name << " med magi! Veien videre er klar.\n";
+                p.gainXp(m->xpReward);
+                currentRoom->monster = nullptr;
+                return true;
+            }
+        }
         else if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
+            int caffeineMod = p.getEffectBonus(StatusType::caffeineRush) + p.getEffectBonus(StatusType::sugarCrash);
             int playerAttackRoll = rollDice(20);
             int attackBonus = p.playerLvl; //Usikker på om jeg vil gi såpass med bonus uten at spilleren har et magisk våpen
-            int totalAttack = playerAttackRoll + attackBonus;
+            int totalAttack = playerAttackRoll + attackBonus + caffeineMod;
 
             int targetAC = m->monsterAC;  
 
@@ -114,7 +141,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                     bonusDamage = rollDice(8);       //Er dette fair? Eller bør den revurderes?  D&D-regler sier man skal doble dmg ved crit...
                 }
 
-                int damageDealt = p.playerBaseDamage + bonusDamage;
+                int damageDealt = p.playerBaseDamage + bonusDamage + p.getEffectBonus(StatusType::caffeineRush);
                 std::string usedWeaponName = "knyttnevene";
                 std::string currentDamageType = "Bludgeoning";
 
@@ -202,6 +229,14 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 std::cout << "Flaks! Du dukker unna angrepet til " << m->name << ".\n";
             }
         }
+        if (!p.activeEffects.empty()) {
+            std::cout << "Aktive effekter: ";
+            for (const auto& eff : p.activeEffects) {
+                std::cout << "[" << eff.name << " (" << eff.turnsRemaining << " runder)] ";
+            }
+            std::cout << "\n";
+        }
+        p.tickEffects();
     }
     return true;
 }
