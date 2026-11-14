@@ -119,7 +119,11 @@ monsterManual::monsterManual() {
         .attackDamage = 25, 
         .xpReward = 225, 
         .monsterAC = 19,
-        .attackMessage = "Kaster 'ASAP-panikk' over deg, spiser opp nattesøvnen din, og tvinger deg til å rulle ut uferdig kode i produksjon!"
+        .attackMessage = "Kaster 'ASAP-panikk' over deg, spiser opp nattesøvnen din, og tvinger deg til å rulle ut uferdig kode i produksjon!",
+        .lootTable = {
+            { getItem("produksjonsnøklene"), 100 },
+            { getItem("gammel smultring"), 5 }
+        }
     });
 }
 

@@ -12,6 +12,25 @@
 #include <string>
 #include <limits>
 
+std::string getSlotName(int slot) {
+    switch (slot) {
+        case 1: return "Hode";
+        case 2: return "Kropp";
+        case 3: return "Armer";
+        case 4: return "Ben";
+        case 5: return "Skjold";
+        default: return "Ukjent";
+    }
+}
+
+bool isItemEquipped(const player& p, const std::shared_ptr<item>& it) {
+    if (p.equippedWeapon == it) return true;
+    for (const auto& [slot, armourPiece] : p.equippedArmour) {
+        if (armourPiece == it) return true;
+    }
+    return false;
+}
+
 void useConsumable(player& p, const item& it) {
     int amount = it.effectFlatBonus;
     for (int i = 0; i < it.effectDiceCount; ++i) {
@@ -189,6 +208,15 @@ void sellToMerchant(NPC &npc, player &p, std::vector<std::shared_ptr<item>> &inv
                 p.equippedWeapon = nullptr;
                 std::cout << "Du la bort " << selectedItem->name << " før du solgte det.\n";
             }
+
+            
+        for (auto& [slot, armourPiece] : p.equippedArmour) {
+            if (armourPiece == selectedItem) {
+                armourPiece = nullptr;
+                std::cout << "Du tok av deg " << selectedItem->name << " før du solgte den.\n"; 
+            }
+        }
+
 
             p.dataBalanceKB += sellPriceKB;
             npc.shopInventory.push_back(*selectedItem);
@@ -421,6 +449,22 @@ namespace
         {
             p.equippedWeapon = selectedItem;
             std::cout << "Du utstyrte deg med: " << selectedItem->name << "!\n";
+        }
+        else if (lowerType == "armour" || lowerType == "armor" || lowerType == "rustning" || lowerType == "shield" || lowerType == "skjold")
+        {
+            int slot = selectedItem->equipSlot;
+            if (slot < 1 || slot > 5) {
+                std::cout << selectedItem->name << " mangler en gyldig equipSlot (1-5).\n";
+                return;
+            }
+
+            //Hvis det allerede er noe i denne sloten, bytt ut
+            if (p.equippedArmour.count(slot) && p.equippedArmour[slot] != nullptr) {
+                std::cout << "Du tok av deg " << p.equippedArmour[slot]->name << " (" << getSlotName(slot) << ").\n";
+            }
+
+            p.equippedArmour[slot] = selectedItem;
+            std::cout << "Du tok på deg " << selectedItem->name << " [" << getSlotName(slot) << selectedItem->acBonus << " AC). Total AC er nå " << p.getTotalAC() << ".\n";
         }
         else if (lowerName == "kaffekopp" || lowerName == "kaffe" || lowerName == "drink")
         {
@@ -685,6 +729,15 @@ bool processCommand(
         }
         else{
             handleUnlock(target, currentRoom, inventory);
+        }
+    }
+    else if (lowerInput.rfind("ta på", 0) == 0)
+    {
+        std::string equipTarget = (input.length() > 6) ? input.substr(6) : "";
+        if (equipTarget.empty()) {
+            std::cout << "Hva vil du ta på deg?\n";
+        } else {
+            handleUse(equipTarget, p, currentRoom, inventory);
         }
     }
     else if (verb == "ta" || verb == "take")

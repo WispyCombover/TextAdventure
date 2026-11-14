@@ -11,13 +11,12 @@ static void onMonsterDefeated(monster* m, player& p, Room* currentRoom) {
     p.gainXp(m->xpReward);
 
     //MONEY MONEY MONEY (kB)
-    if (m->maxDataReward > 0 && m->maxDataReward >= m->minDataReward) {
-        long long range = m->maxDataReward - m->minDataReward +1;
-        long long droppedKB = m->minDataReward + rollDice(static_cast<int>(range)) - 1);
-
+    if (m->maxDataReward > 0) {
+        long long droppedKB = rollRange(m->minDataReward, m->maxDataReward);
+        
         if (droppedKB > 0) {
             p.dataBalanceKB += droppedKB;
-            std::cout << "[LOOT] Du hstet " << formatDataCurrency(droppedKB) << " fra restene av " << m->name << "!\n";
+            std::cout << "[LOOT] Du høstet " << formatDataCurrency(droppedKB) << " fra restene av " << m->name << "!\n";
         }
     }
 

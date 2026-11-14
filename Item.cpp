@@ -107,6 +107,85 @@ namespace {
             .consumeText = "Du tar en bit. Den knaser på feil steder. Magen din angrer umiddelbart."
         },
 
+        // ====== ARMOUR / SHIELDS ======
+        // Light armour
+        {
+            .name = "Utslitt eventhettegenser",     // +1AC
+            .description = "En falmet hettegenser fra et hackathon i 2019. Demper de verste slagene og skjuler deg for prosjektledere.",
+            .value = 1,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 2          // 1 = head, 2 = body, 3 = arms, 4 = legs, 5 = Off hand shield
+        },
+        {
+            .name = "Støydempende headsett",        // +1AC
+            .description = "Sony WH-1000XM5 med aktiv støykansellering. Du hører ikke angrepene, så de gjør beviselig mindre vondt.",
+            .value = 3,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 1
+        },
+        {
+            .name = "Blålysbriller",                // +2AC
+            .description = "Beskytter øynene mot skarpe skjermer og passiv-aggressive Slack-meldinger.",
+            .value = 750,
+            .currency = "kB",
+            .type = "armour",
+            .equipSlot = 1
+        },
+
+        //Medium armour
+        {
+            .name = "Anti-statisk armlenke",        // +2AC
+            .description = "Koblet til jord. Jorder elektriske støt og dårlige vibber fra serverrommet.",
+            .value = 4,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 3
+        },
+        {
+            .name = "Kevlar-forsterket laptopsekk", // +2AC
+            .description = "Den klassisk sekken alle konsulenter bærer på ryggen. Stopper det meste som kommer bakfra.",
+            .value = 6,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 2
+        },
+        {
+            .name = "Laminert GDPR-skjold",         // +3AC - off hand shield
+            .description = "Et tungt, innbundet eksemplar av personvernforordningen. Får enhver angriper til å nøle av ren byråkratisk frykt.",
+            .value = 5,
+            .currency = "MB",
+            .type = "shield",
+            .equipSlot = 5
+        },
+
+        // Heavy armour
+        {
+            .name = "Brannmur-kappe (Enterprise Firewall)", // +4AC
+            .description = "En tung kappe vevd av optiske fiberkabler og strenge tilgangslister. Blokkerer 99.9% av uautoriserte treff.",
+            .value = 25,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 2
+        },
+        {
+            .name = "Zero-Trust Rustning",                  // +5AC
+            .description = "En heldekkende drakt som krever tofaktor autentisering for hvert eneste sverdslag som prøver å trenge gjennom.",
+            .value = 75,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 2
+        },
+        {
+            .name = "Air-Gapped Serverkabinett",            // +6AC
+            .description = "Du har bokstavelig talt tredd et 19-tommers stål-rack over overkroppen. Tungt som bly, men fullstendig immun mot nettverksangrep.",
+            .value = 250,
+            .currency = "MB",
+            .type = "armour",
+            .equipSlot = 2
+        },
+
         // ====== QUEST / MAGIC ======
         {
             .name = "necronomicon manualis",
@@ -122,6 +201,14 @@ namespace {
             .value = 0,
             .currency = "kB",
             .type = "key",
+            .isQuestItem = true
+        },
+        {
+            .name = "produksjonsnøklene",
+            .description = "",
+            .value = 0,
+            .currency = "kB",
+            .type = "",
             .isQuestItem = true
         }
     };

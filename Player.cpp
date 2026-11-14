@@ -2,6 +2,25 @@
 #include "Utils.h"
 #include <iostream>
 
+static std::string getSlotName(int slot) {
+    switch (slot) {
+        case SlotHead: return "Hode";
+        case SlotBody: return "Kropp";
+        case SlotArms: return "Armer";
+        case SlotLegs: return "Ben";
+        case SlotOffHandShield: return "Shield";
+        default:       return "Ukjent";
+    }
+}
+
+int player::getTotalAC() const {
+    int total = playerAC;
+    for (const auto& [slot, armourPiece] : equippedArmour) {
+        total += armourPiece->acBonus;
+    }
+    return total;
+}
+
 void player::gainXp(int amount) {
     playerXP += amount;
     std::cout << "\n[XP] Du fikk " << amount << " XP!\n";

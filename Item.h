@@ -2,6 +2,15 @@
 #include <string>
 #include <vector>
 
+enum ArmourSlot {
+    SlotNone = 0,
+    SlotHead = 1,
+    SlotBody = 2,
+    SlotArms = 3,
+    SlotLegs = 4,
+    SlotOffHandShield = 5
+};
+
 enum class itemEffect {
     none,
     healHp,             //Gjenoppretter HP med rollDice
@@ -15,13 +24,17 @@ struct item {
     std::string description;
     int value = 0;
     std::string currency = "kB";
-    std::string type;
+    std::string type;   // "weapon", "armour", "consumable"
     int damageDiceSides = 0;
     int damageDiceCount = 0;
     std::string damageType;
     int extraDiceSides = 0;
     int extraDiceCount = 0;
     std::string extraDamageType = "";
+
+    //Rustning
+    int acBonus = 0;
+    int equipSlot = SlotNone;
 
     // Consumable / Potion stats
     itemEffect effect = itemEffect::none;

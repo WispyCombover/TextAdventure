@@ -4,6 +4,7 @@
 
 int rollDice(int sides);
 
+long long rollRange(long long min, long long max);
 long long convertToKB(long long amount, const std::string& unit);
 std::string formatDataCurrency(long long kb);
 

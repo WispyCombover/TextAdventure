@@ -7,6 +7,7 @@
 #define NOMINMAX
 #include <windows.h>
 #include "Item.h"
+#include <map>
 
 class Room;
 
@@ -33,6 +34,7 @@ struct player {
     int playerBaseDamage = 2;
     int xpToNextLevel = 100;
     int playerAC = 10;
+
     int playerMana = 10;
     int playerMaxMana = 10;
     int caffeineTurns = 0;
@@ -86,4 +88,8 @@ struct player {
 
     //koden ligger i player.cpp - viser til funksjonen her
     void gainXp(int amount);
+
+    std::map<int, std::shared_ptr<item>> equippedArmour;
+
+    int getTotalAC() const;
 };

@@ -2,6 +2,21 @@
 #include <random>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
+
+static std::mt19937& getRng() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    return gen;
+}
+
+long long rollRange(long long min, long long max) {
+    if (min > max) {
+        std::swap(min, max);
+    }
+    std::uniform_int_distribution<long long> dist(min, max);
+    return dist(getRng());
+}
 
 long long convertToKB(long long amount, const std::string& unit) {
     std::string u = toLowerNorwegian(unit);
