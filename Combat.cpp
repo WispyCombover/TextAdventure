@@ -7,6 +7,23 @@
 
 #include "CommandHandler.h"
 
+static void onMonsterDefeated(monster* m, player& p, Room* currentRoom) {
+    p.gainXp(m->xpReward);
+
+    //MONEY MONEY MONEY (kB)
+    if (m->maxDataReward > 0 && m->maxDataReward >= m->minDataReward) {
+        long long range = m->maxDataReward - m->minDataReward +1;
+        long long droppedKB = m->minDataReward + rollDice(static_cast<int>(range)) - 1);
+
+        if (droppedKB > 0) {
+            p.dataBalanceKB += droppedKB;
+            std::cout << "[LOOT] Du hstet " << formatDataCurrency(droppedKB) << " fra restene av " << m->name << "!\n";
+        }
+    }
+
+    currentRoom->monster = nullptr;
+}
+
 bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<item>>& inventory) {
     monster* m = currentRoom->monster.get();
     if (!m) return true; //Ingen monstre her, spillet fortsetter
@@ -98,8 +115,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
             }
             if (m->hp <= 0) {
                 std::cout << "Du beseiret " << m->name << " med et velrettet kast! Veien videre er klar.\n";
-                p.gainXp(m->xpReward);
-                currentRoom->monster = nullptr;
+                onMonsterDefeated(m, p, currentRoom);
                 return true;
             }
         }
@@ -119,8 +135,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
             }
             if (m->hp <= 0) {
                 std::cout << "Du beseiret " << m->name << " med magi! Veien videre er klar.\n";
-                p.gainXp(m->xpReward);
-                currentRoom->monster = nullptr;
+                onMonsterDefeated(m, p, currentRoom);
                 return true;
             }
         }
@@ -168,8 +183,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 }
                 if (m->hp <= 0) {
                     std::cout << "Du beseiret " << m->name << "! Veien videre er klar.\n";
-                    p.gainXp(m->xpReward);  //Gir spilleren XP
-                    currentRoom->monster = nullptr;
+                    onMonsterDefeated(m, p, currentRoom);
                     return true;
                 }
             } else {
