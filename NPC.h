@@ -32,3 +32,4 @@ struct NPC {
 // Genererer NPCer her, definerer dem i NPC.cpp
 std::unique_ptr<NPC> createFirewallGuru(const player& p);
 std::unique_ptr<NPC> createHRRep(const player& p);
+std::unique_ptr<NPC> createSlitenSenior(const player& p);

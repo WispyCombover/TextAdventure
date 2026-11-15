@@ -71,6 +71,17 @@ monsterManual::monsterManual() {
         .monsterAC = 15,
         .attackMessage = "Oppretter tre nye sub-tasks som du MÅ løse med én gang!"
     });
+    blueprintDatabase[2].push_back({
+        .name = "Rogue Pointer",
+        .description = "En glitrende, ustabil anomali av rå minnedata og løse pekere som peker rett ut i intet. Den flimrer inn og ut av eksistens med en skarp, statisk knitring.",
+        .level = 2,
+        .hp = 20,
+        .maxHp = 20,
+        .attackDamage = 5,
+        .xpReward = 20,
+        .monsterAC = 14,
+        .attackMessage = "Hopper til en uallokert minneadresse og kaster en 'Segmentation Fault (core dumped)' rett i brystet ditt!"
+    });
 
     // LEVEL 3
     blueprintDatabase[3].push_back({

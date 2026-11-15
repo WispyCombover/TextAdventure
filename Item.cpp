@@ -186,6 +186,16 @@ namespace {
             .equipSlot = 2
         },
 
+        // ====== MISC ======
+        {
+            .name = "liten gummiand",
+            .description = "",
+            .value = 500,
+            .currency = "kB",
+            .type = "En lommeutgave av den klassiske gule gummianden. Den piper svakt og dømmende når du klemmer på den, men hjelper deg å tenke klart når koden nekter å kompilere.",
+            .isQuestItem = false
+        },
+
         // ====== QUEST / MAGIC ======
         {
             .name = "necronomicon manualis",
@@ -205,7 +215,7 @@ namespace {
         },
         {
             .name = "produksjonsnøklene",
-            .description = "",
+            .description = "Et tungt knippe med krypterte USB-nøkler og et laminert kort merket 'ROOT ACCESS - PROD'. Med disse kan du endelig rulle ut fiksen og redde dagen.",
             .value = 0,
             .currency = "kB",
             .type = "",

@@ -2,6 +2,7 @@
 #include "Item.h"
 #include "Monster.h"
 #include "NPC.h"
+#include "Player.h"
 #include <sstream>
 #include <iomanip>
 #include <cstdint>
@@ -13,7 +14,7 @@ static std::string getMemoryAddress(const Room* roomPtr) {
     return oss.str();
 }
 
-Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
+Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) {
     //BYGG ROMMENE HER
     auto spawnRoom = std::make_unique<Room>(
         "Møterommet",
@@ -21,7 +22,15 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     );
     auto corridor = std::make_unique<Room>(
         "Korridoren",
-        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er flere dører til tilstøtende møterom langs veggene. På dørene til møterommene står der romnumre som.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake gjennom DØR til møterommet du nettopp forlot."
+        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er flere dører til tilstøtende møterom langs veggene. På dørene til møterommene står der romnumre som.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot."
+    );
+    auto rubberDuckSanctum = std::make_unique<Room>(
+        "Rubber Duck Sanctum",
+        "Du river opp døren og avbryter et intenst enmannsmøte. Lyset er dempet, og midt på konferanseborde står en diger, gul gummiand på en liten fløyelspute, belyst av en skrivebordslampe. Ved bordenden sitter en tydelig utslitt utvikler med bustete hår og stirrende blikk, som stopper brått midt i en setning og ser forfjamset på deg. Du kan gå ut igjen gjennom DØR."
+    );
+    auto salaSegfault = std::make_unique<Room>(
+        "Sala Segfault",
+        "I det du åpner døren, møtes du av et kaotisk syn. Møterommet ser ut til å ha krasjet midt i en kvartalspresentasjon. Stoler ligger veltet, dokumenter flyr rundt som konfetti, og prosjektoren på veggen viser en blendende blåskjerm. Midt i rommet svever en glitrende, ustabil anomali av rå minnedata og løse pekere som freser illevarslende. Utgangen er tilbake gjennom DØR."
     );
     auto corridorWest = std::make_unique<Room>(
         "Korridoren mot vest",
@@ -35,6 +44,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
 
     //HENT MINNEADRESSENE TIL ROMMENE DER DET ER AKTUELT
     std::string spawnAddr = getMemoryAddress(spawnRoom.get());
+    std::string rubberDuckSanctumAddr = getMemoryAddress(rubberDuckSanctum.get());
+    std::string salaSegfaultAddr = getMemoryAddress(salaSegfault.get());
 
     //UTGANGER HER
     //Spawn (møterommet)
@@ -48,7 +59,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     };
 
     //Corridor
-    corridor->exits["dør"] = {
+    corridor->exits["kaffekoppens krypt"] = {
         spawnRoom.get(),
         true,
         false,
@@ -62,7 +73,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
         true,
         false,
         "",
-        "Når du ser mot vest kan du se hjørnet med døren inn til REKVISITA. Veien fortsetter nordover derfra og inn i kontorlandskapet."
+        "Når du ser mot vest kan du se døren inn til møterommet 'RUBBER DUCK SANCTUM', forbi døren fortsetter korridoren net til hjørnet med døren inn til REKVISITA. Veien fortsetter nordover derfra og inn i kontorlandskapet."
     };
     corridor->exits["øst"] = {
         corridorEast.get(),
@@ -70,7 +81,23 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
         true,
         false,
         "",
-        "Mot øst kan du se korridoren lede forbi mange lukkede og opptatte møterom og ned til kaffekroken der også kopirommet ligger."
+        "Mot øst kan du se korridoren lede forbi møterommet 'SALA SEGFAULT' og ned til kaffekroken der også kopirommet ligger."
+    };
+    corridor->exits["rubber duck sanctum"] = {
+        rubberDuckSanctum.get(),
+        true,
+        false,
+        false,
+        "",
+        "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Rubber Duck Sanctum' samt romnummeret. Dette rommet har nummer: " + rubberDuckSanctumAddr
+    };
+    corridor->exits["sala segfault"] = {
+        salaSegfault.get(),
+        true,
+        false,
+        false,
+        "",
+        "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Sala Segfault' samt romnummeret. Dette rommet har nummer: " + salaSegfaultAddr
     };
 
     //Corridor-West
@@ -93,16 +120,44 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
         "Du ser tilbake ned korridoren mot vest. Der ligger møterommet 'Kaffekoppens Krypt', og veien videre mot rekvisitalageret"
     };
 
+    rubberDuckSanctum->exits["dør"] = {
+        corridor.get(),
+        true,
+        false,
+        false,
+        "",
+        "Døren tilbake til den knirkende korridoren."
+    };
+
+    salaSegfault->exits["dør"] = {
+        corridor.get(),
+        true,
+        false,
+        false,
+        "",
+        "Døren ut igjen til korridoren. Det frister veldig å lukke den godt bak seg!"
+    };
+
     // LEGG TIL ITEMS
     spawnRoom->items.push_back(getItem("kaffekopp"));
     spawnRoom->items.push_back(getItem("penn"));
+
+    rubberDuckSanctum->items.push_back(getItem("liten gummiand"));
+
+    salaSegfault->items.push_back(getItem("adgangskort"));  //Tror adgangskortene må gjøres spesifikke, men enn så lenge har vi ett!
 
     // RANDOM ENCOUNTERS
     monsterManual manual;
     corridorEast->monster = manual.getRandomMonster(1);  // Spawner et tilfeldig level 1 monster i østkorridoren
 
+    // FAST ENCOUNTER
+    salaSegfault->monster = manual.getMonsterBlueprint(2, "Rogue Pointer");
+
+
+
     // NPCer
     //openOfficeOne->npcs.push_back(createFirewallGuru());
+    rubberDuckSanctum->npcs.push_back(createSlitenSenior(p));
 
     //SCENERY
     //Spawn
@@ -113,7 +168,24 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     spawnRoom->scenery["bord"] = "Et langt konferansebord i falsk eikefiner. Det er klissete på ett sted.";
     
     //Korridoren ut fra møterommet (spawn)
-    corridor->scenery["dør"] = "Du lukket som vanlig døren bak deg. På døren henger et skilt som viser navnet på møterommet samt romnummeret. Dette møterommet heter 'Kaffekoppens krypt' og har romnummer: " + spawnAddr;
+    corridor->scenery["kaffekoppens krypt"] = "Døren til møterommet 'Kaffekoppens krypt' (" + spawnAddr + "). Det frostede glasset skjuler rommet der det hele startet, og ved siden av dørkarmen henger en gulnet lapp med teksten: 'Vennligst rydd ut kopper etter møtet - vi har ikke garbage collection her'.";
+    corridor->scenery["rubber duck sanctum"] = "Døren inn til 'Rubber Duck Sanctum' (romnummer: " + rubberDuckSanctumAddr + "). På dørhåndtaket henger en liten lapp hvor det står: 'Ikke forstyrr - dyp feilsøking pågår'. Du syns du hører noen hviske forklaringer om pekere og minnelekkasjer innenfra.";
+    corridor->scenery["sala segfault"] = "På skiltet står det 'Sala Segfault' (" + salaSegfaultAddr + "). Det ser ut som om noen har prøvd å sparke opp døren fra innsiden, og under romnummeret har noen skrevet 'core dumped' med sprittusj.";
+
+    //Rubber Duck Sanctum
+    rubberDuckSanctum->scenery["gummiand"] = "En 30 centimeter høy, knall gul gummiand. Den har et dømmende, men tålmodig uttrykk i sine malte øyne, som om den allerede vet at feilen ligger på linje 42.";
+    rubberDuckSanctum->scenery["and"] = "En 30 centimeter høy, knall gul gummiand. Den har et dømmende, men tålmodig uttrykk i sine malte øyne, som om den allerede vet at feilen ligger på linje 42.";
+    rubberDuckSanctum->scenery["utvikler"] = "En seniorutvikler i falmet hettegenser. Han holder et halvt oppspist knekkebrød med brunost i den ene hånden, og peker med den andre på en skjerm full av rød feilmeldingstekst. Han mumler irritert: 'Jeg var SÅ nær ved å forstå hvorfor pekeren var null...'.";
+    rubberDuckSanctum->scenery["skjerm"] = "Skjermen viser et terminalvindu med en endeløs strøm av stack traces og en åpen fane på StackOverflow fra 2014.";
+    rubberDuckSanctum->scenery["laptop"] = "Skjermen viser et terminalvindu med en endeløs strøm av stack traces og en åpen fane på StackOverflow fra 2014.";
+
+    //Sala Segfault
+    salaSegfault->scenery["blåskjerm"] = "Prosjektoren lyser opp hele rommet med en knallblå feilmelding: 'FATAL ERROR: Unhandled meeting exception at address " + salaSegfaultAddr + ". System halted.'";
+    salaSegfault->scenery["prosjektor"] = "Prosjektoren lyser opp hele rommet med en knallblå feilmelding: 'FATAL ERROR: Unhandled meeting exception at address " + salaSegfaultAddr + ". System halted.'";
+    salaSegfault->scenery["vegg"] = "Prosjektoren lyser opp hele rommet med en knallblå feilmelding: 'FATAL ERROR: Unhandled meeting exception at address " + salaSegfaultAddr + ". System halted.'";
+    salaSegfault->scenery["dokumenter"] = "Utskrifter av arkitekturdiagrammer som gir absolutt ingen mening. Noen har skrevet 'HVEM SKREV DETTE?!' med rød tusj over hele forsiden.";
+    salaSegfault->scenery["papirer"] = "Utskrifter av arkitekturdiagrammer som gir absolutt ingen mening. Noen har skrevet 'HVEM SKREV DETTE?!' med rød tusj over hele forsiden.";
+    salaSegfault->scenery["stoler"] = "Kontorstoler som er veltet i panikk. Det ser ut som møtedeltakerne bokstavelig talt fordampet da krasjet inntraff.";
 
     //Korridoren mot vest
     corridorWest->scenery["kortleser"] = "En standard RFID-kortleser. Den blinker utålmodig med et lite rødt lys.";
@@ -131,6 +203,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     //LEGG ROMMENE I allRooms-vektoren
     allRooms.push_back(std::move(spawnRoom));
     allRooms.push_back(std::move(corridor));
+    allRooms.push_back(std::move(rubberDuckSanctum));
+    allRooms.push_back(std::move(salaSegfault));
     allRooms.push_back(std::move(corridorWest));
     allRooms.push_back(std::move(corridorEast));
 

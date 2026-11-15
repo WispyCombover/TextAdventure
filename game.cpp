@@ -40,7 +40,7 @@ int main() {
     std::vector<std::unique_ptr<Room>> allRooms;
     std::vector<std::shared_ptr<item>> inventory;
 
-    Room* currentRoom = buildWorld(allRooms);
+    Room* currentRoom = buildWorld(allRooms, p);
 
     bool running = true;
 

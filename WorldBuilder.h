@@ -3,4 +3,4 @@
 #include <memory>
 #include "Room.h"
 
-Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms);
+Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p);
