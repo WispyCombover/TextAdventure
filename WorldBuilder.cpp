@@ -22,7 +22,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     );
     auto corridor = std::make_unique<Room>(
         "Korridoren",
-        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er flere dører til tilstøtende møterom langs veggene. På dørene til møterommene står der romnumre som.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot."
+        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er dører inn til to andre møterom langs veggen: 'RUBBER DUCK SANCTUM' og 'SALA SEGFAULT'.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot."
     );
     auto rubberDuckSanctum = std::make_unique<Room>(
         "Rubber Duck Sanctum",

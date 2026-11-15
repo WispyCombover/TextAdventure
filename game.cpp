@@ -24,8 +24,7 @@
 //TO-DO AND WISHLIST:
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
-// -Nøkkelkort og adgangskoder
-// -Interaktive dører (åpne, låste ... )
+// -Nøkkelkort og adgangskoder....WIP
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
 // -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!  DONE!

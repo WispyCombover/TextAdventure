@@ -22,7 +22,7 @@ monsterManual::monsterManual() {
         .maxDataReward = 512,
         .lootTable = {
             { getItem("rød monster"), 75 },
-            { getItem("gammel smultring"), 5 }
+            { getItem("gammel smultring"), 50 }
         }
     });
     blueprintDatabase[1].push_back({
