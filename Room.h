@@ -27,6 +27,7 @@ class Room {
     std::unique_ptr<monster> monster;  //nullptr for rom der det ikke er monstre
     std::vector<std::unique_ptr<NPC>> npcs;
     std::map<std::string, std::string> scenery;
+    std::map<std::string, std::string> hiddenItems;  //key = scenery-navn (feks 'sofa'), value = item-navn (feks "inntørket vestlandslefse")
 
     Room(std::string n, std::string d);
 

@@ -30,6 +30,7 @@
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
 // -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!  DONE!
 // -Rundeteller/tickers. Dersom kaffen kan drikkes kan den gi en midlertidig Hit-bonus som går over etter, tja, 1d4 ticks? Eller mer?
+// -Hvor er egentlig spillerens skrivebord og PC? Hen jobber jo her...
 //....
 
 int main() {

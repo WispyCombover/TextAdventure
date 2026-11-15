@@ -31,6 +31,121 @@ bool isItemEquipped(const player& p, const std::shared_ptr<item>& it) {
     return false;
 }
 
+void handleExamine(const std::string &targetName, Room *currentRoom, std::vector<std::shared_ptr<item>> &inventory)
+{
+    if (targetName.empty())
+    {
+        std::cout << "Hva vil du undersøke nærmere?\n";
+        return;
+    }
+
+    std::string cleanTarget = toLowerNorwegian(targetName);
+    if (cleanTarget.rfind("på ", 0) == 0)
+    {
+        cleanTarget = cleanTarget.substr(3);
+    }
+
+    //1. Sjekk om det er et item i sekken
+    auto invIt = std::find_if(inventory.begin(), inventory.end(), [&cleanTarget](const std::shared_ptr<item> &i) {
+        return toLowerNorwegian(i->name) == cleanTarget;
+    });
+    if (invIt != inventory.end())
+    {
+        inspectItem(**invIt);
+        return;
+    }
+
+    //2. Shekk om det er et synlig item i rommet
+    auto roomIt = std::find_if(currentRoom->items.begin(), currentRoom->items.end(), [&cleanTarget](const item &i) {
+        return toLowerNorwegian(i.name) == cleanTarget;
+    });
+    if (roomIt != currentRoom->items.end())
+    {
+        inspectItem(*roomIt);
+        return;
+    }
+
+    //3. sjhek om det er et scenery objekt i rommet (og om det skjuler et item)
+    for (const auto &[key, desc] : currentRoom->scenery)
+    {
+        if (key.find(cleanTarget) != std::string::npos || cleanTarget.find(key) != std::string::npos)
+        {
+            std::cout << desc << "\n";
+
+            //Sjekk om scenery objektet har et skjult item
+            auto hiddenIt = currentRoom->hiddenItems.find(key);
+            if (hiddenIt != currentRoom->hiddenItems.end())
+            {
+                item foundItem = getItem(hiddenIt->second);
+                std::cout << "Du roter litt rundt og finner: [" << foundItem.name << "]! (Lagt til i sekken)\n";
+                inventory.push_back(std::make_shared<item>(foundItem));
+                currentRoom->hiddenItems.erase(hiddenIt);   //Fjern itemet
+            }
+            return;
+        }
+    }
+
+    std::cout << "Du finner ingenting uvanlig ved '" << targetName << "'.\n";
+}
+
+void handleCode(const std::string &codeInput, Room *currentRoom)
+{
+    if (currentRoom->scenery.find("kodepanel") == currentRoom->scenery.end())
+    {
+        std::cout << "Det er ikke noe kodepanel her.\n";
+        return;
+    }
+
+    if (codeInput.empty())
+    {
+        std::cout << "Hvilken kode vil du taste inn? (F.eks. '1234')\n";
+        return;
+    }
+    //Finn alle utganger i rommet som har en numerisk kdoe som keyName
+    Exit *matchingDoor = nullptr;
+    bool hasAnyKeypadDoor = false;
+
+    for (auto&[dir, exit] : currentRoom->exits)
+    {
+        //Sjekk om keyName kun består av sifre - altså en PIN-kode, ikke "adgangskort"
+        bool isNumericCode = !exit.keyName.empty() && std::all_of(exit.keyName.begin(), exit.keyName.end(), ::isdigit);
+
+        if (isNumericCode)
+        {
+            hasAnyKeypadDoor = true;
+            if (exit.keyName == codeInput)
+            {
+                matchingDoor = &exit;
+                break;
+            }
+        }
+    }
+
+    if (!hasAnyKeypadDoor)
+    {
+        std::cout << "Kodepanelet ser ikke ut til å være koblet til noen låst dør her.\n";
+        return;
+    }
+
+    if (matchingDoor)
+    {
+        if (!matchingDoor->isLocked)
+        {
+            std::cout << "Panelet lyser allerede grønt. Døren er ulåst!\n";
+        }
+        else
+        {
+            matchingDoor->isLocked = false;
+            matchingDoor->isOpen = true;
+            std::cout << "*BIIIP!* Kodepanelet blinker grønt, og låsen inn til " << matchingDoor->destination->name << " klikker opp!\n";
+        }
+    }
+    else
+    {
+        std::cout << "*BRRRZT!* Rødt lys. Feil kode.\n";
+    }
+}
+
 void useConsumable(player& p, const item& it) {
     int amount = it.effectFlatBonus;
     for (int i = 0; i < it.effectDiceCount; ++i) {
@@ -767,6 +882,11 @@ bool processCommand(
             handleTake(target, currentRoom, inventory);
         }
     }
+    else if (verb == "undersøk" || verb == "inspiser" || verb == "examine" || verb == "inspect")
+    {
+        handleExamine(target, currentRoom, inventory);
+    }
+    
     else if (lowerInput == "status" || lowerInput == "stats" || lowerInput == "utstyr" || lowerInput == "gear")
     {
         std::cout << "\n=== " << p.name << " (Level " << p.playerLvl << ") ===\n";
@@ -873,34 +993,9 @@ bool processCommand(
         }
     }
     else if (verb == "tast" || verb == "kode") {
-        //Sjekk om der er et kodepanel i rommet
-        if (currentRoom->scenery.find("kodepanel") == currentRoom->scenery.end()) {
-            std::cout << "Det er ikke noe kodepanel her.\n";
-            return true;
-        }
-
-        if (target.empty()) {
-            std::cout << "Hvilken kode vil du taste inn? (F.eks. 'tast 1234')\n";
-            return true;
-        }
-        //Finn utgangen som styres av kodepanelet
-        auto exitIt = currentRoom->exits.find("rekvisita");  //Denne må gjøres generell. Vi kommer til å ha flere dører med kodelås...
-        if (exitIt != currentRoom->exits.end()) {
-            Exit& door = exitIt->second;
-
-            if (!door.isLocked) {
-                std::cout << "Panelet lyser allerede grønt. Døren er ulåst!\n";
-            }
-            else if (target == door.keyName) { //Sjekker mot keyName (I dette tilfellet 1357)
-                door.isLocked = false;
-                door.isOpen = true;
-                std::cout << "*BIIIP!* Kodepanelet blinker grønt, og en tung mekanisk lås klikker opp!\n";
-            }
-            else {
-                std::cout << "*BRRRZT!* Rødt lys Feil kode.\n";
-            }
-        }
+        handleCode(target, currentRoom);
     }
+
     else if (lowerInput == "hjelp" || lowerInput == "help" || lowerInput == "?")
     {
         std::cout << "<TITTEL PÅ SPILL HER> er et humoristisk teksteventyr bygget på lesten av klassisk fantasy og med 'lette' D&D-regler.\n";
