@@ -16,7 +16,9 @@ static std::string getSlotName(int slot) {
 int player::getTotalAC() const {
     int total = playerAC;
     for (const auto& [slot, armourPiece] : equippedArmour) {
-        total += armourPiece->acBonus;
+        if (armourPiece != nullptr) {
+            total += armourPiece->acBonus;
+        }
     }
     return total;
 }

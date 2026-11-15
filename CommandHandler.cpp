@@ -154,7 +154,7 @@ void sellToMerchant(NPC &npc, player &p, std::vector<std::shared_ptr<item>> &inv
             long long baseValueKB = convertToKB(currentItem->value, currentItem->currency);
             long long sellPriceKB = baseValueKB / 2;
 
-            bool isEquipped = (p.equippedWeapon != nullptr && p.equippedWeapon == currentItem);
+            bool isEquipped = isItemEquipped(p, currentItem);
 
             std::cout << (i + 1) << ". " << currentItem->name;
             if (isEquipped)
@@ -464,7 +464,7 @@ namespace
             }
 
             p.equippedArmour[slot] = selectedItem;
-            std::cout << "Du tok på deg " << selectedItem->name << " [" << getSlotName(slot) << selectedItem->acBonus << " AC). Total AC er nå " << p.getTotalAC() << ".\n";
+            std::cout << "Du tok på deg " << selectedItem->name << " [" << getSlotName(slot) << "] (+" << selectedItem->acBonus << " AC). Total AC er nå " << p.getTotalAC() << ".\n";
         }
         else if (lowerName == "kaffekopp" || lowerName == "kaffe" || lowerName == "drink")
         {
@@ -482,9 +482,7 @@ namespace
         }
         else if (lowerType == "consumable" || lowerType == "potion")
         {
-            int healAmount = 15;
-            p.playerHP = std::min(p.playerMaxHP, p.playerHP + healAmount);
-            std::cout << "Du brukte " << selectedItem->name << " og fikk " << healAmount << " HP!\n";
+            useConsumable(p, *selectedItem);
             inventory.erase(it);
         }
         else
@@ -751,6 +749,22 @@ bool processCommand(
             handleTake(target, currentRoom, inventory);
         }
     }
+    else if (lowerInput == "status" || lowerInput == "stats" || lowerInput == "utstyr" || lowerInput == "gear")
+    {
+        std::cout << "\n=== " << p.name << " (Level " << p.playerLvl << ") ===\n";
+        std::cout << "HP: " << p.playerHP << "/" << p.playerMaxHP << " | XP: " << p.playerXP << " | Total AC: " << p.getTotalAC() << "\n";
+        std::cout << "Våpen: " << (p.equippedWeapon ? p.equippedWeapon->name : "Ingen (knyttnever)") << "\n";
+
+        for (int slot = 1; slot <= 5; ++slot) {
+            std::cout << getSlotName(slot) << ": ";
+            auto it = p.equippedArmour.find(slot);
+            if (it != p.equippedArmour.end() && it-> second !=nullptr) {
+                std::cout << it->second->name << " (+" << it->second->acBonus << " AC)\n";
+            } else {
+                std::cout << "Tom\n";
+            }
+        }
+    }
     else if (verb == "bruk" || verb == "use" || verb == "utstyr" || verb == "equip")
     {
         if (target.empty())
@@ -801,7 +815,7 @@ bool processCommand(
             for (const auto &it : inventory)
             {
                 std::cout << "- " << it->name << (it->isFilled ? " (full)" : "");
-                if (p.equippedWeapon == it)
+                if (isItemEquipped(p, it))
                 {
                     std::cout << " [Utstyrt]";
                 }
@@ -842,18 +856,19 @@ bool processCommand(
     }
     else if (lowerInput == "hjelp" || lowerInput == "help" || lowerInput == "?")
     {
-        std::cout << " <TITTEL PÅ SPILL HER> er et humoristisk teksteventyr bygget på lesten av klassisk fantasy og med 'lette' D&D-regler.\n";
-        std::cout << " Det fungerer slik at etter hvert som du navigerer rundt i spillverdenen får du opp en beskrivelse av hva du ser.\n";
-        std::cout << " Det vil også stå hvor du potensielt kan bevege deg videre.\n";
-        std::cout << " ---------------------------------------------------------------------------------------------------------------- \n";
-        std::cout << " Måten du interagerer med spillverdenen på er via tekstkommandoer av typen:   \n";
-        std::cout << " For eksempel: ta kopp\n\n";
-        std::cout << " I tillegg har du noen faste kommandoer som kan hjelpe:\n\n";
-        std::cout << " Inventory/inventory/inventar/inv/i/se sekk - åpner inventaret og lister ut innhold\n";
-        std::cout << " Saldo/lommebok - viser hvor mye båndbredde (kB/MB/GB/TB) du har\n";
-        std::cout << " Avslutt/quit/avslutt - avslutter spillet.\n";
-        std::cout << " Save/save/lagre - Lagrer spillet der du står.\n";
-        std::cout << " Load/load/last - Laster inn tidligere lagret spill.\n";
+        std::cout << "<TITTEL PÅ SPILL HER> er et humoristisk teksteventyr bygget på lesten av klassisk fantasy og med 'lette' D&D-regler.\n";
+        std::cout << "Det fungerer slik at etter hvert som du navigerer rundt i spillverdenen får du opp en beskrivelse av hva du ser.\n";
+        std::cout << "Det vil også stå hvor du potensielt kan bevege deg videre.\n";
+        std::cout << "---------------------------------------------------------------------------------------------------------------- \n";
+        std::cout << "Måten du interagerer med spillverdenen på er via tekstkommandoer av typen:   \n";
+        std::cout << "For eksempel: ta kopp\n\n";
+        std::cout << "I tillegg har du noen faste kommandoer som kan hjelpe:\n\n";
+        std::cout << "Inventory/inventory/inventar/inv/i/se sekk - åpner inventaret og lister ut innhold\n";
+        std::cout << "Saldo/lommebok - viser hvor mye båndbredde (kB/MB/GB/TB) du har\n";
+        std::cout << "Avslutt/quit/avslutt - avslutter spillet.\n";
+        std::cout << "Save/save/lagre - Lagrer spillet der du står.\n";
+        std::cout << "Load/load/last - Laster inn tidligere lagret spill.\n";
+        std::cout << "Status/stats/utstyr/gear - Viser din nåværende status.\n";
     }
     else if (lowerInput == "panikk" || lowerInput == "panic")
     {

@@ -13,10 +13,18 @@ static void onMonsterDefeated(monster* m, player& p, Room* currentRoom) {
     //MONEY MONEY MONEY (kB)
     if (m->maxDataReward > 0) {
         long long droppedKB = rollRange(m->minDataReward, m->maxDataReward);
-        
+
         if (droppedKB > 0) {
             p.dataBalanceKB += droppedKB;
             std::cout << "[LOOT] Du høstet " << formatDataCurrency(droppedKB) << " fra restene av " << m->name << "!\n";
+        }
+    }
+
+    //ITEM DROPS
+    for (const auto& entry : m->lootTable) {
+        if (rollDice(100) <= entry.dropChancePercent) {
+            currentRoom->items.push_back(entry.dropItem);
+            std::cout << "[LOOT] " << m->name << " mistet: " << entry.dropItem.name << "!\n";
         }
     }
 
@@ -216,10 +224,11 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
 
             int monsterAttackRoll = rollDice(20);
             int monsterTotalAttack = monsterAttackRoll + m->level;  //Level bonus
+            int currentPlayerAC = p.getTotalAC();
 
             std::cout << m->name << " triller for å treffe deg... Det fikk " << monsterTotalAttack << " mot din AC " << p.playerAC << ".\n";
 
-            if (monsterTotalAttack >= p.playerAC) {
+            if (monsterTotalAttack >= currentPlayerAC) {
 
                 int monsterBonusDamage = 0;
                 if (monsterAttackRoll == 20) {

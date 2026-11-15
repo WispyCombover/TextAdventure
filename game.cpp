@@ -41,16 +41,16 @@
 int main() {
     SetConsoleOutputCP(CP_UTF8); // Sørger for å støtte norske tegn
     SetConsoleCP(CP_UTF8);       // Sørger for å støtte norske tegn
-    //std::vector<std::unique_ptr<Room>> allRooms;
+
     player p;
     std::vector<std::unique_ptr<Room>> allRooms;
     std::vector<std::shared_ptr<item>> inventory;
 
     Room* currentRoom = buildWorld(allRooms);
 
-    //2. SPILLER-TILSTAND
     bool running = true;
 
+//INTROTEKST
 std::cout << "====================================================================\n";
 std::cout << "   MIMIR OS v0.9-alpha // EMERGENCY RECOVERY PROTOCOL INITIATED     \n";
 std::cout << "====================================================================\n\n";
@@ -67,11 +67,57 @@ std::cout << "Du strammer stroppene på din +2 Ergonomiske Laptop-sekk og snur\n
 std::cout << "deg resolutt og bestemt. Endelig en oppgave som er deg verdig!\n";
 
 std::cout << "--------------------------------------------------------------------\n";
-std::cout << "Skriv 'hjelp' for kommandoer (eller 'panikk' for å gråte stille).\n\n";
+
+//SPILLER-AUTENTISERING (NAVN)
+std::cout << "[MIMIR]: 'Før jeg gir deg tilgang til produksjonsmiljøet, må jeg\n";
+std::cout << "loggføre hvem som er på vakt.'\n";
+
+while (true) {
+    std::cout << "Oppgi brukernavn / navn: > ";
+    std::string rawName;
+    std::getLine(std::cin, rawName);
+
+    size_t first = rawName.find_first_not_of(" \t\r\n");
+    if (first != std::string::npos) {
+        size_t last = rawName.find_last_not_of(" \t\r\n");
+        p.name = rawName.substr(first, last - first + 1);
+        break;
+    }
+    std::cout << "[MIMIR]: 'Ugyldig brukernavn. Tom streng godtas ikke i AD.'\n";
+}
+std::cout << "\n[MIMIR]: 'Autentisering godkjent. Velkommen, " << p.name << "!'\n";
+
+//VENT PÅ 'START'
+while (true) {
+    std::cout << "Skriv 'start' for å starte recovery-protokollen (eller 'last' for lagret spill): > ";
+    std::string startCmd;
+    std::getLine(std::cin, startCmd);
+
+    std::string cleanCmd = toLowerNorwegian(startCmd);
+    if (cleanCmd == "start") {
+        std::cout << "\nInitialiserer sesjon for " << p.name << "...\n";
+        std::cout << "Skriv 'hjelp' for kommandoer (eller 'panikk' for å gråte stille).\n\n";
+        break;
+    }
+    else if (cleanCmd == "last" || cleanCmd == "load") {
+        if (loadGame(p, currentRoom, allRooms, inventory)) {
+            std::cout << "\nLagret sesjon gjenopprettet! Velkommen tilbake, " << p.name << ".\n";
+            break;
+        } else {
+            std::cout << "[MIMIR]: 'Fant ingen lagringsfil i systemet. Skriv 'start' for ny sesjon.'\n";
+        }
+    }
+    else if (cleanCmd == "avslutt" || cleanCmd == "quit") {
+        return 0;
+    }
+    else {
+        std::cout << "[MIMIR]: 'Ukjent kommando. Skriv 'start' for å begynne.'\n";
+    }
+}
 
     printRoomDescription(currentRoom);
 
-    //3. GAME-LOOP
+    //GAME-LOOP
     while (running) {
 
 
