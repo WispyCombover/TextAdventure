@@ -22,6 +22,7 @@
 #include "Spells.h"
 
 //TO-DO AND WISHLIST:
+// -Sub-quests og quest-givers. En som sender spilleren til kjelleren, fordi det er naturligvis der postmottaket er, for å hente ...
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
 // -Nøkkelkort og adgangskoder....WIP

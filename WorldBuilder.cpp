@@ -46,7 +46,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     );
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
-        "Du kommer til et lite hjørne av korridoren. Du kan høre banking fra døren til kopirommet, og lyden av dempet prat fra møterommet mot SØR. Møterommet heter: 'THE BIKESHED'. Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD som har et skilt med 'KOPIROM'. Ved siden av døren til kopirommet henger en kortleser." //Man skal kunne snakke med personen som er innelåst på kopirommet. "snakk dør" eller noe slikt...
+        "Du kommer til et lite hjørne av korridoren. Du kan høre banking fra døren til kopirommet, og lyden av engasjert prat fra møterommet mot SØR. Møterommet heter: 'THE BIKESHED'. Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD som har et skilt med 'KOPIROM'. Ved siden av døren til kopirommet henger en kortleser." //Man skal kunne snakke med personen som er innelåst på kopirommet. "snakk dør" eller noe slikt...
     );
     auto copyRoomOne = std::make_unique<Room>(
         "Kopirommet",
@@ -174,7 +174,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         false,
         false,
         "",
-        ""
+        "Denne døren leder inn til møterommet 'The Bikeshed' med romnummer " + theBikeshedAddr + " Det pågår en høylydt diskusjon der inne."
     };
 
     supplyRoom->exits["dør"] = {
@@ -186,7 +186,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         ""
     };
 
-    openOfficeOne->exits["south"] = {
+    openOfficeOne->exits["sør"] = {
         corridorWest.get(),
         false,
         true,
@@ -222,6 +222,15 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         "Døren ut igjen til korridoren og kaffekroken."
     };
 
+    copyRoomOne->exits["dør"] = {
+        corridorEast.get(),
+        true,
+        false,
+        false,
+        "",
+        "Døren ut igjen til kaffekroken. På denne siden henger det en lapp der det står: 'Døren kan kun låses opp utenfra'."
+    };
+
     // LEGG TIL ITEMS
     spawnRoom->items.push_back(getItem("kaffekopp"));
     spawnRoom->items.push_back(getItem("penn"));
@@ -244,7 +253,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     // NPCer
     openOfficeOne->npcs.push_back(createFirewallGuru(p));
     rubberDuckSanctum->npcs.push_back(createSlitenSenior(p));
-    //copyRoomOne->npcs.push_back(createLockedInSecops());
+    copyRoomOne->npcs.push_back(createFreedSecops(p));
+    corridorEast->npcs.push_back(createLockedInSecopsVoice(p));
 
     //SCENERY
     //Spawn
@@ -261,17 +271,17 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
     //Rubber Duck Sanctum
     rubberDuckSanctum->scenery["gummiand"] = "En 30 centimeter høy, knall gul gummiand. Den har et dømmende, men tålmodig uttrykk i sine malte øyne, som om den allerede vet at feilen ligger på linje 42.";
-    rubberDuckSanctum->scenery["and"] = "En 30 centimeter høy, knall gul gummiand. Den har et dømmende, men tålmodig uttrykk i sine malte øyne, som om den allerede vet at feilen ligger på linje 42.";
+    rubberDuckSanctum->scenery["and"] = rubberDuckSanctum->scenery["gummiand"];
     rubberDuckSanctum->scenery["utvikler"] = "En seniorutvikler i falmet hettegenser. Han holder et halvt oppspist knekkebrød med brunost i den ene hånden, og peker med den andre på en skjerm full av rød feilmeldingstekst. Han mumler irritert: 'Jeg var SÅ nær ved å forstå hvorfor pekeren var null...'.";
     rubberDuckSanctum->scenery["skjerm"] = "Skjermen viser et terminalvindu med en endeløs strøm av stack traces og en åpen fane på StackOverflow fra 2014.";
-    rubberDuckSanctum->scenery["laptop"] = "Skjermen viser et terminalvindu med en endeløs strøm av stack traces og en åpen fane på StackOverflow fra 2014.";
+    rubberDuckSanctum->scenery["laptop"] = rubberDuckSanctum->scenery["skjerm"];
 
     //Sala Segfault
     salaSegfault->scenery["blåskjerm"] = "Prosjektoren lyser opp hele rommet med en knallblå feilmelding: 'FATAL ERROR: Unhandled meeting exception at address " + salaSegfaultAddr + ". System halted.'";
-    salaSegfault->scenery["prosjektor"] = "Prosjektoren lyser opp hele rommet med en knallblå feilmelding: 'FATAL ERROR: Unhandled meeting exception at address " + salaSegfaultAddr + ". System halted.'";
-    salaSegfault->scenery["vegg"] = "Prosjektoren lyser opp hele rommet med en knallblå feilmelding: 'FATAL ERROR: Unhandled meeting exception at address " + salaSegfaultAddr + ". System halted.'";
+    salaSegfault->scenery["prosjektor"] = salaSegfault->scenery["blåskjerm"];
+    salaSegfault->scenery["vegg"] = salaSegfault->scenery["blåskjerm"];
     salaSegfault->scenery["dokumenter"] = "Utskrifter av arkitekturdiagrammer som gir absolutt ingen mening. Noen har skrevet 'HVEM SKREV DETTE?!' med rød tusj over hele forsiden.";
-    salaSegfault->scenery["papirer"] = "Utskrifter av arkitekturdiagrammer som gir absolutt ingen mening. Noen har skrevet 'HVEM SKREV DETTE?!' med rød tusj over hele forsiden.";
+    salaSegfault->scenery["papirer"] = salaSegfault->scenery["dokumenter"];
     salaSegfault->scenery["stoler"] = "Kontorstoler som er veltet i panikk. Det ser ut som møtedeltakerne bokstavelig talt fordampet da krasjet inntraff.";
 
     //Korridoren mot vest
@@ -280,21 +290,41 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     corridorWest->scenery["dør"] = "På døren henger et skilt som sier 'REKVISITA'.";
 
     //Rekvisitarommet
+    supplyRoom->scenery["kabler"] = "En floke av PS/2-adaptere, SCART-kabler og mystiske strømforsyninger som ingen tør å kaste 'i tilfelle vi får bruk for dem'.";
+    supplyRoom->scenery["post-it"] = "Tårn på tårn med gule og rosa lapper. Den ultimate formen for agil prosjektstyring.";
 
 
 
     //Kontorlandskapet - gruppe 1
-
+    openOfficeOne->scenery["brannmur-guruen"] = "En småtrøtt seniorutvikler omringet av tre buede skjermer, kabler og tomme bokser med hvit Monster™.";
+    openOfficeOne->scenery["guru"] = openOfficeOne->scenery["brannmur-guruen"];
+    openOfficeOne->scenery["skjermer"] = "Ulåste skjermer fulle av halvferdig kode, endeløse Slack-tråder og minst førti åpne nettleserfaner.";
+    openOfficeOne->scenery["pulter"] = "Rader med hev-senk-pulter i ulike høyder. På en av dem står en ensom kaktus og et krus med teksten 'World's Okayest Developer'.";
 
 
     //Korridoren mot øst
     corridorEast->scenery["kaffemaskin"] = "En industriell trakter som har sett bedre dager. Den putrer illevarslende, og kannen er full av beksvart væske.";
     corridorEast->scenery["dør"] = "På døren henger et skilt der det står 'KOPIROM'. Ved siden av døren ser du en kortleser.";
-    corridorEast->scenery["møterom"] = "";
-    corridorEast->scenery["sittegruppe"] = "";
-    corridorEast->scenery["sofa"] = "Mellom to sofaputer finner du en inntørket vestlandslefse.";  // "se sofa / undersøk sofa?" må trigge item.get("inntørket vestlandslefse")
-    corridorEast->scenery["kortleser"] = "";
+    corridorEast->scenery["kopirom"] = corridorEast->scenery["dør"];
+    corridorEast->scenery["møterom"] = "Gjennom glassveggen ser du tre utviklere som gestikulerer vilt rundt en whiteboard. De ser ut til å være i ferd med å bruke sin tredje time på en helt triviel detalj.";
+    corridorEast->scenery["the bikeshed"] = corridorEast->scenery["møterom"];
+    corridorEast->scenery["sittegruppe"] = "Et par slitte lenestoler og en tre-seters sofa i kunstskinn, og et lavt loungebord fullt av kafferinger og smuler.";
+    corridorEast->scenery["sofa"] = "Mellom to sofaputer finner du en inntørket vestlandslefse.";  // "Undersøk sofa?" må trigge item.get("inntørket vestlandslefse") - vi trenger en handleExamine!
+    corridorEast->scenery["lenestoler"] = "To nedsunkne lenestoler i imitert skinn. Den ene har en mistenkelig fjær som stikker opp av setet.";  //Så her må vi ha en "inspect/examine/undersøk fjær"?
+    corridorEast->scenery["kortleser"] = "En hvit RFID-leser ved siden av kopirommet. Den lyser rødt og venter på et godkjent adgangskort.";
 
+    //Kopirommet
+    copyRoomOne->scenery["skriver"] = "En gigant av en kontorprinter. Den lager en lav, truende brummelyd, og det sitter et fastkjørt ark dypt inne i innvollene dens.";
+    copyRoomOne->scenery["printer"] = copyRoomOne->scenery["skriver"];
+    copyRoomOne->scenery["kopimaskin"] = copyRoomOne->scenery["skriver"];
+    copyRoomOne->scenery["hyller"] = "Stabler med kopipapir og en makuleringsmaskin som ser ut til å ha tygget i seg noe som definitivt ikke var papir.";
+    copyRoomOne->scenery["a4-ark"] = copyRoomOne->scenery["hyller"];
+
+    //The Bikeshed
+    theBikeshed->scenery["whiteboard"] = "Tavlen er dekket av en 14-stegs prosess for å avgjøre om knappen skal være #FF0000 eller #EE0000. Nederst står det 'Må avklares i styringsgruppen'.";
+    theBikeshed->scenery["tavle"] = theBikeshed->scenery["whiteboard"];
+    theBikeshed->scenery["utviklere"] = "Tre dypt konsentrerte utviklere som knapt enser at du kommer inn. En av dem mumler noe om 'kontrast-ratio og psykologisk effekt av hex-koder'.";
+    theBikeshed->scenery["folk"] = theBikeshed->scenery["utviklere"];
 
     //PEKER TIL SPAWN
     Room* startingRoomPtr = spawnRoom.get();

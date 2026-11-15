@@ -2,6 +2,82 @@
 #include "Item.h"
 #include "Utils.h"
 
+std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p) {
+    auto voice = std::make_unique<NPC>();
+    voice->name = "Stemme fra kopirommet";
+    voice->description = "Du kan ikke se hvem det er gjennom døren, men basert på den desperate bankinen er det noen som har vært sperret inne alt for lenge.";
+    voice->isMerchant = false;
+
+    std::string playerName = p.name.empty() ? "Du der ute" : p.name;
+
+    //Node 0: første kontakt gjennom døren
+    voice->dialogueTree.push_back({
+        "*BANK! BANK! BANK!* Hallo?! Er det noen der ute?! For guds skyld, du må slippe meg ut! Døren smalt igjen da jeg gikk inn for å bytte toner, og denne døren kan bare åpnes fra utsiden! Trolig et brudd på flere HMS-forskrifter!",
+        {
+            {"Hvem er du, og hvordan havnet du der inne?", 1, false},
+            {"Hvordan får jeg opp døren?", 2, false},
+            {"Hold ut, jeg skal finne en vei inn! (Avslutt samtalen)", -1, false}
+        }
+    });
+
+    //Node 1: Hvem og hvorfor (og hint til adgangskort)
+    voice->dialogueTree.push_back({
+        "Jeg jobber i SecOps! Jeg burde visst bedre enn noen, men jeg la igjen adgangskortet mitt på pulten da jeg løp for å hente utskrifter. Smekk – Zero-Trust-politikken slo inn! Nå har jeg sittet her med en skriver som piper 'PC LOAD LETTER' hvert tredje minutt. Jeg holder på å miste forstanden!",
+        {
+            {"Greit, hvordan får jeg låst opp døren?", 2, false},
+            {"Jeg skal se hva jeg kan gjøre. (Avslutt samtalen)", -1, false}
+        }
+    });
+
+    //Node 2: konklusjon...
+    voice->dialogueTree.push_back({
+        "Du må finne et gyldig adgangskort og bruke det på kortleseren ved siden av døren! Som sagt la jeg igjen mitt på pulten min i SecOps-avdelingen, ellers hørte jeg skrik og brak borte ved Sala Segfault tidligere i dag ... kanskje en av utviklerne mistet kortet sitt der inne? Vær så snill, " + playerName + ", finn et kort og slipp meg ut før skriveren vinner!",
+        {
+            {"Jeg går for å finne et adgangskort med én gang! (Avslutt samtalen)", -1, false}
+        }
+    });
+
+    return voice;
+}
+
+std::unique_ptr<NPC> createFreedSecops(const player& p) {
+    auto secops = std::make_unique<NPC>();
+    secops->name = "Utslitt SecOps-analytiker";
+    secops->description = "En blek sikkerhetsanalytiker i sort hettegenser med en halvdrukket termos og et lettet blikk. Hun ser ut som om hun nettopp har overlevd en gisselsituasjon med en HP LaserJet.";
+    secops->isMerchant = false;
+
+    std::string playerName = p.name.empty() ? "helt" : p.name;
+
+    //Node 0: takk og belønning
+    secops->dialogueTree.push_back({
+        "Du klarte det! Endelig frisk luft ... vel, resirkulert kontorluft, men likevel! Tusen takk, " + playerName + "! Hadde jeg måttet høre på den skriveren ett minutt til, hadde jeg revet ut strømkabelen med tennene.",
+        {
+            {"Bare hyggelig! Hva gjorde du egentlig her inne?", 1, false, "laminert GDPR-skjold"},
+            {"Vet du hva som foregår på kontoret i dag? Alt virker helt kaos.", 2, false},
+            {"Godt å se deg i live. Jeg må videre! (Avslutt samtalen)", -1, false}
+        }
+    });
+
+    //Node 1: Lore
+    secops->dialogueTree.push_back({
+        "Jeg skulle bare skrive ut en fysisk backup av brannmur-reglene. Ironisk nok ble jeg stengt inne av min egen tilgangskontroll. Forresten ... jeg fant et laminert GDPR-skjold bak makuleringsmaskinen mens jeg lette etter en nødutgang. Ta det, du trenger det nok mer enn meg!",
+        {
+            {"Hva skjer egentlig på resten av kontoret?", 2, false},
+            {"Takk for skjoldet! Ta vare på deg selv. (Avslutt samtalen)", -1, false}
+        }
+    });
+
+    //Node 2: Hint for videre gameplay
+    secops->dialogueTree.push_back({
+        "Hele systemet gikk i vranglås da Deadlinemonsteret™ brøt seg inn i produksjonsmiljøet. Hvis du skal stoppe det, bør du stikke innom Brannmur-Guruen i kontorlandskapet mot nordvest for å skaffe deg skikkelig utstyr først!",
+        {
+            {"Notert! Takk for hjelpen. (Avslutt samtalen)", -1, false}
+        }
+    });
+
+    return secops;
+}
+
 std::unique_ptr<NPC> createSlitenSenior(const player& p) {
     auto senior = std::make_unique<NPC>();
     senior->name = "Gretten Seniorutvikler";

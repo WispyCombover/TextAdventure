@@ -6,9 +6,11 @@
 #include "Player.h"
 
 struct dialogueOption {
-    std::string playerText;    //Dialogalternativ for spiller
-    int nextNodeIndex;         //Neste node på dialogtreet
-    bool opensShop = false;    //Sett til true for åpne butikkmenyen
+    std::string playerText;         //Dialogalternativ for spiller
+    int nextNodeIndex;              //Neste node på dialogtreet
+    bool opensShop = false;         //Sett til true for åpne butikkmenyen
+    std::string giveItemName = "";  //Navn på item som skal gis
+    bool itemGiven = false;         //Man skal kun få belønningen én gang!
 };
 
 struct dialogueNode {
@@ -33,3 +35,5 @@ struct NPC {
 std::unique_ptr<NPC> createFirewallGuru(const player& p);
 std::unique_ptr<NPC> createHRRep(const player& p);
 std::unique_ptr<NPC> createSlitenSenior(const player& p);
+std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p);
+std::unique_ptr<NPC> createFreedSecops(const player& p);

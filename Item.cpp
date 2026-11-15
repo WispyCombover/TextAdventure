@@ -44,6 +44,19 @@ namespace {
             .extraDiceCount = 1,
             .extraDamageType = "sonic"
         },
+        {
+            .name = "gammel cat5-kabel",
+            .description = "En 5 meter lang nettverkskabel med knekt klips. Gjør 1d6 slashing-skade og gir +2 mot utdaterte rutere. Weapon (whip).",
+            .value = 2,
+            .currency = "MB",
+            .type = "weapon",
+            .damageDiceSides = 6,
+            .damageDiceCount = 1,
+            .damageType = "Slashing",
+            .extraDiceSides = 0,
+            .extraDiceCount = 0,
+            .extraDamageType = ""
+        },
 
         // ====== CONSUMABLES ======
         {
@@ -56,7 +69,7 @@ namespace {
             .effectDiceSides = 8,
             .effectDiceCount = 1,
             .effectFlatBonus = 2,
-            .consumeText = ""
+            .consumeText = "Du spretter den lunkne boksen. Den smaker som flytende sukkerspinn blandet med overtid, og gir deg akkurat nok viljestyrke til å overleve ett sprintmøte til."
         },
         {
             .name = "grønn monster",
@@ -116,7 +129,19 @@ namespace {
             .effectDiceSides = 4,
             .effectDiceCount = 1,
             .effectFlatBonus = 0,
-            .consumeText = ""
+            .consumeText = "Du tar en bit. Den er tørrere enn en 400-siders RFC-spesifikasjon, og kanelstøvet støver ut av munnen din som en gammel servervifte. Magen gjør opprør."
+        },
+        {
+            .name = "kald filterkaffe",
+            .description = "Har stått på kannen siden lunsj i går. Gir 1d4 HP, men tvinger deg til å ta en 'constitution save' mot halsbrann.",
+            .value = 5,
+            .currency = "kB",
+            .type = "consumable",
+            .effect = itemEffect::healHp,
+            .effectDiceSides = 4,
+            .effectDiceCount = 1,
+            .effectFlatBonus = 0,
+            .consumeText = "Du tar en slurk av den bekmørke, lunkne væsken. Det svir nedover spiserøret som flytende kompilatorfeil, men du våkner i det minste til."
         },
 
         // ====== ARMOUR / SHIELDS ======
@@ -127,6 +152,7 @@ namespace {
             .value = 1,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 1,
             .equipSlot = 2          // 1 = head, 2 = body, 3 = arms, 4 = legs, 5 = Off hand shield
         },
         {
@@ -135,6 +161,7 @@ namespace {
             .value = 3,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 1,
             .equipSlot = 1
         },
         {
@@ -143,6 +170,16 @@ namespace {
             .value = 750,
             .currency = "kB",
             .type = "armour",
+            .acBonus = 2,
+            .equipSlot = 1
+        },
+        {
+            .name = "Ørepropper i skum",            // +1AC
+            .description = "Oransje engangspropper. Demper lyden av både scrum-masters og kolleger som tygger eple.",
+            .value = 300,
+            .currency = "kB",
+            .type = "armour",
+            .acBonus = 1,
             .equipSlot = 1
         },
 
@@ -153,6 +190,7 @@ namespace {
             .value = 4,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 2,
             .equipSlot = 3
         },
         {
@@ -161,14 +199,16 @@ namespace {
             .value = 6,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 2,
             .equipSlot = 2
         },
         {
-            .name = "Laminert GDPR-skjold",         // +3AC - off hand shield
+            .name = "Laminert GDPR-skjold",         // +2AC - off hand shield
             .description = "Et tungt, innbundet eksemplar av personvernforordningen. Får enhver angriper til å nøle av ren byråkratisk frykt.",
             .value = 5,
             .currency = "MB",
             .type = "shield",
+            .acBonus = 2,
             .equipSlot = 5
         },
 
@@ -179,6 +219,7 @@ namespace {
             .value = 25,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 4,
             .equipSlot = 2
         },
         {
@@ -187,6 +228,7 @@ namespace {
             .value = 75,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 5,
             .equipSlot = 2
         },
         {
@@ -195,18 +237,22 @@ namespace {
             .value = 250,
             .currency = "MB",
             .type = "armour",
+            .acBonus = 6,
             .equipSlot = 2
         },
 
-        // ====== MISC ======
+        // ====== TRINKETS ======
         {
             .name = "liten gummiand",
-            .description = "",
+            .description = "En lommeutgave av den klassiske gule gummianden. Den piper svakt og dømmende når du klemmer på den, men hjelper deg å tenke klart når koden nekter å kompilere.",
             .value = 500,
             .currency = "kB",
-            .type = "En lommeutgave av den klassiske gule gummianden. Den piper svakt og dømmende når du klemmer på den, men hjelper deg å tenke klart når koden nekter å kompilere.",
+            .type = "trinket",
             .isQuestItem = false
         },
+
+        // ====== MISC ======
+
 
         // ====== QUEST / MAGIC ======
         {
@@ -230,7 +276,15 @@ namespace {
             .description = "Et tungt knippe med krypterte USB-nøkler og et laminert kort merket 'ROOT ACCESS - PROD'. Med disse kan du endelig rulle ut fiksen og redde dagen.",
             .value = 0,
             .currency = "kB",
-            .type = "",
+            .type = "key",
+            .isQuestItem = true
+        },
+        {
+            .name = "post-it med passord",
+            .description = "En gul lapp funnet under et tastatur. Det står 'Sommer2026!' med kulepenn.",
+            .value = 0,
+            .currency = "kB",
+            .type = "password",
             .isQuestItem = true
         }
     };

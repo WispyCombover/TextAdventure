@@ -310,6 +310,9 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
     {
         cleanTarget = cleanTarget.substr(4);
     }
+    if ((cleanTarget == "dør" || cleanTarget == "kopirom") && toLowerNorwegian(currentRoom->name) == "korridoren mot øst") {
+        cleanTarget = "stemme";
+    }
 
     NPC *foundNPC = nullptr;
     for (auto &npc : currentRoom->npcs)
@@ -336,7 +339,7 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
     int currentNode = 0;
     while (currentNode != -1 && static_cast<size_t>(currentNode) < foundNPC->dialogueTree.size())
     {
-        const auto &node = foundNPC->dialogueTree[currentNode];
+        auto &node = foundNPC->dialogueTree[currentNode];
         std::cout << "\n[" << foundNPC->name << "]: \"" << node.npcText << "\"\n";
 
         if (node.options.empty())
@@ -362,7 +365,7 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
 
         if (choice > 0 && static_cast<size_t>(choice) <= node.options.size())
         {
-            const auto &chosenOption = node.options[choice - 1];
+            auto &chosenOption = node.options[choice - 1];
 
             if (chosenOption.opensShop && foundNPC->isMerchant)
             {
@@ -372,6 +375,12 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
                 }
                 handleShop(*foundNPC, p, inventory);
                 break;
+            }
+            if (!chosenOption.giveItemName.empty() && !chosenOption.itemGiven) {
+                item reward = getItem(chosenOption.giveItemName);
+                inventory.push_back(std::make_shared<item>(reward));
+                std::cout << "\n[Du mottok: " << reward.name << "!]\n";
+                chosenOption.itemGiven = true;
             }
             currentNode = chosenOption.nextNodeIndex;
         }
@@ -664,6 +673,15 @@ namespace
         {
             exit.isLocked = false;
             std::cout << "Du bruker " << (*keyIt)->name << " og låser opp døren!\n";
+
+            //Fjerner "stemme fra kopirommet" når døren låses pop
+            auto& npcs = currentRoom->npcs;
+            npcs.erase(
+                std::remove_if(npcs.begin(), npcs.end(), [](const std::unique_ptr<NPC>& npc) {
+                    return npc->name == "Stemme fra kopirommet";
+                }),
+                npcs.end()
+            );
         }
         else
         {
@@ -858,12 +876,12 @@ bool processCommand(
         //Sjekk om der er et kodepanel i rommet
         if (currentRoom->scenery.find("kodepanel") == currentRoom->scenery.end()) {
             std::cout << "Det er ikke noe kodepanel her.\n";
-            return;
+            return true;
         }
 
         if (target.empty()) {
             std::cout << "Hvilken kode vil du taste inn? (F.eks. 'tast 1234')\n";
-            return;
+            return true;
         }
         //Finn utgangen som styres av kodepanelet
         auto exitIt = currentRoom->exits.find("rekvisita");  //Denne må gjøres generell. Vi kommer til å ha flere dører med kodelås...
