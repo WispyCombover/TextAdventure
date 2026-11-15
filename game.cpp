@@ -22,14 +22,8 @@
 #include "Spells.h"
 
 //TO-DO AND WISHLIST:
-// -Ikke gå rett på spillet fra introteksten. I stedet krev "start" for å starte, og deretter må spilleren angi navn (for vi har en player->name)
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
-// -Potions (Monster(TM) i forskjellige farger - rød Monster = Heal, blå Monster = Mana, hvit Monster = Haste...)
-// -Dialogsystem for NPCer (keep it simple)  WIP
-// -Merchants WIP
-// -Spells! WIP -> Spellcastingsystem er nå inne. Mangler spellbook
-// -Romnumre til møterommene refererer til minneadresser (tilgjengelige rom skal ha den faktiske minneadressen som rommet ligger i som romnummer)
 // -Nøkkelkort og adgangskoder
 // -Interaktive dører (åpne, låste ... )
 // -Puzzles! Klart vi må ha puzzles!
@@ -75,7 +69,7 @@ std::cout << "loggføre hvem som er på vakt.'\n";
 while (true) {
     std::cout << "Oppgi brukernavn / navn: > ";
     std::string rawName;
-    std::getLine(std::cin, rawName);
+    std::getline(std::cin, rawName);
 
     size_t first = rawName.find_first_not_of(" \t\r\n");
     if (first != std::string::npos) {
@@ -91,7 +85,7 @@ std::cout << "\n[MIMIR]: 'Autentisering godkjent. Velkommen, " << p.name << "!'\
 while (true) {
     std::cout << "Skriv 'start' for å starte recovery-protokollen (eller 'last' for lagret spill): > ";
     std::string startCmd;
-    std::getLine(std::cin, startCmd);
+    std::getline(std::cin, startCmd);
 
     std::string cleanCmd = toLowerNorwegian(startCmd);
     if (cleanCmd == "start") {

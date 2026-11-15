@@ -2,6 +2,16 @@
 #include "Item.h"
 #include "Monster.h"
 #include "NPC.h"
+#include <sstream>
+#include <iomanip>
+#include <cstdint>
+
+static std::string getMemoryAddress(const Room* roomPtr) {
+    std::ostringstream oss;
+    uintptr_t addr = reinterpret_cast<uintptr_t>(roomPtr);
+    oss << "0x" << std::uppercase << std::hex << std::setfill('0') << std::setw(sizeof(void*) * 2) << addr;
+    return oss.str();
+}
 
 Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     //BYGG ROMMENE HER
@@ -22,6 +32,10 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
         "Du kommer til et lite hjørne av korridoren. Det er stille her, men du kan høre lyden av dempet prat fra at av de nærmeste møterommene. \n Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD." //Kaffemaskinen må kunne brukes til å fylle koppen med varm kaffe (Acid attack, AOE 1d4)
     );
 
+
+    //HENT MINNEADRESSENE TIL ROMMENE DER DET ER AKTUELT
+    std::string spawnAddr = getMemoryAddress(spawnRoom.get());
+
     //UTGANGER HER
     //Spawn (møterommet)
     spawnRoom->exits["dør"] = {
@@ -34,13 +48,13 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     };
 
     //Corridor
-    corridor->exits["door"] = {
+    corridor->exits["dør"] = {
         spawnRoom.get(),
         true,
         false,
         false,
         "",
-        "Fra denne siden kan du se dørskiltet som viser navnet på møterommet samt romnummeret. Dette rommet heter 'Kaffekoppens Krypt' og har nummer: 0xC0FFEE00"  //Må få inn minneadressen til rommet - tror det blir kult
+        "Fra denne siden kan du se dørskiltet som viser navnet på møterommet samt romnummeret. Dette rommet heter 'Kaffekoppens Krypt' og har nummer: " + spawnAddr
     };
     corridor->exits["vest"] = {
         corridorWest.get(),
@@ -99,7 +113,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms) {
     spawnRoom->scenery["bord"] = "Et langt konferansebord i falsk eikefiner. Det er klissete på ett sted.";
     
     //Korridoren ut fra møterommet (spawn)
-    corridor->scenery["dør"] = "Du lukket som vanlig døren bak deg. På døren henger et skilt som viser navnet på møterommet samt romnummeret. Dette møterommet heter 'Kaffekoppens krypt' og har romnummer: 0xC0FFEE00";  //Her må inn minneadressen til rommet
+    corridor->scenery["dør"] = "Du lukket som vanlig døren bak deg. På døren henger et skilt som viser navnet på møterommet samt romnummeret. Dette møterommet heter 'Kaffekoppens krypt' og har romnummer: " + spawnAddr;
 
     //Korridoren mot vest
     corridorWest->scenery["kortleser"] = "En standard RFID-kortleser. Den blinker utålmodig med et lite rødt lys.";
