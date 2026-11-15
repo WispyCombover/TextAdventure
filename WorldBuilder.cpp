@@ -34,11 +34,27 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     );
     auto corridorWest = std::make_unique<Room>(
         "Korridoren mot vest",
-        "Du kommet til et hjørne som går videre mot NORD og inn i kontorlandskapet. Rett foran deg er der en dør. På veggen ved siden av døren sert du en kortleser med et kodepanel." //Trenger logikk for å håndtere lesing av nøkkelkort samt inntasting av kode
+        "Du kommet til et hjørne som går videre mot NORD og inn i kontorlandskapet. Rett foran deg er der en dør in til REKVISITA. På veggen ved siden av døren sert du en et kodepanel." //Trenger logikk for å håndtere lesing av nøkkelkort samt inntasting av kode
+    );
+    auto supplyRoom = std::make_unique<Room>(
+        "Rekvisitarommet",
+        "Et trangt, vindusløst rom stappet til randen med pappesker fulle av utdaterte VGA-kabler, post-it-blokker i neonfarger og tonerkassetter til en skriver som ble kastet i 2016. Det lukter svakt av støv og uåpnet plast. Utgangen er tilbake gjennom DØR."
+    );
+    auto openOfficeOne = std::make_unique<Room>(
+        "Kontorlandskapet - gruppe 1",
+        "Et åpent kontorlandskap med rekker av hev-senk-pulter og flimrende lysrør i taket. Luften er tung av konsentrasjon og lavmælt tasting. De fleste pultene er forlatt i hui og hast, med halvfulle kaffekopper og ulåste skjermer. Du kan gå tilbake mot SØR, eller videre mot NORD. Her ser du også Brannmur-Guruen sitte og stirre inn i skjermene sine."
     );
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
-        "Du kommer til et lite hjørne av korridoren. Det er stille her, men du kan høre lyden av dempet prat fra at av de nærmeste møterommene. \n Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD." //Kaffemaskinen må kunne brukes til å fylle koppen med varm kaffe (Acid attack, AOE 1d4)
+        "Du kommer til et lite hjørne av korridoren. Du kan høre banking fra døren til kopirommet, og lyden av dempet prat fra møterommet mot SØR. Møterommet heter: 'THE BIKESHED'. Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD som har et skilt med 'KOPIROM'. Ved siden av døren til kopirommet henger en kortleser." //Man skal kunne snakke med personen som er innelåst på kopirommet. "snakk dør" eller noe slikt...
+    );
+    auto copyRoomOne = std::make_unique<Room>(
+        "Kopirommet",
+        "En klaustrofobisk boks dominert av en gigantisk multifunksjonsskriver som blinker illevarslende med 'PC LOAD LETTER'. Hyllene langs veggen er fulle av A4-ark og makuleringsposer. Utgangen er tilbake mot SØR."  //Her er også en innelåst NPC
+    );
+    auto theBikeshed = std::make_unique<Room>(
+        "The Bikeshed",
+        "Et lite møterom der en opphetet diskusjon pågår. På whiteboarden står det 'VALG AV FARGE PÅ LOGG-KNAPP' understreket tre ganger, omringet av komplekse arkitekturdiagrammer. Døren tilbake til korridoren er mot NORD."
     );
 
 
@@ -46,6 +62,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     std::string spawnAddr = getMemoryAddress(spawnRoom.get());
     std::string rubberDuckSanctumAddr = getMemoryAddress(rubberDuckSanctum.get());
     std::string salaSegfaultAddr = getMemoryAddress(salaSegfault.get());
+    std::string theBikeshedAddr = getMemoryAddress(theBikeshed.get());
 
     //UTGANGER HER
     //Spawn (møterommet)
@@ -109,6 +126,22 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         "",
         "Du ser tilbake mot møterommet der det hele startet. Det virker så lenge siden nå."
     };
+    corridorWest->exits["rekvisita"] = {
+        supplyRoom.get(),
+        true,
+        false,
+        true,
+        "1357",
+        ""
+    };
+    corridorWest->exits["nord"] = {
+        openOfficeOne.get(),
+        false,
+        true,
+        false,
+        "",
+        ""
+    };
 
     //Corridor-East
     corridorEast->exits["vest"] = {
@@ -118,6 +151,48 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         false,
         "",
         "Du ser tilbake ned korridoren mot vest. Der ligger møterommet 'Kaffekoppens Krypt', og veien videre mot rekvisitalageret"
+    };
+    corridorEast->exits["nord"] = {
+        copyRoomOne.get(),
+        true,
+        false,
+        true,
+        "adgangskort",
+        ""
+    };
+    corridorEast->exits["kopirom"] = {
+        copyRoomOne.get(),
+        true,
+        false,
+        true,
+        "adgangskort",
+        ""
+    };
+    corridorEast->exits["the bikeshed"] = {
+        theBikeshed.get(),
+        true,
+        false,
+        false,
+        "",
+        ""
+    };
+
+    supplyRoom->exits["dør"] = {
+        corridorWest.get(),
+        true,
+        false,
+        false,
+        "",
+        ""
+    };
+
+    openOfficeOne->exits["south"] = {
+        corridorWest.get(),
+        false,
+        true,
+        false,
+        "",
+        ""
     };
 
     rubberDuckSanctum->exits["dør"] = {
@@ -138,6 +213,15 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         "Døren ut igjen til korridoren. Det frister veldig å lukke den godt bak seg!"
     };
 
+    theBikeshed->exits["dør"] = {
+        corridorEast.get(),
+        true,
+        false,
+        false,
+        "",
+        "Døren ut igjen til korridoren og kaffekroken."
+    };
+
     // LEGG TIL ITEMS
     spawnRoom->items.push_back(getItem("kaffekopp"));
     spawnRoom->items.push_back(getItem("penn"));
@@ -145,6 +229,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     rubberDuckSanctum->items.push_back(getItem("liten gummiand"));
 
     salaSegfault->items.push_back(getItem("adgangskort"));  //Tror adgangskortene må gjøres spesifikke, men enn så lenge har vi ett!
+
+    
 
     // RANDOM ENCOUNTERS
     monsterManual manual;
@@ -156,8 +242,9 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
 
     // NPCer
-    //openOfficeOne->npcs.push_back(createFirewallGuru());
+    openOfficeOne->npcs.push_back(createFirewallGuru(p));
     rubberDuckSanctum->npcs.push_back(createSlitenSenior(p));
+    //copyRoomOne->npcs.push_back(createLockedInSecops());
 
     //SCENERY
     //Spawn
@@ -192,9 +279,21 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     corridorWest->scenery["kodepanel"] = "Et slitt talltastatur fra 0 til 9. Tastene 1, 3, 5 og 7 ser merkbart mer slitte ut enn de andre.";
     corridorWest->scenery["dør"] = "På døren henger et skilt som sier 'REKVISITA'.";
 
+    //Rekvisitarommet
+
+
+
+    //Kontorlandskapet - gruppe 1
+
+
+
     //Korridoren mot øst
     corridorEast->scenery["kaffemaskin"] = "En industriell trakter som har sett bedre dager. Den putrer illevarslende, og kannen er full av beksvart væske.";
-    corridorEast->scenery["dør"] = "På døren henger et skilt der det står 'KOPIROM'.";
+    corridorEast->scenery["dør"] = "På døren henger et skilt der det står 'KOPIROM'. Ved siden av døren ser du en kortleser.";
+    corridorEast->scenery["møterom"] = "";
+    corridorEast->scenery["sittegruppe"] = "";
+    corridorEast->scenery["sofa"] = "Mellom to sofaputer finner du en inntørket vestlandslefse.";  // "se sofa / undersøk sofa?" må trigge item.get("inntørket vestlandslefse")
+    corridorEast->scenery["kortleser"] = "";
 
 
     //PEKER TIL SPAWN
@@ -206,7 +305,11 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     allRooms.push_back(std::move(rubberDuckSanctum));
     allRooms.push_back(std::move(salaSegfault));
     allRooms.push_back(std::move(corridorWest));
+    allRooms.push_back(std::move(supplyRoom));
+    allRooms.push_back(std::move(openOfficeOne));
     allRooms.push_back(std::move(corridorEast));
+    allRooms.push_back(std::move(copyRoomOne));
+    allRooms.push_back(std::move(theBikeshed));
 
     //SEND SPAWN TIL game.cpp
     return startingRoomPtr;

@@ -854,6 +854,35 @@ bool processCommand(
             handleTalk(target, currentRoom, p, inventory);
         }
     }
+    else if (verb == "tast" || verb == "kode") {
+        //Sjekk om der er et kodepanel i rommet
+        if (currentRoom->scenery.find("kodepanel") == currentRoom->scenery.end()) {
+            std::cout << "Det er ikke noe kodepanel her.\n";
+            return;
+        }
+
+        if (target.empty()) {
+            std::cout << "Hvilken kode vil du taste inn? (F.eks. 'tast 1234')\n";
+            return;
+        }
+        //Finn utgangen som styres av kodepanelet
+        auto exitIt = currentRoom->exits.find("rekvisita");  //Denne må gjøres generell. Vi kommer til å ha flere dører med kodelås...
+        if (exitIt != currentRoom->exits.end()) {
+            Exit& door = exitIt->second;
+
+            if (!door.isLocked) {
+                std::cout << "Panelet lyser allerede grønt. Døren er ulåst!\n";
+            }
+            else if (target == door.keyName) { //Sjekker mot keyName (I dette tilfellet 1357)
+                door.isLocked = false;
+                door.isOpen = true;
+                std::cout << "*BIIIP!* Kodepanelet blinker grønt, og en tung mekanisk lås klikker opp!\n";
+            }
+            else {
+                std::cout << "*BRRRZT!* Rødt lys Feil kode.\n";
+            }
+        }
+    }
     else if (lowerInput == "hjelp" || lowerInput == "help" || lowerInput == "?")
     {
         std::cout << "<TITTEL PÅ SPILL HER> er et humoristisk teksteventyr bygget på lesten av klassisk fantasy og med 'lette' D&D-regler.\n";

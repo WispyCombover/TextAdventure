@@ -106,6 +106,18 @@ namespace {
             .effectFlatBonus = 0,
             .consumeText = "Du tar en bit. Den knaser på feil steder. Magen din angrer umiddelbart."
         },
+        {
+            .name = "inntørket vestlandslefse",
+            .description = "Umulig å anslå hvor lenge denne har ligget her. Du kan ikke huske sist det ble servert vestlandslefser til kaffekosen.",
+            .value = 8,
+            .currency = "kB",
+            .type = "consumable",
+            .effect = itemEffect::sugarCrash, //Hmm, må kanskje heller ha en "poisoned" effect. 1d4 dmg over 3 runder eller noe slikt - det føles ikke riktig at denne skal gi en buff
+            .effectDiceSides = 4,
+            .effectDiceCount = 1,
+            .effectFlatBonus = 0,
+            .consumeText = ""
+        },
 
         // ====== ARMOUR / SHIELDS ======
         // Light armour
