@@ -19,6 +19,13 @@ enum class itemEffect {
     sugarCrash          //Skader spilleren litt (gammel smultring / utgått brus / etc)
 };
 
+struct Recipe {
+    std::string ingredient1;
+    std::string ingredient2;
+    std::string resultItem;
+    std::string craftText;
+};
+
 struct item {
     std::string name;
     std::string description;
@@ -48,6 +55,7 @@ struct item {
     bool isQuestItem = false;  //Sett denne til true på kritiske items
 };
 
+const Recipe* findRecipe(const std::string& itemA, const std::string& itemB);
 const std::vector<item>& itemList();
 item getItem(const std::string& name);
 bool itemExists(const std::string& name);

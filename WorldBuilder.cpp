@@ -313,8 +313,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     corridorEast->scenery["lenestoler"] = "To nedsunkne lenestoler i imitert skinn. Den ene har en mistenkelig fjær som stikker opp av setet.";  //Så her må vi ha en "inspect/examine/undersøk fjær"?
     corridorEast->scenery["kortleser"] = "En hvit RFID-leser ved siden av kopirommet. Den lyser rødt og venter på et godkjent adgangskort.";
     corridorEast->hiddenItems["sofa"] = "inntørket vestlandslefse";
-    corridorEast->scenery["fjær"] = "Du pirker borti den løse stålfjæren under puten og kjenner noe metallisk kilte seg fast!";
-    corridorEast->hiddenItems["fjær"] = "penn"; // Eller et nytt item, f.eks. "løs stålfjær" eller "post-it med passord"!
+    corridorEast->scenery["fjær"] = "Du pirker borti den løse stålfjæren under puten og kjenner noe metallisk som har kilt seg fast!";
+    corridorEast->hiddenItems["fjær"] = "løs stålfjær"; 
 
     //Kopirommet
     copyRoomOne->scenery["skriver"] = "En gigant av en kontorprinter. Den lager en lav, truende brummelyd, og det sitter et fastkjørt ark dypt inne i innvollene dens.";

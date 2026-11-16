@@ -31,6 +31,122 @@ bool isItemEquipped(const player& p, const std::shared_ptr<item>& it) {
     return false;
 }
 
+void handleCraft(const std::string &targetInput, std::vector<std::shared_ptr<item>> &inventory)
+{
+    if (targetInput.empty())
+    {
+        std::cout << "Hva vil du kombinere? (Bruk f.eks. 'kombiner inntørket vestlandslefse med gammel smultring')n";
+        return;
+    }
+
+    std::string input = toLowerNorwegian(targetInput);
+    std::string itemA, itemB;
+
+    //Legg inn støtte for skilleord som 'med', 'og' og '+'
+    const std::vector<std::string> separators = {" med ", " og ", " + "};
+    bool foundSep = false;
+
+    for (const auto &sep : separators)
+    {
+        size_t pos = input.find(sep);
+        if (pos != std::string::npos)
+        {
+            itemA = input.substr(0, pos);
+            itemB = input.substr(pos + sep.length());
+            foundSep = true;
+            break;
+        }
+    }
+
+    //Trim mellomrom
+    auto trim = [](std::string &s) {
+        size_t start = s.find_first_not_of(" \t");
+        size_t end = s.find_last_not_of(" \t");
+        s = (start == std::string::npos) ? "" : s.substr(start, end - start + 1);
+    };
+    trim(itemA);
+    trim(itemB);
+
+    if (!foundSep || itemA.empty() || itemB.empty ())
+    {
+        std::cout << "Skriv hva du vil kombinere med formen: 'kombiner <ting 1> med <ting 2>'.\n";
+        return;
+    }
+
+    //Hent begge gjenstandene fra inventory
+    auto itA = std::find_if(inventory.begin(), inventory.end(), [&itemA](const std::shared_ptr<item> &i) {
+        return toLowerNorwegian(i->name) == itemA;
+    });
+    auto itB = std::find_if(inventory.begin(), inventory.end(), [&itemB](const std::shared_ptr<item> &i) {
+        return toLowerNorwegian(i->name) == itemB;
+    });
+
+    if (itA == inventory.end())
+    {
+        std::cout << "Du har ikke '" << itemA << "' i sekken.\n";
+        return;
+    }
+    if (itB == inventory.end())
+    {
+        std::cout << "Du har ikke '" << itemB << "' i sekken.\n";
+        return;
+    }
+    if (itA == itB)
+    {
+        std::cout << "Du kan ikke kombinere en gjenstand med seg selv.\n";
+        return;
+    }
+
+    //Special - fyll kaffekoppen med kald filterkaffe
+    if ((itemA == "kaffekopp" && itemB == "kald filterkaffe") || (itemA == "kald filterkaffe" && itemB == "kaffekopp"))
+    {
+        auto cupIt = (itemA == "kaffekopp") ? itA : itB;
+        auto coffeIt = (itemA == "kald filterkaffe") ? itA : itB;
+        if ((*cupIt)->isFilled)
+        {
+            std::cout << "Kaffekoppen er allerede full!\n";
+            return;
+        }
+
+        (*cupIt)->isFilled = true;
+        (*cupIt)->description = "En mye brukt kaffekopp fylt til randen med tvilsom, etsende filterkaffe. Klar til kamp!";
+        inventory.erase(coffeeIt);
+
+        std::cout << "Du heller den kalde filterkaffen oppi kaffekoppen. Væsken ryker svakt – nå gjør koppen ekstra syreskade!\n";
+        return;
+    }
+
+    //Sjekk i oppskriftsdatabasen (recipeDatabase)
+    const Recipe *recipe = findRecipe((*itA)->name, (*itB)->name);
+    if (!recipe)
+    {
+        std::cout << "Du prøver å sette sammen " << (*itA)->name << " og " << (*itB)->name << ", men det gir ingen mening. Dette er ikke Minecraft!\n";
+        return;
+    }
+
+    //Fjerner ingrediensene når de er brukt
+    size_t indexA = std::distance(inventory.begin(), itA);
+    size_t indexB = std::distance(inventory.begin(), itB);
+
+    if (indexA > indexB)
+    {
+        inventory.erase(inventory.begin() + indexA);
+        inventory.erase(inventory.begin() + itB);
+    }
+    else
+    {
+        inventory.erase(inventory.begin() + indexB);
+        inventory.erase(inventory.begin() + indexA);
+    }
+
+    //Legg til det ferdige resultatet
+    item crafted = getItem(recipe->resultItem);
+    inventory.push_back(std::make_shared<item>(crafted));
+
+    std::cout << "\n" << recipe->craftText << "\n";
+    std::cout << "[Legt til i sekken: " << crafted.name << "]\n";
+}
+
 void handleExamine(const std::string &targetName, Room *currentRoom, std::vector<std::shared_ptr<item>> &inventory)
 {
     if (targetName.empty())
@@ -886,7 +1002,7 @@ bool processCommand(
     {
         handleExamine(target, currentRoom, inventory);
     }
-    
+
     else if (lowerInput == "status" || lowerInput == "stats" || lowerInput == "utstyr" || lowerInput == "gear")
     {
         std::cout << "\n=== " << p.name << " (Level " << p.playerLvl << ") ===\n";
@@ -940,6 +1056,10 @@ bool processCommand(
         {
             handleLook(target, currentRoom, inventory);
         }
+    }
+    else if (verb == "kombiner" || verb = "craft" || verb == "lag" || verb == "mekk")
+    {
+        handleCraft(target, inventory);
     }
     else if (lowerInput == "inventar" || lowerInput == "sekk" || lowerInput == "i")
     {

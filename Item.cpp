@@ -3,6 +3,29 @@
 #include <iostream>
 
 namespace {
+    const std::vector<Recipe> recipeDatabase = {
+        {
+            .ingredient1 = "løs stålfjær",
+            .ingredient2 = "gammel cat5-kabel",
+            .resultItem = "piskende patchkabel mk.ii",
+            .craftText = "Du tvinner stålfjæren rundt nettverkskabelen for ekstra piskesnert. Det knitrer av statisk elektrisitet!"
+        },
+        {
+            .ingredient1 = "inntørket vestlandslefse",
+            .ingredient2 = "gammel smultring",
+            .resultItem = "kastbar kanel-murstein",
+            .craftText = "Du presser den steinharde lefsen og den fossilerte smultringen sammen. Resultatet har samme egenvekt som en murstein."
+        },
+        {
+            .ingredient1 = "rød monster",
+            .ingredient2 = "hvit monster",
+            .resultItem = "overklokket monster-brygg",
+            .craftText = "Du heller den røde og den hvite Monsteren sammen i én boks. Blandingen bruser illevarslende som en overbelastet kjøleribbe."
+        }
+    };
+
+    // ITEMS ITEMS ITEMS ITEMS ITEMS ITEMS ITEMS ITEMS ITEMS ITEMS ITEMS
+
     const std::vector<item> itemDatabase = {
         // ====== VÅPEN ======
         {
@@ -56,6 +79,30 @@ namespace {
             .extraDiceSides = 0,
             .extraDiceCount = 0,
             .extraDamageType = ""
+        },
+        {
+            .name = "piskende patchkabel mk.ii",
+            .description = "En gammel Cat5-kabel viklet rundt en stålfjær for ekstra snert. Gir en ubehagelig statisk utladning ved treff.",
+            .value = 10,
+            .curency = "MB",
+            .type = "weapon",
+            .damageDiceSides = 8,
+            .damageDiceCount = 1,
+            .damageType = "Slashing",
+            .extraDiceSides = 4,
+            .extraDiceCount = 1,
+            .extraDamageType = "lightning"
+        },
+        {
+            .name = "kastbar kanel-murstein",
+            .description = "En inntørket vestlandslefse og en forsteinet smultring presset sammen til ett kompakt prosjektil. Utgått på dato i begge endene.",
+            .value = 2,
+            .currency = "MB",
+            .type = "weapon",
+            .damageDiceSides = 6,
+            .damageDiceCount = 2,
+            .damageType = "Bludgeoning",
+            .throwable = true
         },
 
         // ====== CONSUMABLES ======
@@ -142,6 +189,18 @@ namespace {
             .effectDiceCount = 1,
             .effectFlatBonus = 0,
             .consumeText = "Du tar en slurk av den bekmørke, lunkne væsken. Det svir nedover spiserøret som flytende kompilatorfeil, men du våkner i det minste til."
+        },
+        {
+            .name = "overklokket monster-brygg",
+            .description = "En tvilsom blanding av rød og hvit Monster. Væsken vibrerer svakt og hjertet ditt slår allerede i 144 Hz bare av å se på den.",
+            .value = 150,
+            .currency = "kB",
+            .type = "consumable",
+            .effect = itemEffect::caffeineRush,
+            .effectDiceSides = 8,
+            .effectDiceCount = 2,
+            .effectFlatBonus = 2,
+            .consumeText = "Du styrter det overklokkede brygget. Tiden ser ut til å gå i sakte film mens pulsen treffer taket!"
         },
 
         // ====== ARMOUR / SHIELDS ======
@@ -252,6 +311,18 @@ namespace {
         },
 
         // ====== MISC ======
+
+
+        // ====== CRAFTING ITEMS ======
+
+        {
+            .name = "løs stålfjær",
+            .description = "En stram stålfjær du pirket løs fra en slitt lenestol. Den har overraskende mye spenn i seg ... perfekt for kreative ingeniørprosjekter.",
+            .value = 1,
+            .currency = "MB",
+            .type = "crafting",
+            .isQuestItem = false
+        },
 
 
         // ====== QUEST / MAGIC ======
@@ -384,4 +455,19 @@ void inspectItem(const item& it) {
         std::cout << "  * Markedsverdi:  " << it.value << " " << it.currency << "\n";
     }
     std::cout << "=========================\n";
+}
+
+const Recipe* findRecipe(const std::string& itemA, const std::string& itemB) {
+    std::string a = toLowerNorwegian(itemA);
+    std::string b = toLowerNorwegian(itemB);
+
+    for (const auto& r : recipeDatabase) {
+        std::string r1 = toLowerNorwegian(r.ingredient1);
+        std::string r2 = toLowerNorwegian(r.ingredient2);
+
+        if ((a == r1 && b == r2) || (a == r2 && b == r1)) {
+            return &r;
+        }
+    }
+    return nullptr;
 }
