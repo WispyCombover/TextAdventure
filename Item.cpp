@@ -84,7 +84,7 @@ namespace {
             .name = "piskende patchkabel mk.ii",
             .description = "En gammel Cat5-kabel viklet rundt en stålfjær for ekstra snert. Gir en ubehagelig statisk utladning ved treff.",
             .value = 10,
-            .curency = "MB",
+            .currency = "MB",
             .type = "weapon",
             .damageDiceSides = 8,
             .damageDiceCount = 1,

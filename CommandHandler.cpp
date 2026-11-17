@@ -101,7 +101,7 @@ void handleCraft(const std::string &targetInput, std::vector<std::shared_ptr<ite
     if ((itemA == "kaffekopp" && itemB == "kald filterkaffe") || (itemA == "kald filterkaffe" && itemB == "kaffekopp"))
     {
         auto cupIt = (itemA == "kaffekopp") ? itA : itB;
-        auto coffeIt = (itemA == "kald filterkaffe") ? itA : itB;
+        auto coffeeIt = (itemA == "kald filterkaffe") ? itA : itB;
         if ((*cupIt)->isFilled)
         {
             std::cout << "Kaffekoppen er allerede full!\n";
@@ -131,7 +131,7 @@ void handleCraft(const std::string &targetInput, std::vector<std::shared_ptr<ite
     if (indexA > indexB)
     {
         inventory.erase(inventory.begin() + indexA);
-        inventory.erase(inventory.begin() + itB);
+        inventory.erase(inventory.begin() + indexB);
     }
     else
     {
@@ -641,6 +641,7 @@ namespace
                 std::cout << "Døren er lukket. Du må åpne den først.\n";
                 return;
             }
+            p.lastRoom = currentRoom;
             currentRoom = exit.destination;
             printRoomDescription(currentRoom);
         }
@@ -1057,7 +1058,7 @@ bool processCommand(
             handleLook(target, currentRoom, inventory);
         }
     }
-    else if (verb == "kombiner" || verb = "craft" || verb == "lag" || verb == "mekk")
+    else if (verb == "kombiner" || verb == "craft" || verb == "lag" || verb == "mekk")
     {
         handleCraft(target, inventory);
     }
@@ -1131,6 +1132,9 @@ bool processCommand(
         std::cout << "Save/save/lagre - Lagrer spillet der du står.\n";
         std::cout << "Load/load/last - Laster inn tidligere lagret spill.\n";
         std::cout << "Status/stats/utstyr/gear - Viser din nåværende status.\n";
+        std::cout << "Cast - bruker magi! Men du trenger en spellbook først.\n";
+        std::cout << "Kombiner <ting 1> med <ting2> - Lar deg sette ting sammen til nye ting-\n";
+        std::cout << "Undersøk <ting> - lar deg undersøke noe nærmere. Kanskje er det noe gjemt der?\n";
     }
     else if (lowerInput == "panikk" || lowerInput == "panic")
     {
