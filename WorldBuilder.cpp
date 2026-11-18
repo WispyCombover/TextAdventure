@@ -14,6 +14,13 @@ static std::string getMemoryAddress(const Room* roomPtr) {
     return oss.str();
 }
 
+static std::shared_ptr<Door> makeDoor(bool locked = false, const std::string& key = "") {
+    auto d = std::make_shared<Door>();
+    d->isLocked = locked;
+    d->keyName = key;
+    return d;
+}
+
 Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) {
     //BYGG ROMMENE HER
     auto spawnRoom = std::make_unique<Room>(
@@ -65,170 +72,86 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     std::string theBikeshedAddr = getMemoryAddress(theBikeshed.get());
 
     //UTGANGER HER
-    //Spawn (møterommet)
+    //DØRER (én per dør, delt mellom begge sider)
+    auto doorSpawn   = makeDoor();
+    auto doorDuck    = makeDoor();
+    auto doorSala    = makeDoor();
+    auto doorSupply  = makeDoor(true, "1357");
+    auto doorCopy    = makeDoor(true, "adgangskort");
+    auto doorBikeshed = makeDoor();
+
+    //Spawn <-> Korridor
     spawnRoom->exits["dør"] = {
-        corridor.get(),       //destination
-        true,                 //hasDoor
-        false,                //isOpen
-        false,                //isLocked
-        "",                   //keyName
+        corridor.get(), doorSpawn,
         "På døren har noen teipet fast et bilde av en flodhest og teksten: 'GOT MILK?'"
     };
-
-    //Corridor
     corridor->exits["kaffekoppens krypt"] = {
-        spawnRoom.get(),
-        true,
-        false,
-        false,
-        "",
+        spawnRoom.get(), doorSpawn,
         "Fra denne siden kan du se dørskiltet som viser navnet på møterommet samt romnummeret. Dette rommet heter 'Kaffekoppens Krypt' og har nummer: " + spawnAddr
     };
-    corridor->exits["vest"] = {
-        corridorWest.get(),
-        false,
-        true,
-        false,
-        "",
-        "Når du ser mot vest kan du se døren inn til møterommet 'RUBBER DUCK SANCTUM', forbi døren fortsetter korridoren net til hjørnet med døren inn til REKVISITA. Veien fortsetter nordover derfra og inn i kontorlandskapet."
-    };
-    corridor->exits["øst"] = {
-        corridorEast.get(),
-        false,
-        true,
-        false,
-        "",
-        "Mot øst kan du se korridoren lede forbi møterommet 'SALA SEGFAULT' og ned til kaffekroken der også kopirommet ligger."
-    };
+
+    //Korridor <-> Rubber Duck Sanctum
     corridor->exits["rubber duck sanctum"] = {
-        rubberDuckSanctum.get(),
-        true,
-        false,
-        false,
-        "",
+        rubberDuckSanctum.get(), doorDuck,
         "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Rubber Duck Sanctum' samt romnummeret. Dette rommet har nummer: " + rubberDuckSanctumAddr
     };
-    corridor->exits["sala segfault"] = {
-        salaSegfault.get(),
-        true,
-        false,
-        false,
-        "",
-        "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Sala Segfault' samt romnummeret. Dette rommet har nummer: " + salaSegfaultAddr
-    };
-
-    //Corridor-West
-    corridorWest->exits["øst"] = {
-        corridor.get(),
-        false,
-        true,
-        false,
-        "",
-        "Du ser tilbake mot møterommet der det hele startet. Det virker så lenge siden nå."
-    };
-    corridorWest->exits["rekvisita"] = {
-        supplyRoom.get(),
-        true,
-        false,
-        true,
-        "1357",
-        ""
-    };
-    corridorWest->exits["nord"] = {
-        openOfficeOne.get(),
-        false,
-        true,
-        false,
-        "",
-        ""
-    };
-
-    //Corridor-East
-    corridorEast->exits["vest"] = {
-        corridor.get(),
-        false,
-        true,
-        false,
-        "",
-        "Du ser tilbake ned korridoren mot vest. Der ligger møterommet 'Kaffekoppens Krypt', og veien videre mot rekvisitalageret"
-    };
-    corridorEast->exits["nord"] = {
-        copyRoomOne.get(),
-        true,
-        false,
-        true,
-        "adgangskort",
-        ""
-    };
-    corridorEast->exits["kopirom"] = {
-        copyRoomOne.get(),
-        true,
-        false,
-        true,
-        "adgangskort",
-        ""
-    };
-    corridorEast->exits["the bikeshed"] = {
-        theBikeshed.get(),
-        true,
-        false,
-        false,
-        "",
-        "Denne døren leder inn til møterommet 'The Bikeshed' med romnummer " + theBikeshedAddr + " Det pågår en høylydt diskusjon der inne."
-    };
-
-    supplyRoom->exits["dør"] = {
-        corridorWest.get(),
-        true,
-        false,
-        false,
-        "",
-        ""
-    };
-
-    openOfficeOne->exits["sør"] = {
-        corridorWest.get(),
-        false,
-        true,
-        false,
-        "",
-        ""
-    };
-
     rubberDuckSanctum->exits["dør"] = {
-        corridor.get(),
-        true,
-        false,
-        false,
-        "",
+        corridor.get(), doorDuck,
         "Døren tilbake til den knirkende korridoren."
     };
 
+    //Korridor <-> Sala Segfault
+    corridor->exits["sala segfault"] = {
+        salaSegfault.get(), doorSala,
+        "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Sala Segfault' samt romnummeret. Dette rommet har nummer: " + salaSegfaultAddr
+    };
     salaSegfault->exits["dør"] = {
-        corridor.get(),
-        true,
-        false,
-        false,
-        "",
+        corridor.get(), doorSala,
         "Døren ut igjen til korridoren. Det frister veldig å lukke den godt bak seg!"
     };
 
-    theBikeshed->exits["dør"] = {
-        corridorEast.get(),
-        true,
-        false,
-        false,
-        "",
-        "Døren ut igjen til korridoren og kaffekroken."
+    //Korridor <-> Korridor vest/øst (åpne passasjer, ingen dør)
+    corridor->exits["vest"] = {
+        corridorWest.get(), nullptr,
+        "Når du ser mot vest kan du se døren inn til møterommet 'RUBBER DUCK SANCTUM', forbi døren fortsetter korridoren net til hjørnet med døren inn til REKVISITA. Veien fortsetter nordover derfra og inn i kontorlandskapet."
+    };
+    corridor->exits["øst"] = {
+        corridorEast.get(), nullptr,
+        "Mot øst kan du se korridoren lede forbi møterommet 'SALA SEGFAULT' og ned til kaffekroken der også kopirommet ligger."
+    };
+    corridorWest->exits["øst"] = {
+        corridor.get(), nullptr,
+        "Du ser tilbake mot møterommet der det hele startet. Det virker så lenge siden nå."
+    };
+    corridorEast->exits["vest"] = {
+        corridor.get(), nullptr,
+        "Du ser tilbake ned korridoren mot vest. Der ligger møterommet 'Kaffekoppens Krypt', og veien videre mot rekvisitalageret"
     };
 
+    //Korridor vest <-> Rekvisita (kodepanel)
+    corridorWest->exits["rekvisita"] = { supplyRoom.get(), doorSupply, "" };
+    supplyRoom->exits["dør"]         = { corridorWest.get(), doorSupply, "" };
+
+    //Korridor vest <-> Kontorlandskap
+    corridorWest->exits["nord"]   = { openOfficeOne.get(), nullptr, "" };
+    openOfficeOne->exits["sør"]   = { corridorWest.get(), nullptr, "" };
+
+    //Korridor øst <-> Kopirom (to navn, SAMME dør)
+    corridorEast->exits["nord"]    = { copyRoomOne.get(), doorCopy, "" };
+    corridorEast->exits["kopirom"] = { copyRoomOne.get(), doorCopy, "" };
     copyRoomOne->exits["dør"] = {
-        corridorEast.get(),
-        true,
-        false,
-        false,
-        "",
+        corridorEast.get(), doorCopy,
         "Døren ut igjen til kaffekroken. På denne siden henger det en lapp der det står: 'Døren kan kun låses opp utenfra'."
+    };
+
+    //Korridor øst <-> The Bikeshed
+    corridorEast->exits["the bikeshed"] = {
+        theBikeshed.get(), doorBikeshed,
+        "Denne døren leder inn til møterommet 'The Bikeshed' med romnummer " + theBikeshedAddr + " Det pågår en høylydt diskusjon der inne."
+    };
+    theBikeshed->exits["dør"] = {
+        corridorEast.get(), doorBikeshed,
+        "Døren ut igjen til korridoren og kaffekroken."
     };
 
     // LEGG TIL ITEMS

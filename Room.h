@@ -19,6 +19,19 @@ struct Exit
 };
 
 class Room {
+
+    struct Door {
+        bool isOpen = false;
+        bool isLocked = false;
+        std::string keyNAme = "";
+    };
+
+    struct Exit {
+        Room* destination = nullptr;
+        std::shared_ptr<Door> door;
+        std::string description = "";
+    };
+    
     public:
     std::string name;
     std::string description;

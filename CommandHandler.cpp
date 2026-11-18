@@ -12,6 +12,19 @@
 #include <string>
 #include <limits>
 
+static bool stripPrefix(std::string& s, const std::string& prefix) {
+    if (s.rfind(prefix, 0) != 0) return false;
+    if (s.size() > prefix.size() && s[prefix.size()] != ' ') s.erase(0, prefix.size());
+    size_t first = s.find_first_not_of(' ');
+    s.erase(0, first == std::string::npos ? s.size() : first ) ;
+    return true;
+}
+
+static bool isNumericCode(const std::string& s) {
+    return !s.empty( && std::all_of(s.begin(), s.end(), [](unsigned char c) { return std::isdigit(c); });
+}
+
+
 std::string getSlotName(int slot) {
     switch (slot) {
         case 1: return "Hode";
@@ -156,6 +169,13 @@ void handleExamine(const std::string &targetName, Room *currentRoom, std::vector
     }
 
     std::string cleanTarget = toLowerNorwegian(targetName);
+    stripPrefix(cleanTarget, "på");
+    if (cleanTarget.empty())
+    {
+        std::cout << "Hva vil du undersøke nærmere?\n";
+        return;
+    }
+
     if (cleanTarget.rfind("på ", 0) == 0)
     {
         cleanTarget = cleanTarget.substr(3);
@@ -536,6 +556,7 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
     }
 
     std::string cleanTarget = toLowerNorwegian(targetName);
+    stripPrefix(cleanTarget, "med");
 
     if (cleanTarget.rfind("med ", 0) == 0)
     {
@@ -707,20 +728,6 @@ namespace
             p.equippedArmour[slot] = selectedItem;
             std::cout << "Du tok på deg " << selectedItem->name << " [" << getSlotName(slot) << "] (+" << selectedItem->acBonus << " AC). Total AC er nå " << p.getTotalAC() << ".\n";
         }
-        else if (lowerName == "kaffekopp" || lowerName == "kaffe" || lowerName == "drink")
-        {
-            if (selectedItem->isFilled)
-            {
-                int healAmount = 10;
-                p.playerHP = std::min(p.playerMaxHP, p.playerHP + healAmount);
-                selectedItem->isFilled = false;
-                std::cout << "Du tar en slurk rykende varm kaffe. Du føler deg våken og får tilbake " << healAmount << " HP! (HP: " << p.playerHP << "/" << p.playerMaxHP << ")\n";
-            }
-            else
-            {
-                std::cout << "Koppen er dessverre tom. Du må finne en kaffemaskin for å fylle den.\n";
-            }
-        }
         else if (lowerType == "consumable" || lowerType == "potion")
         {
             useConsumable(p, *selectedItem);
@@ -729,6 +736,34 @@ namespace
         else
         {
             std::cout << "Du vet ikke helt hvordan du skal bruke " << selectedItem->name << " her.\n";
+        }
+    }
+    void handleDrink(const std::string& itemName, player& p, std::vector<std::shared_ptr<item>>& inventory) {
+        std::string wanted = toLowerNorwegian(itemName.empty() ? "kaffekopp" : itemName);
+
+        auto it = std::find_if(inventory.begin(), inventory.end(), [&wanted](const std::shared_ptr<item>& i) {return toLowerNorwegian(i->name) == wanted; });
+        if (it == inventory.end()) {
+            std::cout << "Du har ingen " << wanted << "' i sekken.\n";
+            return;
+        }
+        
+        std::shared_ptr<item> selected = *it;
+
+        if (selected->type == "consumable") {
+        useConsumable(p, *selected);
+        inventory.erase(it);
+    }
+    else if (selected->name == "kaffekopp") {
+        if (!selected->isFilled) {
+            std::cout << "Koppen er dessverre tom. DU må finne en kaffemaskin for å fylle den.\n";
+            return;
+        }
+        int healAmount = 10;
+        p.playerHP = (std::min)(p.playerMaxHP, p.playerHP + healAmount);
+        selected->isFilled = false;
+        std::cout << "Du tar en slurk rykende varm kaffe. Du får tilbake " << healAmount << " HP! (HP: " << p.playerHP << "/" << p.playerMaxHP << ")\n";
+    } else {
+        std::cout << "Du kan ikke drikke " << selected->name << ".\n";
         }
     }
     void handleFill(const std::string &targetName, Room *currentRoom, std::vector<std::shared_ptr<item>> &inventory)
@@ -795,6 +830,7 @@ namespace
         }
 
         std::string cleanTarget = toLowerNorwegian(targetName);
+        stripPrefix(cleanTarget, "på");
         //Fjern fyllord
         if (cleanTarget.rfind("på", 0) == 0)
         {
@@ -1044,8 +1080,7 @@ bool processCommand(
     }
     else if (verb == "drikk" || verb == "drink")
     {
-        std::string drinkTarget = target.empty() ? "kaffekopp" : target;
-        handleUse(drinkTarget, p, currentRoom, inventory);
+        handleDrink(target, p, inventory);
     }
     else if (verb == "se" || verb == "look")
     {
