@@ -264,7 +264,7 @@ castResult castSpell(
             bool foundAny = false;
             if (currentRoom) {
                 for (const auto& [dir, ex] : currentRoom->exits) {
-                    if (ex.destination && ex.destination->monster) {
+                    if (ex.destination && ex.destination->occupant) {
                         std::cout << " 64 bytes fra noe stort og sint mot '" << dir << "'.\n";
                         foundAny = true;
                     }

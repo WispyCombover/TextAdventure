@@ -243,10 +243,10 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
     // RANDOM ENCOUNTERS
     monsterManual manual;
-    corridorEast->monster = manual.getRandomMonster(1);  // Spawner et tilfeldig level 1 monster i østkorridoren
+    corridorEast->occupant = manual.getRandomMonster(1);  // Spawner et tilfeldig level 1 monster i østkorridoren
 
     // FAST ENCOUNTER
-    salaSegfault->monster = manual.getMonsterBlueprint(2, "Rogue Pointer");
+    salaSegfault->occupant = manual.getMonsterBlueprint(2, "Rogue Pointer");
 
 
 

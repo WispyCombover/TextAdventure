@@ -24,7 +24,7 @@ class Room {
     std::string description;
     std::map<std::string, Exit> exits;  //Peker til tilstøtende rom
     std::vector<item> items;
-    std::unique_ptr<monster> monster;  //nullptr for rom der det ikke er monstre
+    std::unique_ptr<monster> occupant;  //nullptr for rom der det ikke er monstre
     std::vector<std::unique_ptr<NPC>> npcs;
     std::map<std::string, std::string> scenery;
     std::map<std::string, std::string> hiddenItems;  //key = scenery-navn (feks 'sofa'), value = item-navn (feks "inntørket vestlandslefse")

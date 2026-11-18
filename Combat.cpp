@@ -28,11 +28,11 @@ static void onMonsterDefeated(monster* m, player& p, Room* currentRoom) {
         }
     }
 
-    currentRoom->monster = nullptr;
+    currentRoom->occupant = nullptr;
 }
 
 bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<item>>& inventory) {
-    monster* m = currentRoom->monster.get();
+    monster* m = currentRoom->occupant.get();
     if (!m) return true; //Ingen monstre her, spillet fortsetter
 
     std::cout << "\n!!! SKREKK OG GRU !!!\n";

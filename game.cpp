@@ -116,7 +116,7 @@ while (true) {
     while (running) {
 
 
-    if (currentRoom->monster != nullptr) {
+    if (currentRoom->occupant != nullptr) {
         if (!handleCombat(p, currentRoom, inventory)) {
             running = false;
             break;

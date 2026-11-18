@@ -35,7 +35,7 @@ void handleCraft(const std::string &targetInput, std::vector<std::shared_ptr<ite
 {
     if (targetInput.empty())
     {
-        std::cout << "Hva vil du kombinere? (Bruk f.eks. 'kombiner inntørket vestlandslefse med gammel smultring')n";
+        std::cout << "Hva vil du kombinere? (Bruk f.eks. 'kombiner inntørket vestlandslefse med gammel smultring')\n";
         return;
     }
 
