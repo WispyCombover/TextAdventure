@@ -8,22 +8,12 @@
 #include "Monster.h"
 #include "NPC.h"
 
-struct Exit
-{
-    Room *destination = nullptr;
-    bool hasDoor = false;            //Er det en dør, eller en passasje?
-    bool isOpen = true;              //Er døren åpen akkurat nå?
-    bool isLocked = false;           //Er døren låst?
-    std::string keyName = "";        //Hva trengs for å låse opp døren?
-    std::string description = "";    //Tekst som vises når "se dør"
-};
-
 class Room {
-
+public:
     struct Door {
         bool isOpen = false;
         bool isLocked = false;
-        std::string keyNAme = "";
+        std::string keyName = "";
     };
 
     struct Exit {
@@ -32,7 +22,6 @@ class Room {
         std::string description = "";
     };
     
-    public:
     std::string name;
     std::string description;
     std::map<std::string, Exit> exits;  //Peker til tilstøtende rom

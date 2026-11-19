@@ -3,6 +3,7 @@
 #include "Monster.h"
 #include "NPC.h"
 #include "Player.h"
+#include "Room.h"
 #include <sstream>
 #include <iomanip>
 #include <cstdint>
@@ -14,8 +15,8 @@ static std::string getMemoryAddress(const Room* roomPtr) {
     return oss.str();
 }
 
-static std::shared_ptr<Door> makeDoor(bool locked = false, const std::string& key = "") {
-    auto d = std::make_shared<Door>();
+static std::shared_ptr<Room::Door> makeDoor(bool locked = false, const std::string& key = "") {
+    auto d = std::make_shared<Room::Door>();
     d->isLocked = locked;
     d->keyName = key;
     return d;
@@ -29,7 +30,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     );
     auto corridor = std::make_unique<Room>(
         "Korridoren",
-        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker. Det er dører inn til to andre møterom langs veggen: 'RUBBER DUCK SANCTUM' og 'SALA SEGFAULT'.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot."
+        "En lang, smal korridor med falmede tapeter og knirkende gulvplanker som en herlig kontrast mot glassvinduer inn mot møterommene. Det er dører inn til to andre møterom langs veggen: 'RUBBER DUCK SANCTUM' og 'SALA SEGFAULT'.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot."
     );
     auto rubberDuckSanctum = std::make_unique<Room>(
         "Rubber Duck Sanctum",
@@ -50,6 +51,10 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     auto openOfficeOne = std::make_unique<Room>(
         "Kontorlandskapet - gruppe 1",
         "Et åpent kontorlandskap med rekker av hev-senk-pulter og flimrende lysrør i taket. Luften er tung av konsentrasjon og lavmælt tasting. De fleste pultene er forlatt i hui og hast, med halvfulle kaffekopper og ulåste skjermer. Du kan gå tilbake mot SØR, eller videre mot NORD. Her ser du også Brannmur-Guruen sitte og stirre inn i skjermene sine."
+    );
+    auto openOfficeTwo = std::make_unique<Room>(
+        "Kontorlandskapet - gruppe 2",
+        ""
     );
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
@@ -129,28 +134,65 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     };
 
     //Korridor vest <-> Rekvisita (kodepanel)
-    corridorWest->exits["rekvisita"] = { supplyRoom.get(), doorSupply, "" };
-    supplyRoom->exits["dør"]         = { corridorWest.get(), doorSupply, "" };
+    corridorWest->exits["rekvisita"] = { 
+        supplyRoom.get(), 
+        doorSupply, 
+        "" 
+    };
+    supplyRoom->exits["dør"] = { 
+        corridorWest.get(), 
+        doorSupply, 
+        "" 
+    };
 
     //Korridor vest <-> Kontorlandskap
-    corridorWest->exits["nord"]   = { openOfficeOne.get(), nullptr, "" };
-    openOfficeOne->exits["sør"]   = { corridorWest.get(), nullptr, "" };
+    corridorWest->exits["nord"] = { 
+        openOfficeOne.get(), 
+        nullptr, 
+        "" 
+    };
+    openOfficeOne->exits["sør"] = { 
+        corridorWest.get(), 
+        nullptr, 
+        "" 
+    };
+    openOfficeOne->exits["nord"] = {
+        openOfficeTwo.get(),
+        nullptr,
+        ""
+    };
+    openOfficeTwo->exits["sør"] = {
+        openOfficeOne.get(),
+        nullptr,
+        ""
+    };
 
     //Korridor øst <-> Kopirom (to navn, SAMME dør)
-    corridorEast->exits["nord"]    = { copyRoomOne.get(), doorCopy, "" };
-    corridorEast->exits["kopirom"] = { copyRoomOne.get(), doorCopy, "" };
+    corridorEast->exits["nord"] = { 
+        copyRoomOne.get(), 
+        doorCopy, 
+        "" 
+    };
+    corridorEast->exits["kopirom"] = { 
+        copyRoomOne.get(), 
+        doorCopy, 
+        "" 
+    };
     copyRoomOne->exits["dør"] = {
-        corridorEast.get(), doorCopy,
+        corridorEast.get(), 
+        doorCopy,
         "Døren ut igjen til kaffekroken. På denne siden henger det en lapp der det står: 'Døren kan kun låses opp utenfra'."
     };
 
     //Korridor øst <-> The Bikeshed
     corridorEast->exits["the bikeshed"] = {
-        theBikeshed.get(), doorBikeshed,
+        theBikeshed.get(), 
+        doorBikeshed,
         "Denne døren leder inn til møterommet 'The Bikeshed' med romnummer " + theBikeshedAddr + " Det pågår en høylydt diskusjon der inne."
     };
     theBikeshed->exits["dør"] = {
-        corridorEast.get(), doorBikeshed,
+        corridorEast.get(), 
+        doorBikeshed,
         "Døren ut igjen til korridoren og kaffekroken."
     };
 
@@ -225,6 +267,10 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     openOfficeOne->scenery["pulter"] = "Rader med hev-senk-pulter i ulike høyder. På en av dem står en ensom kaktus og et krus med teksten 'World's Okayest Developer'.";
 
 
+    //Kontorlandskapet - gruppe 2
+
+
+
     //Korridoren mot øst
     corridorEast->scenery["kaffemaskin"] = "En industriell trakter som har sett bedre dager. Den putrer illevarslende, og kannen er full av beksvart væske.";
     corridorEast->scenery["dør"] = "På døren henger et skilt der det står 'KOPIROM'. Ved siden av døren ser du en kortleser.";
@@ -263,6 +309,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     allRooms.push_back(std::move(corridorWest));
     allRooms.push_back(std::move(supplyRoom));
     allRooms.push_back(std::move(openOfficeOne));
+    allRooms.push_back(std::move(openOfficeTwo));
     allRooms.push_back(std::move(corridorEast));
     allRooms.push_back(std::move(copyRoomOne));
     allRooms.push_back(std::move(theBikeshed));

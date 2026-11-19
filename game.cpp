@@ -22,15 +22,16 @@
 #include "Spells.h"
 
 //TO-DO AND WISHLIST:
-// -Sub-quests og quest-givers. En som sender spilleren til kjelleren, fordi det er naturligvis der postmottaket er, for å hente ...
+// -Sub-quests og quest-givers. En som sender spilleren til kjelleren, fordi det er naturligvis der postmottaket er, for å hente ... (trenger å brainstorme quest-idéer)
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
 // -Nøkkelkort og adgangskoder....WIP
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)
-// -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!  DONE!
+// -Man bør vel strengt tatt også kunne drikke kaffen - ikke bare kaste den på fiender!  DONE (tror jeg)!
 // -Rundeteller/tickers. Dersom kaffen kan drikkes kan den gi en midlertidig Hit-bonus som går over etter, tja, 1d4 ticks? Eller mer?
-// -Hvor er egentlig spillerens skrivebord og PC? Hen jobber jo her...
+// -Hvor er egentlig spillerens skrivebord og PC? Hen jobber jo her...  
+// -Iallfall to grupper til med openOffice ... man skal jo kunne vinne, så en del questing og levelups må til.
 //....
 
 int main() {

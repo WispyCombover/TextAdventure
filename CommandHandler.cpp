@@ -21,7 +21,7 @@ static bool stripPrefix(std::string& s, const std::string& prefix) {
 }
 
 static bool isNumericCode(const std::string& s) {
-    return !s.empty( && std::all_of(s.begin(), s.end(), [](unsigned char c) { return std::isdigit(c); });
+    return !s.empty() && std::all_of(s.begin(), s.end(), [](unsigned char c) { return std::isdigit(c); });
 }
 
 
@@ -238,20 +238,17 @@ void handleCode(const std::string &codeInput, Room *currentRoom)
         return;
     }
     //Finn alle utganger i rommet som har en numerisk kdoe som keyName
-    Exit *matchingDoor = nullptr;
+    Room::Exit *matchingExit = nullptr;
     bool hasAnyKeypadDoor = false;
 
-    for (auto&[dir, exit] : currentRoom->exits)
+    for (auto& [dir, exit] : currentRoom->exits)
     {
-        //Sjekk om keyName kun består av sifre - altså en PIN-kode, ikke "adgangskort"
-        bool isNumericCode = !exit.keyName.empty() && std::all_of(exit.keyName.begin(), exit.keyName.end(), ::isdigit);
-
-        if (isNumericCode)
+        if (exit.door && isNumericCode(exit.door->keyName))
         {
             hasAnyKeypadDoor = true;
-            if (exit.keyName == codeInput)
+            if (exit.door->keyName == codeInput)
             {
-                matchingDoor = &exit;
+                matchingExit = &exit;
                 break;
             }
         }
@@ -263,17 +260,17 @@ void handleCode(const std::string &codeInput, Room *currentRoom)
         return;
     }
 
-    if (matchingDoor)
+    if (matchingExit && matchingExit->door)
     {
-        if (!matchingDoor->isLocked)
+        if (!matchingExit->door->isLocked)
         {
             std::cout << "Panelet lyser allerede grønt. Døren er ulåst!\n";
         }
         else
         {
-            matchingDoor->isLocked = false;
-            matchingDoor->isOpen = true;
-            std::cout << "*BIIIP!* Kodepanelet blinker grønt, og låsen inn til " << matchingDoor->destination->name << " klikker opp!\n";
+            matchingExit->door->isLocked = false;
+            matchingExit->door->isOpen = true;
+            std::cout << "*BIIIP!* Kodepanelet blinker grønt, og låsen inn til " << matchingExit->destination->name << " klikker opp!\n";
         }
     }
     else
@@ -651,17 +648,21 @@ namespace
 
         if (currentRoom->exits.count(cleanDir))
         {
-            Exit &exit = currentRoom->exits[cleanDir];
-            if (exit.isLocked)
+            Room::Exit &exit = currentRoom->exits[cleanDir];
+            if (exit.door)
             {
-                std::cout << "Døren er låst.\n";
-                return;
+                if (exit.door->isLocked)
+                {
+                    std::cout << "Døren er låst.\n";
+                    return;
+                }
+                if (exit.door->isOpen)
+                {
+                    std::cout << "Døren er lukket. Du må åpne den først.\n";
+                    return;
+                }
             }
-            if (exit.hasDoor && !exit.isOpen)
-            {
-                std::cout << "Døren er lukket. Du må åpne den først.\n";
-                return;
-            }
+            
             p.lastRoom = currentRoom;
             currentRoom = exit.destination;
             printRoomDescription(currentRoom);
@@ -864,14 +865,14 @@ namespace
         //Sjekk utganger
         if (currentRoom->exits.count(cleanTarget))
         {
-            const Exit &exit = currentRoom->exits[cleanTarget];
+            const Room::Exit &exit = currentRoom->exits[cleanTarget];
             if (!exit.description.empty())
             {
                 std::cout << exit.description << " ";
             }
-            if (exit.hasDoor)
+            if (exit.door)
             {
-                std::cout << "Døren er " << (exit.isLocked ? "låst." : (exit.isOpen ? "åpen." : "lukket.")) << "\n";
+                std::cout << "Døren er " << (exit.door->isLocked ? "låst." : (exit.door->isOpen ? "åpen." : "lukket.")) << "\n";
             }
             else
             {
@@ -900,22 +901,22 @@ namespace
             return;
         }
 
-        Exit &exit = currentRoom->exits[cleanTarget];
-        if (!exit.hasDoor)
+        Room::Exit &exit = currentRoom->exits[cleanTarget];
+        if (!exit.door)
         {
             std::cout << "Det er ingen dør der, veien er allerede åpen.\n"; 
         }
-        else if (exit.isLocked)
+        else if (exit.door->isLocked)
         {
             std::cout << "Døren er låst. Du må låse den opp først.\n";
         }
-        else if (exit.isOpen)
+        else if (exit.door->isOpen)
         {
             std::cout << "Døren er allerede åpen.\n";
         }
         else
         {
-            exit.isOpen = true;
+            exit.door->isOpen = true;
             std::cout << "Du åpner døren mot " << exit.destination->name << ".\n";
         }
     }
@@ -929,17 +930,17 @@ namespace
             return;
         }
 
-        Exit &exit = currentRoom->exits[cleanTarget];
-        if (!exit.isLocked)
+        Room::Exit &exit = currentRoom->exits[cleanTarget];
+        if (!exit.door || !exit.door->isLocked)
         {
             std::cout << "Den er ikke låst.\n";
             return;
         }
         //Sjekk om spilleren har riktig nøkkel i sekken
-        auto keyIt = std::find_if(inventory.begin(), inventory.end(), [&exit](const std::shared_ptr<item> &i) { return toLowerNorwegian(i->name).find(exit.keyName) != std::string::npos; });
+        auto keyIt = std::find_if(inventory.begin(), inventory.end(), [&exit](const std::shared_ptr<item> &i) { return toLowerNorwegian(i->name).find(exit.door->keyName) != std::string::npos; });
         if (keyIt != inventory.end())
         {
-            exit.isLocked = false;
+            exit.door->isLocked = false;
             std::cout << "Du bruker " << (*keyIt)->name << " og låser opp døren!\n";
 
             //Fjerner "stemme fra kopirommet" når døren låses pop
