@@ -56,6 +56,10 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         "Kontorlandskapet - gruppe 2",
         ""
     );
+    auto northernCorridorOne = std::make_unique<Room>(
+        "Den nordre korridoren",
+        ""
+    )
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
         "Du kommer til et lite hjørne av korridoren. Du kan høre banking fra døren til kopirommet, og lyden av engasjert prat fra møterommet mot SØR. Møterommet heter: 'THE BIKESHED'. Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD som har et skilt med 'KOPIROM'. Ved siden av døren til kopirommet henger en kortleser." //Man skal kunne snakke med personen som er innelåst på kopirommet. "snakk dør" eller noe slikt...
@@ -84,52 +88,63 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     auto doorSupply  = makeDoor(true, "1357");
     auto doorCopy    = makeDoor(true, "adgangskort");
     auto doorBikeshed = makeDoor();
+    auto doorNorthernCorridorOne = makeDoor(true, "");
 
     //Spawn <-> Korridor
     spawnRoom->exits["dør"] = {
-        corridor.get(), doorSpawn,
+        corridor.get(), 
+        doorSpawn,
         "På døren har noen teipet fast et bilde av en flodhest og teksten: 'GOT MILK?'"
     };
     corridor->exits["kaffekoppens krypt"] = {
-        spawnRoom.get(), doorSpawn,
+        spawnRoom.get(), 
+        doorSpawn,
         "Fra denne siden kan du se dørskiltet som viser navnet på møterommet samt romnummeret. Dette rommet heter 'Kaffekoppens Krypt' og har nummer: " + spawnAddr
     };
 
     //Korridor <-> Rubber Duck Sanctum
     corridor->exits["rubber duck sanctum"] = {
-        rubberDuckSanctum.get(), doorDuck,
+        rubberDuckSanctum.get(), 
+        doorDuck,
         "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Rubber Duck Sanctum' samt romnummeret. Dette rommet har nummer: " + rubberDuckSanctumAddr
     };
     rubberDuckSanctum->exits["dør"] = {
-        corridor.get(), doorDuck,
+        corridor.get(), 
+        doorDuck,
         "Døren tilbake til den knirkende korridoren."
     };
 
     //Korridor <-> Sala Segfault
     corridor->exits["sala segfault"] = {
-        salaSegfault.get(), doorSala,
+        salaSegfault.get(), 
+        doorSala,
         "Fra denne siden kan du se dørskiltet med navnet på møterommet: 'Sala Segfault' samt romnummeret. Dette rommet har nummer: " + salaSegfaultAddr
     };
     salaSegfault->exits["dør"] = {
-        corridor.get(), doorSala,
+        corridor.get(), 
+        doorSala,
         "Døren ut igjen til korridoren. Det frister veldig å lukke den godt bak seg!"
     };
 
     //Korridor <-> Korridor vest/øst (åpne passasjer, ingen dør)
     corridor->exits["vest"] = {
-        corridorWest.get(), nullptr,
+        corridorWest.get(), 
+        nullptr,
         "Når du ser mot vest kan du se døren inn til møterommet 'RUBBER DUCK SANCTUM', forbi døren fortsetter korridoren net til hjørnet med døren inn til REKVISITA. Veien fortsetter nordover derfra og inn i kontorlandskapet."
     };
     corridor->exits["øst"] = {
-        corridorEast.get(), nullptr,
+        corridorEast.get(), 
+        nullptr,
         "Mot øst kan du se korridoren lede forbi møterommet 'SALA SEGFAULT' og ned til kaffekroken der også kopirommet ligger."
     };
     corridorWest->exits["øst"] = {
-        corridor.get(), nullptr,
+        corridor.get(), 
+        nullptr,
         "Du ser tilbake mot møterommet der det hele startet. Det virker så lenge siden nå."
     };
     corridorEast->exits["vest"] = {
-        corridor.get(), nullptr,
+        corridor.get(), 
+        nullptr,
         "Du ser tilbake ned korridoren mot vest. Der ligger møterommet 'Kaffekoppens Krypt', og veien videre mot rekvisitalageret"
     };
 
@@ -166,6 +181,14 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         nullptr,
         ""
     };
+
+    //Korridor nord <-> kontorlandskap gruppe to, rom mot vest (aner ikke hva enda) og nordre korridor videre mot øst.
+    northernCorridorOne->exits["sør"] = {
+        openOfficeTwo.get(),
+        nullptr,
+        ""
+    };
+
 
     //Korridor øst <-> Kopirom (to navn, SAMME dør)
     corridorEast->exits["nord"] = { 
