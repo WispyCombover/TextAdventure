@@ -15,8 +15,9 @@ static std::string getMemoryAddress(const Room* roomPtr) {
     return oss.str();
 }
 
-static std::shared_ptr<Room::Door> makeDoor(bool locked = false, const std::string& key = "") {
+static std::shared_ptr<Room::Door> makeDoor(const std::string& id, bool locked = false, const std::string& key = "") {
     auto d = std::make_shared<Room::Door>();
+    d->id = id;
     d->isLocked = locked;
     d->keyName = key;
     return d;
@@ -59,7 +60,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     auto northernCorridorOne = std::make_unique<Room>(
         "Den nordre korridoren",
         ""
-    )
+    );
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
         "Du kommer til et lite hjørne av korridoren. Du kan høre banking fra døren til kopirommet, og lyden av engasjert prat fra møterommet mot SØR. Møterommet heter: 'THE BIKESHED'. Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD som har et skilt med 'KOPIROM'. Ved siden av døren til kopirommet henger en kortleser." //Man skal kunne snakke med personen som er innelåst på kopirommet. "snakk dør" eller noe slikt...
@@ -82,13 +83,13 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
     //UTGANGER HER
     //DØRER (én per dør, delt mellom begge sider)
-    auto doorSpawn   = makeDoor();
-    auto doorDuck    = makeDoor();
-    auto doorSala    = makeDoor();
-    auto doorSupply  = makeDoor(true, "1357");
-    auto doorCopy    = makeDoor(true, "adgangskort");
-    auto doorBikeshed = makeDoor();
-    auto doorNorthernCorridorOne = makeDoor(true, "");
+    auto doorSpawn   = makeDoor("spawn");
+    auto doorDuck    = makeDoor("duck");
+    auto doorSala    = makeDoor("sala");
+    auto doorSupply  = makeDoor("supply", true, "1357");
+    auto doorCopy    = makeDoor("copy", true, "adgangskort");
+    auto doorBikeshed = makeDoor("bikeshed");
+    auto doorNorthernCorridorOne = makeDoor("northern1", true, "");
 
     //Spawn <-> Korridor
     spawnRoom->exits["dør"] = {
@@ -178,6 +179,11 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     };
     openOfficeTwo->exits["sør"] = {
         openOfficeOne.get(),
+        nullptr,
+        ""
+    };
+    openOfficeTwo->exits["nord"] = {
+        northernCorridorOne.get(),
         nullptr,
         ""
     };
@@ -333,6 +339,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     allRooms.push_back(std::move(supplyRoom));
     allRooms.push_back(std::move(openOfficeOne));
     allRooms.push_back(std::move(openOfficeTwo));
+    allRooms.push_back(std::move(northernCorridorOne));
     allRooms.push_back(std::move(corridorEast));
     allRooms.push_back(std::move(copyRoomOne));
     allRooms.push_back(std::move(theBikeshed));

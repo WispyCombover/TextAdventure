@@ -334,6 +334,10 @@ castResult castSpell(
         if (p.equippedWeapon && isDeletable(p.equippedWeapon)) {
             p.equippedWeapon = nullptr;
         }
+        for (auto it = p.equippedArmour.begin(); it != p.equippedArmour.end(); ) {
+            if (it->second && isDeletable(it->second)) it = p.equippedArmour.erase(it);
+            else ++it;
+        }
         std::erase_if(inventory, isDeletable);
         std::cout << "Sekken din er tom. Bare det viktigste overlevde (--preserve-root).\n";
     }

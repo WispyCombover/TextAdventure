@@ -121,8 +121,7 @@ void handleCraft(const std::string &targetInput, std::vector<std::shared_ptr<ite
             return;
         }
 
-        (*cupIt)->isFilled = true;
-        (*cupIt)->description = "En mye brukt kaffekopp fylt til randen med tvilsom, etsende filterkaffe. Klar til kamp!";
+        fillContainer(**cupIt, "kaffe");
         inventory.erase(coffeeIt);
 
         std::cout << "Du heller den kalde filterkaffen oppi kaffekoppen. Væsken ryker svakt – nå gjør koppen ekstra syreskade!\n";
@@ -656,7 +655,7 @@ namespace
                     std::cout << "Døren er låst.\n";
                     return;
                 }
-                if (exit.door->isOpen)
+                if (!exit.door->isOpen)
                 {
                     std::cout << "Døren er lukket. Du må åpne den først.\n";
                     return;
@@ -761,7 +760,7 @@ namespace
         }
         int healAmount = 10;
         p.playerHP = (std::min)(p.playerMaxHP, p.playerHP + healAmount);
-        selected->isFilled = false;
+        emptyContainer(*selected);
         std::cout << "Du tar en slurk rykende varm kaffe. Du får tilbake " << healAmount << " HP! (HP: " << p.playerHP << "/" << p.playerMaxHP << ")\n";
     } else {
         std::cout << "Du kan ikke drikke " << selected->name << ".\n";
@@ -783,6 +782,11 @@ namespace
             return;
         }
         std::shared_ptr<item>container = *it;
+        if (!container->isContainer)
+        {
+            std::cout << "Du kan ikke fylle " << container->name << ".\n";
+            return;
+        }
         if (container->isFilled)
         {
             std::cout << container->name << " er allerede full!\n";
@@ -791,20 +795,12 @@ namespace
         std::string roomLower = toLowerNorwegian(currentRoom->name);
         if (roomLower == "korridoren mot øst")
         {
-            container->isFilled = true;
-            container->description = "Fylt med lett svidd, glovarm, beksvart og etsende trakterkaffe! (1d2 bludgeoning + 1d4 acid).\n";
-            container->extraDiceSides = 4;
-            container->extraDiceCount = 1;
-            container->extraDamageType = "Acid";
+            fillContainer(*container, "kaffe");
             std::cout << "BRRrrrzzzzt Du fyller " << container->name << " med beksvart, rykende varm kontorkaffe! Den lukter etsende, men også oppfriskende.\n";
         }
         else if (roomLower == "toalettet" || roomLower == "kjøkkenet")
         {
-            container->isFilled = true;
-            container->description = "Fylt med lunkent springvann.\n";
-            container->extraDiceSides = 0;
-            container->extraDiceCount = 0;
-            container->extraDamageType = "";
+            fillContainer(*container, "vann");
             std::cout << "Du fyller " << container->name << " med friskt vann fra springen.\n";
         }
         else
@@ -1056,6 +1052,13 @@ bool processCommand(
                 std::cout << "Tom\n";
             }
         }
+        if (!p.activeEffects.empty()) {
+            std::cout << "Aktive effekter: ";
+            for (const auto& eff : p.activeEffects) {
+                std::cout << "[" << eff.name << " (" << eff.turnsRemaining << " runder)] ";
+            }
+            std::cout << "\n";
+        }
     }
     else if (verb == "bruk" || verb == "use" || verb == "utstyr" || verb == "equip")
     {
@@ -1124,7 +1127,7 @@ bool processCommand(
     }
     else if (lowerInput == "lagre" || lowerInput == "save")
     {
-        saveGame(p, currentRoom, inventory);
+        saveGame(p, currentRoom, allRooms, inventory);
     }
     else if (lowerInput == "last" || lowerInput == "load")
     {
@@ -1132,10 +1135,6 @@ bool processCommand(
         {
             std::cout << "Spillet ble lastet inn.\n";
             printRoomDescription(currentRoom);
-        }
-        else
-        {
-            std::cout << "Fant ingen lagringsfil.\n";
         }
     }
     else if (verb == "snakk" || verb == "talk" || verb == "prat")

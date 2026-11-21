@@ -53,6 +53,8 @@ struct item {
     bool isFilled = false;
     bool throwable = false;
     bool isQuestItem = false;  //Sett denne til true på kritiske items
+    bool isContainer = false;
+    std::string contents = "";
 };
 
 const Recipe* findRecipe(const std::string& itemA, const std::string& itemB);
@@ -60,3 +62,5 @@ const std::vector<item>& itemList();
 item getItem(const std::string& name);
 bool itemExists(const std::string& name);
 void inspectItem(const item& it);
+bool fillContainer(item& it, const std::string& liquid);
+void emptyContainer(item& it);

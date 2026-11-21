@@ -5,5 +5,12 @@
 #include "Room.h"
 #include "Item.h"
 
-void saveGame(const player& p, const Room* currentRoom, const std::vector<std::shared_ptr<item>>& inventory);
-bool loadGame(player& p, Room*& currentRoom, const std::vector<std::unique_ptr<Room>>& allRooms, std::vector<std::shared_ptr<item>>& inventory);
+void saveGame(const player& p,
+              const Room* currentRoom,
+              const std::vector<std::unique_ptr<Room>>& allRooms,
+              const std::vector<std::shared_ptr<item>>& inventory);
+
+bool loadGame(player& p,
+              Room*& currentRoom,
+              const std::vector<std::unique_ptr<Room>>& allRooms,
+              std::vector<std::shared_ptr<item>>& inventory);

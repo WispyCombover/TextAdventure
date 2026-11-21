@@ -22,6 +22,7 @@
 #include "Spells.h"
 
 //TO-DO AND WISHLIST:
+// -Monstre må også bruke rollDice
 // -Sub-quests og quest-givers. En som sender spilleren til kjelleren, fordi det er naturligvis der postmottaket er, for å hente ... (trenger å brainstorme quest-idéer)
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
@@ -100,7 +101,7 @@ while (true) {
             std::cout << "\nLagret sesjon gjenopprettet! Velkommen tilbake, " << p.name << ".\n";
             break;
         } else {
-            std::cout << "[MIMIR]: 'Fant ingen lagringsfil i systemet. Skriv 'start' for ny sesjon.'\n";
+            std::cout << "[MIMIR]: 'Skriv 'start' for ny sesjon.'\n";
         }
     }
     else if (cleanCmd == "avslutt" || cleanCmd == "quit") {
@@ -130,7 +131,12 @@ while (true) {
     std::getline(std::cin, input);
     if (!processCommand(input, p, currentRoom, allRooms, inventory)) {
         running = false;
-    }  
+    }
+    else if (p.playerHP <= 0) {
+        std::cout << "\n=== GAME OVER ===\n";
+        std::cout << "Du segner om på kontorgulvet. Mimir logger deg ut og noterer 'matforgiftning' i hendelsesloggen.\n";
+        running = false;
+    }
 }
     return 0;
 }

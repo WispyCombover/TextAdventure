@@ -11,6 +11,7 @@
 class Room {
 public:
     struct Door {
+        std::string id;
         bool isOpen = false;
         bool isLocked = false;
         std::string keyName = "";

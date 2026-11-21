@@ -41,7 +41,8 @@ namespace {
             .extraDiceCount = 1,
             .extraDamageType = "acid",
             .isFilled = false,
-            .throwable = true
+            .throwable = true,
+            .isContainer = true
         },
         {
             .name = "penn",
@@ -470,4 +471,37 @@ const Recipe* findRecipe(const std::string& itemA, const std::string& itemB) {
         }
     }
     return nullptr;
+}
+
+bool fillContainer(item& it, const std::string& liquid) {
+    if (!it.isContainer) return false;
+    if (liquid == "kaffe") {
+        it.isFilled = true;
+        it.contents = "kaffe";
+        it.description = "Fylt med lett svidd, glovarm, beksvart og etsende trakterkaffe! (1d2 bludgeoning + 1d4 acid).";
+        it.extraDiceSides = 4,
+        it.extraDiceCount = 1;
+        it.extraDamageType = "Acid";
+        return true;
+    }
+    if (liquid == "vann") {
+        it.isFilled = true;
+        it.contents = "vann";
+        it.description = "Fylt med lunkent springvann.";
+        it.extraDiceSides = 0;
+        it.extraDiceCount = 0,
+        it.extraDamageType = "";
+        return true;
+    }
+    return false;
+}
+
+void emptyContainer(item& it) {
+    const item base = getItem(it.name);
+    it.isFilled = false;
+    it.contents = base.contents;
+    it.description = base.description;
+    it.extraDiceSides = base.extraDiceSides;
+    it.extraDiceCount = base.extraDiceCount;
+    it.extraDamageType = base.extraDamageType;
 }

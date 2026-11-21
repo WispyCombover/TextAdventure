@@ -1,11 +1,10 @@
+#define NOMINMAX
 #pragma once
 #include <string>
 #include <memory>
 #include <vector>
 #include <iostream>
 #include <algorithm>
-#define NOMINMAX
-#include <windows.h>
 #include "Item.h"
 #include <map>
 
@@ -55,23 +54,22 @@ struct player {
 
     //Sjekk om spilleren har en aktiv effekt
     void tickEffects() {
+        bool crashPending = false;
+
         for (auto it = activeEffects.begin(); it != activeEffects.end(); ) {
-            it->turnsRemaining--;
-
-            if (it->turnsRemaining <= 0) {
+           
+            if (--it->turnsRemaining <= 0) {
                 std::cout << "[Status] Effekten '" << it->name << "' har gått ut.\n";
-
-                if (it->type == StatusType::caffeineRush) {
-                    std::cout << "[Status] Hendene dine skjelver... Du får [Sukkerkrasj] (-2 angrep) i 1 runde!\n";
-                    it = activeEffects.erase(it);
-                    addEffect(StatusType::sugarCrash, "Sukkerkrasj", 1, -2);
-                    continue;
-                }
-
+                if (it->type == StatusType::caffeineRush) crashPending = true;
                 it = activeEffects.erase(it);
             } else {
                 ++it;
             }
+        }
+
+        if (crashPending) {
+            std::cout << "[Status] Hendene dine skjelver... Du får [Sukkerkrasj] (-2 angrep) i 1 runde!\n";
+            addEffect(StatusType::sugarCrash, "Sukkerkrasj", 1, -2);
         }
     }
 
