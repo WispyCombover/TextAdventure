@@ -58,7 +58,7 @@ namespace {
         {
             .name = "mekanisk tastatur",
             .description = "Et blytungt tastatur med Cherry MX Blue-brytere. Skaden er både fysisk og psykisk.",
-            .value = 15,
+            .value = 3,
             .currency = "MB",
             .type = "weapon",
             .damageDiceSides = 8,

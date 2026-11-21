@@ -57,10 +57,48 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         "Kontorlandskapet - gruppe 2",
         ""
     );
+
     auto northernCorridorOne = std::make_unique<Room>(
-        "Den nordre korridoren",
+        "Den nordre korridoren - vest",
         ""
     );
+    auto restroomsIT = std::make_unique<Room>(
+        "Unisex restrooms for the IT department",
+        ""
+    );
+    auto northernCorridorMid = std::make_unique<Room>(
+        "Den nordre korridoren - senter",
+        ""
+    );
+    auto theHotfixHotel = std::make_unique<Room>(
+        "The Hotfix Hotel",
+        ""
+    );
+    auto serviceUnavailable = std::make_unique<Room>(
+        "503: Service Unavailable",
+        ""
+    );
+    auto elevatorFromIT = std::make_unique<Room>(
+        "Personheis",
+        ""
+    );
+    auto northernCorridorTwo = std::make_unique<Room>(
+        "Den nordre korridoren - øst",
+        ""
+    );
+    auto openOfficeThree = std::make_unique<Room>(
+        "Kontorlandskapet - gruppe 3",
+        ""
+    );
+    auto openOfficeFour = std::make_unique<Room>(
+        "Kontorlandskapet - gruppe 4",
+        ""
+    );
+    auto stairwellFromIT = std::make_unique<Room>(
+        "Trappeganen",
+        ""
+    );
+
     auto corridorEast = std::make_unique<Room>(
         "Korridoren mot øst",
         "Du kommer til et lite hjørne av korridoren. Du kan høre banking fra døren til kopirommet, og lyden av engasjert prat fra møterommet mot SØR. Møterommet heter: 'THE BIKESHED'. Her ser du også en liten sittegruppe med noen stoler og et bord, og på et lite bord i hjørnet står en gammel kaffemaskin. \nDu kan gå tilbake mot VEST, eller gjennom en dør mot NORD som har et skilt med 'KOPIROM'. Ved siden av døren til kopirommet henger en kortleser." //Man skal kunne snakke med personen som er innelåst på kopirommet. "snakk dør" eller noe slikt...
@@ -80,6 +118,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     std::string rubberDuckSanctumAddr = getMemoryAddress(rubberDuckSanctum.get());
     std::string salaSegfaultAddr = getMemoryAddress(salaSegfault.get());
     std::string theBikeshedAddr = getMemoryAddress(theBikeshed.get());
+    std::string hotfixHotelAddr = getMemoryAddress(theHotfixHotel.get());
+    std::string serviceUnavailableAddr = getMemoryAddress(serviceUnavailable.get());
 
     //UTGANGER HER
     //DØRER (én per dør, delt mellom begge sider)
@@ -89,7 +129,11 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     auto doorSupply  = makeDoor("supply", true, "1357");
     auto doorCopy    = makeDoor("copy", true, "adgangskort");
     auto doorBikeshed = makeDoor("bikeshed");
-    auto doorNorthernCorridorOne = makeDoor("northern1", true, "");
+    auto doorRestroomIT = makeDoor("restroom", true, "");
+    auto doorHotfix = makeDoor("hotfix");
+    auto doorServiceUnavailable = makeDoor("service");
+    auto doorElevator = makeDoor("lift");
+    auto doorStairwell = makeDoor("stairs");
 
     //Spawn <-> Korridor
     spawnRoom->exits["dør"] = {

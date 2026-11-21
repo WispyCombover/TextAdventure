@@ -23,6 +23,9 @@ struct StatusEffect {
     int magnitude;          // Styrke på effekt (+2 f.eks)
 };
 
+inline constexpr int kXpToLevelUp[] = {25, 60, 110, 170};
+in xpNeededForLevel(int level);
+
 struct player {
     std::string name;  //Trenger en start game funksjon som ber om spillerens navn
     int playerLvl = 1;
@@ -31,7 +34,7 @@ struct player {
     int playerMaxHP = 20;
     long long dataBalanceKB = 1024;  //Spilleren starter med 1MB (om det er for lite/mye kan vi justere)
     int playerBaseDamage = 2;
-    int xpToNextLevel = 100;
+    int xpToNextLevel = kXpToLevelUp[0];
     int playerAC = 10;
 
     int playerMana = 10;
@@ -86,6 +89,7 @@ struct player {
 
     //koden ligger i player.cpp - viser til funksjonen her
     void gainXp(int amount);
+    void applyLevelUp();
 
     std::map<int, std::shared_ptr<item>> equippedArmour;
 

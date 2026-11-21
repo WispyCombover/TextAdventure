@@ -34,7 +34,13 @@ monsterManual::monsterManual() {
         .attackDamage = 2, 
         .xpReward = 7, 
         .monsterAC = 12,
-        .attackMessage = "Spammer deg med 'Godta alle' -knapper til du mister oversikten!"
+        .attackMessage = "Spammer deg med 'Godta alle' -knapper til du mister oversikten!",
+        .minDataReward = 150,
+        .maxDataReward = 450,
+        .lootTable = {
+            { getItem("mango loco"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
     blueprintDatabase[1].push_back({
         .name = "The Missing Semicolon",
@@ -45,7 +51,13 @@ monsterManual::monsterManual() {
         .attackDamage = 3, 
         .xpReward = 10, 
         .monsterAC = 14,
-        .attackMessage = "Angriper i mørket, får deg til å snuble og kaster en 'Compilation Error' rett i ansiktet ditt!"
+        .attackMessage = "Angriper i mørket, får deg til å snuble og kaster en 'Compilation Error' rett i ansiktet ditt!",
+        .minDataReward = 200,
+        .maxDataReward = 600,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
 
     // LEVEL 2
@@ -58,7 +70,13 @@ monsterManual::monsterManual() {
         .attackDamage = 5, 
         .xpReward = 15, 
         .monsterAC = 14,
-        .attackMessage = "Holder en endeløs monolog og påfører deg 'Feature Creep' -skade over tid!"
+        .attackMessage = "Holder en endeløs monolog og påfører deg 'Feature Creep' -skade over tid!",
+        .minDataReward = 400,
+        .maxDataReward = 1000,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
     blueprintDatabase[2].push_back({
         .name = "The Jira Ticket Overlord",
@@ -69,18 +87,30 @@ monsterManual::monsterManual() {
         .attackDamage = 4, 
         .xpReward = 15, 
         .monsterAC = 15,
-        .attackMessage = "Oppretter tre nye sub-tasks som du MÅ løse med én gang!"
+        .attackMessage = "Oppretter tre nye sub-tasks som du MÅ løse med én gang!",
+        .minDataReward = 400,
+        .maxDataReward = 1000,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
     blueprintDatabase[2].push_back({
         .name = "Rogue Pointer",
         .description = "En glitrende, ustabil anomali av rå minnedata og løse pekere som peker rett ut i intet. Den flimrer inn og ut av eksistens med en skarp, statisk knitring.",
         .level = 2,
-        .hp = 20,
-        .maxHp = 20,
-        .attackDamage = 5,
+        .hp = 15,
+        .maxHp = 15,
+        .attackDamage = 4,
         .xpReward = 20,
-        .monsterAC = 14,
-        .attackMessage = "Hopper til en uallokert minneadresse og kaster en 'Segmentation Fault (core dumped)' rett i brystet ditt!"
+        .monsterAC = 12,
+        .attackMessage = "Hopper til en uallokert minneadresse og kaster en 'Segmentation Fault (core dumped)' rett i brystet ditt!",
+        .minDataReward = 500,
+        .maxDataReward = 1300,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
 
     // LEVEL 3
@@ -93,7 +123,13 @@ monsterManual::monsterManual() {
         .attackDamage = 8, 
         .xpReward = 22, 
         .monsterAC = 16,
-        .attackMessage = "Endrer IP-adressen din i skjul, så angrepene dine treffer deg selv i stedet!"
+        .attackMessage = "Endrer IP-adressen din i skjul, så angrepene dine treffer deg selv i stedet!",
+        .minDataReward = 700,
+        .maxDataReward = 1500,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
     blueprintDatabase[3].push_back({
         .name = "The COBOL Leviathan",
@@ -104,7 +140,13 @@ monsterManual::monsterManual() {
         .attackDamage = 6, 
         .xpReward = 35, 
         .monsterAC = 17,
-        .attackMessage = "Brøler et uforståelig feilsøkings-dump fra 1983 og lammer deg med nostalgi!"
+        .attackMessage = "Brøler et uforståelig feilsøkings-dump fra 1983 og lammer deg med nostalgi!",
+        .minDataReward = 1000,
+        .maxDataReward = 2500,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
 
     // LEVEL 4
@@ -112,12 +154,18 @@ monsterManual::monsterManual() {
         .name = "Bobby Tables (The Dropper of Databases)",
         .description = "En beryktet skikkelse som bærer på et skilt hvor det står: '; DROP TABLE Monsters;--'.",
         .level = 4, 
-        .hp = 75, 
+        .hp = 60, 
         .maxHp = 75, 
         .attackDamage = 12, 
         .xpReward = 50, 
         .monsterAC = 18,
-        .attackMessage = "Kaster en SQL-injection som sletter vitale deler av dine essensielle funksjoner!"
+        .attackMessage = "Kaster en SQL-injection som sletter vitale deler av dine essensielle funksjoner!",
+        .minDataReward = 2000,
+        .maxDataReward = 4000,
+        .lootTable = {
+            { getItem("rød monster"), 75 },
+            { getItem("gammel smultring"), 50 }
+        }
     });
 
     // LEVEL 5
@@ -127,9 +175,9 @@ monsterManual::monsterManual() {
         .level = 5, 
         .hp = 200, 
         .maxHp = 200, 
-        .attackDamage = 25, 
+        .attackDamage = 18, 
         .xpReward = 225, 
-        .monsterAC = 19,
+        .monsterAC = 18,
         .attackMessage = "Kaster 'ASAP-panikk' over deg, spiser opp nattesøvnen din, og tvinger deg til å rulle ut uferdig kode i produksjon!",
         .lootTable = {
             { getItem("produksjonsnøklene"), 100 },

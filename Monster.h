@@ -37,4 +37,5 @@ class monsterManual {
         monsterManual();
         std::unique_ptr<monster> getMonsterBlueprint(int level, const std::string& name);
         std::unique_ptr<monster> getRandomMonster(int level);
+        const std::map<int, std::vector<monster>>& blueprints() const { return blueprintDatabase; }
 };

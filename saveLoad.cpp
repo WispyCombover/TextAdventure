@@ -384,7 +384,7 @@ bool loadGame(player& p,
     p.name           = d.name;
     p.playerLvl      = d.level;
     p.playerXP       = d.xp;
-    p.xpToNextLevel  = d.xpToNext;
+    p.xpToNextLevel  = xpNeededForLevel(d.level);
     p.playerHP       = d.hp;
     p.playerMaxHP    = d.maxHp;
     p.playerMana     = d.mana;

@@ -3,6 +3,8 @@
 #include <iostream>
 #include <algorithm>
 
+constexpr int kKillNineMaxHpPercent = 35;
+
 namespace {
     std::string trim(const std::string& s) {
         const char* ws = " \t\r\n";
@@ -293,9 +295,11 @@ castResult castSpell(
         case spellSpecial::KillNine:
             if (target->level >= 5) {
                 std::cout << "Prosessen er allerede zombie. Den bryr seg ikke.\n";
-            } else {
+            } else if (target->hp * 100 <= target->maxHp * kKillNineMaxHpPercent) {
                 target->hp = 0;
                 std::cout << target->name << " får ikke engang tid til å rope.\n";
+            } else {
+                std::cout << target->name << " er altfor sprek til å drepes med ett signal. SIGKILL ignorert. (Svekk den først.)\n";
             }
             return castResult::Cast;
         

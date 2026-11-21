@@ -1,4 +1,6 @@
 #include "Combat.h"
+#include "CombatRules.h"
+#include "Consumables.h"
 #include "Utils.h"
 #include "Monster.h"
 #include "Spells.h"
@@ -31,6 +33,13 @@ static void onMonsterDefeated(monster* m, player& p, Room* currentRoom) {
     currentRoom->occupant = nullptr;
 }
 
+//Har spilleren noen consumables?
+static bool hasDrinkable(const std::vector<std::shared_ptr<item>>& inventory) {
+    return std::any_of(inventory.begin(), inventory.end(), []const.std::shared_ptr<item>& i) {
+        return i->type == "consumable" || (i->name == "kaffekopp" && i->isFilled);
+    });
+}
+
 bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<item>>& inventory) {
     monster* m = currentRoom->occupant.get();
     if (!m) return true; //Ingen monstre her, spillet fortsetter
@@ -42,6 +51,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
 
     while (m->hp > 0 && p.playerHP > 0) {
         std::string prompt = "Hva gjør du? [angrip / flykt / kast <gjenstand> ";
+        if (hasDrinkable(inventory)) prompt += " / drikk <gjenstand>";
         if (hasSpellbook(inventory)) prompt += " / cast <formel>";
         prompt += "]\n> ";
         std::cout << prompt;
@@ -127,6 +137,14 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 return true;
             }
         }
+
+        //DRIKKE - koster en runde, men kun dersom noe blir drukket
+        else if (combatInput == "drikk" || combatInput.rfind("drikk", 0) == 0) {
+            std::string what = (combatInput == "drikk") ? "": combatInput.substr(6);
+            if (!drinkItem(p, inventory, what)) continue;
+        }
+
+        //SPELLCASTING
         else if (combatInput == "cast" || combatInput.rfind("cast ", 0) == 0) {
             if (combatInput == "cast") {
                 listSpells(p, inventory);
