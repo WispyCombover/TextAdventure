@@ -146,7 +146,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 p.equippedWeapon = nullptr;
             }
 
-            if (thrownItem->destroyOnThrow) {
+            if (thrownItem->destroyOnThrow && rollDice(100) <= thrownItem->breakChancePercent) {
                 std::cout << "KRAASJ! Din " << thrownItem->name << " ble ødelagt i sammenstøtet!\n";
 
                 if (thrownItem->spawnsHazardOnThrow) {
@@ -263,6 +263,35 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
 
         //Monsterets tur
         if (m->hp > 0) {
+            //Sjekk om monsteret tråkker på caltrops
+            for (auto hazIt = currentRoom->hazards.begin(); hazIt != currentRoom->hazards.end(); ) {
+                int hazardDmg = 0;
+                for (int i = 0; i < hazIt->damageDiceCount; ++i) {
+                    hazardDmg += rollDice(hazIt->damageDiceSides);
+                }
+                hazardDmg = applyDamageModifiers(hazardDmg, hazIt->damageType, *m);
+                m->hp -= hazardDmg;
+
+                std::cout << "AU! " << m->name << " tråkker rett på " << hazIt->name << " og tar " << hazardDmg << " " << hazIt->damageType << "-skade!\n";
+
+                hazIt->charges--;
+                if (hazIt->charges <= 0) {
+                    std::cout << "(" << hazIt->name << " er nå sparket utover og utgjør ingen fare lenger.)\n";
+                    hazIt = currentRoom->hazards.erase(hazIt);
+                } else {
+                    ++hazIt;
+                }
+
+                if (m->hp <= 0) break;
+            }
+
+            //Hvis monsteret døde av å tråkke på caltrops
+            if (m->hp <=0) {
+                std::cout << m->name << " kollapser etter å ha tråkket på fellene på gulvet! Veien videre er klar.\n";
+                onMonsterDefeated(m, p, currentRoom);
+                return true;
+            }
+            
             std::cout << m->name << " " << m->attackMessage << "\n";
 
             AttackRoll b = rollToHit(monsterAttackBonus(*m), p.getTotalAC());

@@ -67,6 +67,8 @@ struct item {
     int hazardDiceSides = 4;
     std::string hazardDamageType = "";
     int hazardCharges = 0;
+    int breakChancePercent = 100;
+    bool spawnsHazardOnThrow = false;
 };
 
 const Recipe* findRecipe(const std::string& itemA, const std::string& itemB);

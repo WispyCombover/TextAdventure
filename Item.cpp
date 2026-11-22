@@ -57,7 +57,9 @@ namespace {
             .hazardDiceCount = 1,
             .hazardDiceSides = 4,
             .hazardDamageType = "piercing",
-            .hazardCharges = 3
+            .hazardCharges = 3,
+            .breakChancePercent = 80,
+            .spawnsHazardOnThrow = true,
         },
         {
             .name = "penn",
