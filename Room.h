@@ -40,6 +40,8 @@ public:
     std::vector<std::unique_ptr<NPC>> npcs;
     std::map<std::string, std::string> scenery;
     std::map<std::string, std::string> hiddenItems;  //key = scenery-navn (feks 'sofa'), value = item-navn (feks "inntørket vestlandslefse")
+    int discoveryXP = 5;        //Standard XP for å oppdage et rom
+    bool visited = false;       //Settes til true ved første besøk
 
     Room(std::string n, std::string d);
 

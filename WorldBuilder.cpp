@@ -513,6 +513,23 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     allRooms.push_back(std::move(copyRoomOne));
     allRooms.push_back(std::move(theBikeshed));
 
+    //DISCOVERY XP
+    corridor->discoveryXP = 5;
+    rubberDuckSanctum->discoveryXP = 5;
+    salaSegfault->discoveryXP = 10;
+    corridorWest->discoveryXP = 5;
+    corridorEast->discoveryXP = 5;
+    supplyRoom->discoveryXP = 10;
+    openOfficeOne->discoveryXP = 5;
+    openOfficeTwo->discoveryXP = 5;
+    copyRoomOne->discoveryXP = 10;
+    theBikeshed->discoveryXP = 5;
+    northernCorridorOne->discoveryXP = 5;
+    northernCorridorMid->discoveryXP = 5;
+    northernCorridorTwo->discoveryXP = 5;
+    serviceUnavailable->discoveryXP = 15;
+
+    spawnRoom->visited = true;      //Man får ikke XP bare for å starte spillet
     //SEND SPAWN TIL game.cpp
     return startingRoomPtr;
     
