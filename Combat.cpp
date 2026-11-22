@@ -93,10 +93,13 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 for (int i = 0; i < thrownItem->damageDiceCount * diceMultiplier; ++i) {
                     damage += rollDice(thrownItem->damageDiceSides);
                 }
+                damage = applyDamageModifiers(damage, thrownItem->damageType, *m);
                 if (thrownItem->isFilled) {
                     //Koppen er full: gjør ekstra acid damage  Hmmm, dette fungerer for nå, men ønsker å utvide med flere forskjellige throwables!
                     int acidDamage = 0;
                     for (int i = 0; i < diceMultiplier; ++i) acidDamage += rollDice(6);
+
+                    acidDamage = applyDamageModifiers(acidDamage, "acid", *m);
                     damage += acidDamage;
                     std::cout << "PLASK! " << thrownItem->name << " var full av glovarm kontorkaffe!\n";
                     std::cout << "Det gjør " << acidDamage << " ekstra ACID-skade på " << m->name << ".\n";
@@ -105,7 +108,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                     int acReduction = 2;
                     m->monsterAC -= acReduction;
                     std::cout << "Gulvet blir såpeglatt av sølet! " << m->name << " mister " << acReduction << " AC. (Ny AC: " << m->monsterAC << ").\n";
-                } else {
+                } else if (thrownItem->isContainer) {
                     std::cout << thrownItem->name << " var tom og treffer med et tørt 'KLONK'!\n";
                 }
                 m->hp -= damage;
@@ -185,7 +188,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                     std::cout << "Du har ikke valgt et våpen, og slår løs med bare knyttnevene!\n";
                 }
 
-                int damageDealt = rollPlayerMeleeDamage(p, a.crit);
+                int damageDealt = rollPlayerMeleeDamage(p, *m, a.crit);
                 m->hp -= damageDealt;
                 if (a.crit) {
                     std::cout << "CRITICAL HIT! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";

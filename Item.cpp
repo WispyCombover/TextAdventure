@@ -21,6 +21,12 @@ namespace {
             .ingredient2 = "hvit monster",
             .resultItem = "overklokket monster-brygg",
             .craftText = "Du heller den røde og den hvite Monsteren sammen i én boks. Blandingen bruser illevarslende som en overbelastet kjøleribbe."
+        },
+        {
+            .ingredient1 = "defekt strømforsyning",
+            .ingredient2 = "usb-minnepinne merket 'ikkje rør'",
+            .resultItem = "overklokket usb-killer",
+            .craftText = "Du lodder ledningene fra strømforsyningen rett inn på USB-pinnen med ren viljestyrke. Den lukter svidd ozon!"
         }
     };
 
@@ -104,6 +110,47 @@ namespace {
             .damageDiceCount = 2,
             .damageType = "Bludgeoning",
             .throwable = true
+        },
+        {
+            .name = "defekt strømforsyning",
+            .description = "En blytung PSU fra en stasjonær PC fra 2012. Kondensatorene buler illevarslende. Perfekt som kastevåpen eller til å tappe strøm fra.",
+            .value = 3,
+            .currency = "MB",
+            .type = "weapon",
+            .damageDiceSides = 6,
+            .damageDiceCount = 1,
+            .damageType = "Bludgeoning",
+            .throwable = true
+        },
+        {
+            .name = "usb-minnepinne merket 'ikkje rør'",
+            .description = "En slitt 4GB minnepinne funnet teipet fast under en server. Ingen vet hva som er på den, men den blir varm når du holder den.",
+            .value = 10,
+            .currency = "MB",
+            .type = "crafting",
+            .isQuestItem = false
+        },
+        {
+            .name = "overklokket usb-killer",
+            .description = "Du har koblet en gammel strømforsyning rett inn i den mystiske minnepinnen. Et livsfarlig, engangs cyber-våpen som steker kretskort og monstre.",
+            .value = 50,
+            .currency = "MB",
+            .type = "weapon",
+            .damageDiceSides = 12,
+            .damageDiceCount = 2,
+            .damageType = "Lightning",
+            .throwable = true
+        },
+        {
+            .name = "deodorant og lighter",
+            .description = "En halvfull boks Axe Dark Temptation og en reklame-lighter fra et IT-seminar. Improvisert flammekaster som garantert bryter HMS-reglementet.",
+            .value = 8,
+            .currency = "MB",
+            .type = "weapon",
+            .damageDiceSides = 6,
+            .damageDiceCount = 2,
+            .damageType = "Fire",
+            .throwable = false
         },
 
         // ====== CONSUMABLES ======
@@ -203,6 +250,30 @@ namespace {
             .effectFlatBonus = 2,
             .consumeText = "Du styrter det overklokkede brygget. Tiden ser ut til å gå i sakte film mens pulsen treffer taket!"
         },
+        {
+            .name = "lunken kaffe fra i går",
+            .description = "En halvfull pappkopp som har stått på en pult siden forrige sprint. Smaker som flytende anger, men gir 1d4 Mana.",
+            .value = 10,
+            .currency = "kB",
+            .type = "consumable",
+            .effect = itemEffect::restoreMana,
+            .effectDiceSides = 4,
+            .effectDiceCount = 1,
+            .effectFlatBonus = 1,
+            .consumeText = "Du tvinger i deg den kalde gruten. Den smaker brent gummi, men hjernen våkner motvillig til liv."
+        },
+        {
+            .name = "halvspist energibar",
+            .description = "Smak av sjokolade og eksistensiell overtid. Gjenoppretter 1d6 + 1 HP.",
+            .value = 25,
+            .currency = "kB",
+            .type = "consumable",
+            .effect = itemEffect::healHp,
+            .effectDiceSides = 6,
+            .effectDiceCount = 1,
+            .effectFlatBonus = 1,
+            .consumeText = "Den er seig som viskelær, men gir deg akkurat nok kalorier til å fortsette."
+        },
 
         // ====== ARMOUR / SHIELDS ======
         // Light armour
@@ -241,6 +312,15 @@ namespace {
             .type = "armour",
             .acBonus = 1,
             .equipSlot = 1
+        },
+        {
+            .name = "taktisk cargobukse",
+            .description = "En grå turbukse med åtte lommer fulle av kvitteringer, adaptere og gamle kaffekort. Gir +1 AC og uforklarlig selvtillit under driftstans.",
+            .value = 2,
+            .currency = "MB",
+            .type = "armour",
+            .acBonus = 1,
+            .equipSlot = 4
         },
 
         //Medium armour

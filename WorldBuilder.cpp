@@ -344,6 +344,11 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
     supplyRoom->items.push_back(getItem("kopipapir"));
 
+    openOfficeTwo->items.push_back(getItem("hvit monster"));
+    openOfficeTwo->items.push_back(getItem("lunken kaffe fra i går"));
+
+    serviceUnavailable->items.push_back(getItem("gammel cat5-kabel"));
+
     
 
     // RANDOM ENCOUNTERS
@@ -411,10 +416,19 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
 
     //Kontorlandskapet - gruppe 2
-
+    openOfficeTwo->scenery["pult"] = "På den innerste pulten står en halvfull pappkopp ved siden av en stabel med uåpnede Jira-tickets.";
+    openOfficeTwo->scenery["kaffekopp"] = openOfficeTwo->scenery["pult"];
+    openOfficeTwo->hiddenItems["pult"] = "lunken kaffe fra i går";
+    openOfficeTwo->scenery["bokser"] = "Under pulten ligger en liten pyramide av tomme energidrikk-bokser. Én av dem kjennes mistenkelig tung ut!";
+    openOfficeTwo->hiddenItems["bokser"] = "hvit monster";
 
     //Nordre korridor - vest
     northernCorridorOne->scenery["restrooms"] = "Døren til IT-avdelingens toaletter. Under skiltet henger det en laminert lapp: 'Vennligst ikke flush ned uferdige branches her'.";
+
+    //Restrooms IT
+    restroomsIT->scenery["vask"] = "Et lite speilskap over vasken. Inni ligger en uåpnet pakke med oransje ørepropper – trolig lagt igjen av noen som trengte en pause fra åpent landskap.";
+    restroomsIT->scenery["skap"] = restroomsIT->scenery["vask"];
+    restroomsIT->hiddenItems["skap"] = "ørepropper i skum";
 
     //Nordre korridor - midt
     northernCorridorMid->scenery["the hotfix hotel"] = "Døren inn til møterommet 'The Hotfix Hotel' (" + hotfixHotelAddr + ")";
@@ -427,11 +441,24 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
     //The Hotfix Hotel
     theHotfixHotel->scenery["lapp"] = "Bordet er dekket av kafferinger og krøllete post-it-lapper med kryptiske stikkord som 'rollback?', 'hvem godkjente PR?' og 'skyld på DNS'.";
-    theHotfixHotel->scenery["bord"] = theHotfixHotel->scenery["lapp"];
+    theHotfixHotel->scenery["bord"] = "Blant krøllete post-it-lapper og tomme kaffekopper ligger det en halvspist energibar som noen glemte midt i en krise.";
+    theHotfixHotel->scenery["energibar"] = theHotfixHotel->scenery["bord"];
+    theHotfixHotel->hiddenItems["bord"] = "halvspist energibar";
+    theHotfixHotel->scenery["stol"] = "Over stolryggen henger en slitt hettegenser som lukter svakt av svette og nattarbeid.";
+    theHotfixHotel->hiddenItems["stol"] = "utslitt eventhettegenser";
 
     //503: Service Unavailable
     serviceUnavailable->scenery["servere"] = "Tårn på tårn med blinkende dioder. En av serverne har en gul post-it-lapp klistret over strømknappen med teksten: 'HVIS DENNE SKRUS AV, SLUTTER LØNNSUTBETALINGENE Å VIRKE'.";
+    serviceUnavailable->scenery["kabelkveil"] = "En floke av gamle nettverkskabler slengt i et hjørne. Den øverste ser ut til å ha akkurat passe lengde og snert.";
+    serviceUnavailable->hiddenItems["kabelkveil"] = "gammel cat5-kabel";
 
+    //Kontorlandskapet - gruppe 3
+    openOfficeThree->scenery["skuff"] = "En minimalistisk hvit skuffeseksjon under en pult. Den står på gløtt.";
+    openOfficeThree->hiddenItems["skuff"] = "blålysbriller";
+
+    //Kontorlandskapet - gruppe 4
+    openOfficeFour->scenery["tastatur"] = "Et støvete, mekanisk tastatur som ligger slengt oppå en tom pizzaboks. Det er tungt nok til å brukes som slagvåpen.";
+    openOfficeFour->hiddenItems["tastatur"] = "mekanisk tastatur";
 
     //Korridoren mot øst
     corridorEast->scenery["kaffemaskin"] = "En industriell trakter som har sett bedre dager. Den putrer illevarslende, og kannen er full av beksvart væske.";

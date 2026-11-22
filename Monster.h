@@ -22,6 +22,8 @@ struct monster {
     int damageDiceSides = 0;
     int xpReward;
     int monsterAC;
+    std::vector<std::string> weaknesses;        //Slik kan ekstra damagtypes faktisk ha noe å si, og valg av våpen blir et strategisk poeng
+    std::vector<std::string> resistances;
     std::string attackMessage;
 
     //LOOT

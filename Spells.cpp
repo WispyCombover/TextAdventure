@@ -260,6 +260,12 @@ castResult castSpell(
         
         case spellSpecial::Identify:
             std::cout << " " << target->name << " | level " << target->level << " | HP " << target->hp << "/" << target->maxHp << " | AC " << target->monsterAC << " | skade " << damageText(*target) << "\n";
+            if (!target->weaknesses.empty()) {
+                std::cout << " | Svakheter: ";
+                for (size_t i = 0; i < target->weaknesses.size(); ++i) {
+                    std::cout << target->weaknesses[i] << (i + 1 < target->weaknesses.size() ? ", " : "");
+                }
+            }
             return castResult::Cast;
         
         case spellSpecial::Ping: {
