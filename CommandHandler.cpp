@@ -7,6 +7,7 @@
 #include "WorldBuilder.h"
 #include "Player.h"
 #include "Item.h"
+#include "Consumables.h"
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -14,8 +15,7 @@
 
 static bool stripPrefix(std::string& s, const std::string& prefix) {
     if (s.rfind(prefix, 0) != 0) return false;
-    if (s.size() > prefix.size() && s[prefix.size()] != ' ') s.erase(0, prefix.size());
-    size_t first = s.find_first_not_of(' ');
+    size_t first = s.find_first_not_of(' ', prefix.size());
     s.erase(0, first == std::string::npos ? s.size() : first ) ;
     return true;
 }
@@ -275,49 +275,6 @@ void handleCode(const std::string &codeInput, Room *currentRoom)
     else
     {
         std::cout << "*BRRRZT!* Rødt lys. Feil kode.\n";
-    }
-}
-
-void useConsumable(player& p, const item& it) {
-    int amount = it.effectFlatBonus;
-    for (int i = 0; i < it.effectDiceCount; ++i) {
-        amount += rollDice(it.effectDiceSides);
-    }
-
-    // Viser flavourtext om den finnes
-    if (!it.consumeText.empty()) {
-        std::cout << it.consumeText << "\n";
-    }
-
-    //Kjør effekt
-    switch (it.effect) {
-        case itemEffect::healHp: {
-            int oldHp = p.playerHP;
-            p.playerHP = std::min(p.playerMaxHP, p.playerHP + amount);
-            std::cout << "Du gjenvinner " << (p.playerHP - oldHp) << " HP! (" << p.playerHP << "/" << p.playerMaxHP << ")\n";
-            break;
-        }
-        case itemEffect::restoreMana: {
-            int oldMana = p.playerMana;
-            p.playerMana = std::min(p.playerMaxMana, p.playerMana + amount);
-            std::cout << "Du gjenvinner " << (p.playerMana - oldMana) << " Mana! (" << p.playerMana << "/" << p.playerMaxMana << ")\n";
-            break;
-        }
-        case itemEffect::caffeineRush: {
-            p.playerHP = std::min(p.playerMaxHP, p.playerHP + amount);
-            p.addEffect(StatusType::caffeineRush, "Koffeinsjokk", 3, 2);
-            std::cout << "Du får +" << amount << " HP og [Koffeinsjokk] (+2 angrep/skade) i 3 runder!\n";
-            break;
-        }
-        case itemEffect::sugarCrash: {
-            p.playerHP = std::max(0, p.playerHP - amount);
-            std::cout << "Du tar " << amount << " poison-damage! (" << p.playerHP << "/" << p.playerMaxHP << ")\n";
-            break;
-        }
-        case itemEffect::none:
-        default:
-            std::cout << "Det skjer egentlig ingenting.\n";
-            break;
     }
 }
 
@@ -738,34 +695,7 @@ namespace
             std::cout << "Du vet ikke helt hvordan du skal bruke " << selectedItem->name << " her.\n";
         }
     }
-    void handleDrink(const std::string& itemName, player& p, std::vector<std::shared_ptr<item>>& inventory) {
-        std::string wanted = toLowerNorwegian(itemName.empty() ? "kaffekopp" : itemName);
 
-        auto it = std::find_if(inventory.begin(), inventory.end(), [&wanted](const std::shared_ptr<item>& i) {return toLowerNorwegian(i->name) == wanted; });
-        if (it == inventory.end()) {
-            std::cout << "Du har ingen " << wanted << "' i sekken.\n";
-            return;
-        }
-        
-        std::shared_ptr<item> selected = *it;
-
-        if (selected->type == "consumable") {
-        useConsumable(p, *selected);
-        inventory.erase(it);
-    }
-    else if (selected->name == "kaffekopp") {
-        if (!selected->isFilled) {
-            std::cout << "Koppen er dessverre tom. DU må finne en kaffemaskin for å fylle den.\n";
-            return;
-        }
-        int healAmount = 10;
-        p.playerHP = (std::min)(p.playerMaxHP, p.playerHP + healAmount);
-        emptyContainer(*selected);
-        std::cout << "Du tar en slurk rykende varm kaffe. Du får tilbake " << healAmount << " HP! (HP: " << p.playerHP << "/" << p.playerMaxHP << ")\n";
-    } else {
-        std::cout << "Du kan ikke drikke " << selected->name << ".\n";
-        }
-    }
     void handleFill(const std::string &targetName, Room *currentRoom, std::vector<std::shared_ptr<item>> &inventory)
     {
         if (targetName.empty())
@@ -997,9 +927,9 @@ bool processCommand(
             handleOpen(target, currentRoom);
         }
     }
-    else if (lowerInput.rfind("lås opp", 0) == 0 || verb == "unlock")
+    else if (stripPrefix(lowerInput, "lås opp") || verb == "unlock")
     {
-        if (lowerInput.rfind("lås opp", 0) == 0)
+        if (stripPrefix(lowerInput, "lås opp"))
         {
             target = (input.length() > 8) ? input.substr(8) : "";
         }
@@ -1012,7 +942,7 @@ bool processCommand(
             handleUnlock(target, currentRoom, inventory);
         }
     }
-    else if (lowerInput.rfind("ta på", 0) == 0)
+    else if (stripPrefix(lowerInput, "ta på"))
     {
         std::string equipTarget = (input.length() > 6) ? input.substr(6) : "";
         if (equipTarget.empty()) {
@@ -1084,7 +1014,7 @@ bool processCommand(
     }
     else if (verb == "drikk" || verb == "drink")
     {
-        handleDrink(target, p, inventory);
+        drinkItem(p, inventory, target);
     }
     else if (verb == "se" || verb == "look")
     {

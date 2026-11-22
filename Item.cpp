@@ -314,7 +314,7 @@ namespace {
         // ====== MISC ======
                 {
             .name = "kopipapir",            //Til 'PC LOAD LETTER' puzzle: reward = new spell for spellbook
-            .description = "",
+            .description = "En uåpnet pakke med 500 ark A4-papir (80g). Den hellige gral for enhver kontorskriver som roper 'PC LOAD LETTER'.",
             .value = 500,
             .currency = "kB",
             .type = "misc",

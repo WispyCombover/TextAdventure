@@ -2,7 +2,8 @@
 #include "Utils.h"
 
 namespace {
-    int rollDiceSum(int count, int sides) {
+    int rollDiceSum(int count, int sides, bool crit) {
+        int rolls = crit ? count * 2 : count;
         int total = 0;
         for (int i = 0; i < count; ++i) total += rollDice(sides);
         return total;
@@ -31,16 +32,15 @@ int monsterAttackBonus(const monster& m) {
 
 int rollPlayerMeleeDamage(const player& p, bool crit) {
     int damage = p.playerBaseDamage + p.getEffectBonus(StatusType::caffeineRush);
-    if (crit) damage += rollDice(8);
 
     if (p.equippedWeapon) {
         const item& w = *p.equippedWeapon;
-        damage += rollDiceSum(w.damageDiceCount, w.damageDiceSides);
-        damage += rollDiceSum(w.extraDiceCount, w.extraDiceSides);
+        damage += rollDiceSum(w.damageDiceCount, w.damageDiceSides, crit);
+        damage += rollDiceSum(w.extraDiceCount, w.extraDiceSides, crit);
     }
     return damage;
 }
 
 int rollMonsterDamage(const monster& m, bool crit) {
-    return m.attackDamage + (crit ? rollDice(8) : 0);
+    return rollDiceSum(m.damageDiceCount, m.damageDiceSides, crit) + m.attackDamage;
 }

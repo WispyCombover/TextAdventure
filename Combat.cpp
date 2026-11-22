@@ -35,7 +35,7 @@ static void onMonsterDefeated(monster* m, player& p, Room* currentRoom) {
 
 //Har spilleren noen consumables?
 static bool hasDrinkable(const std::vector<std::shared_ptr<item>>& inventory) {
-    return std::any_of(inventory.begin(), inventory.end(), []const.std::shared_ptr<item>& i) {
+    return std::any_of(inventory.begin(), inventory.end(), [](const std::shared_ptr<item>& i) {
         return i->type == "consumable" || (i->name == "kaffekopp" && i->isFilled);
     });
 }
@@ -81,20 +81,22 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
 
             std::cout << "Du sikter og kaster din " << thrownItem->name << " hardt mot " << m->name << "!\n";
 
-            int hitRoll = rollDice(20);
-            int totalHit = hitRoll + p.playerLvl;
+            AttackRoll toss = rollToHit(playerAttackBonus(p), m->monsterAC);
 
-            bool throwHit = (hitRoll == 20) || (hitRoll != 1 && totalHit >= m->monsterAC);
-            if (throwHit) {
+            if (toss.hit) {
                 int damage = 0;
+                const int diceMultiplier = toss.crit ? 2 : 1;
+
+                if (toss.crit) std::cout << "CRITICAL HIT! Et perfekt kast!\n";
 
                 // Base bludgeoning damage
-                for (int i = 0; i < thrownItem->damageDiceCount; ++i) {
+                for (int i = 0; i < thrownItem->damageDiceCount * diceMultiplier; ++i) {
                     damage += rollDice(thrownItem->damageDiceSides);
                 }
                 if (thrownItem->isFilled) {
                     //Koppen er full: gjør ekstra acid damage  Hmmm, dette fungerer for nå, men ønsker å utvide med flere forskjellige throwables!
-                    int acidDamage = rollDice(6);
+                    int acidDamage = 0;
+                    for (int i = 0; i < diceMultiplier; ++i) acidDamage += rollDice(6);
                     damage += acidDamage;
                     std::cout << "PLASK! " << thrownItem->name << " var full av glovarm kontorkaffe!\n";
                     std::cout << "Det gjør " << acidDamage << " ekstra ACID-skade på " << m->name << ".\n";
@@ -172,36 +174,20 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
             }
         }
         else if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
-            int caffeineMod = p.getEffectBonus(StatusType::caffeineRush) + p.getEffectBonus(StatusType::sugarCrash);
-            int playerAttackRoll = rollDice(20);
-            int attackBonus = p.playerLvl; //Usikker på om jeg vil gi såpass med bonus uten at spilleren har et magisk våpen
-            int totalAttack = playerAttackRoll + attackBonus + caffeineMod;
-            int targetAC = m->monsterAC;
+            AttackRoll a = rollToHit(playerAttackBonus(p), m->monsterAC);
 
-            bool isCrit = (playerAttackRoll == 20);
-            bool isFumble = (playerAttackRoll == 1);
-            bool hit = isCrit || (!isFumble && totalAttack >= targetAC);
+            std::cout << "Du triller en D20 for å treffe... du fikk " << a.roll << " (+ " << a.total - a.roll << " bonus) = " << a.total << " mot AC " << m->monsterAC << ".\n";
 
-            std::cout << "Du triller en D20 for å treffe... du fikk " << playerAttackRoll << " (+ " << attackBonus << " bonus) = " << totalAttack << " mot AC " << targetAC << ".\n";
-
-            if (hit) {
-                int bonusDamage = isCrit ? rollDice(8) : 0;
-                int damageDealt = p.playerBaseDamage + bonusDamage + p.getEffectBonus(StatusType::caffeineRush);
-
-                //Sjekker om spilleren har aktivert et våpen på forhånd
+            if (a.hit) {
                 if (p.equippedWeapon != nullptr) {
-                    int weaponDamage = 0;
-                    for (int i = 0; i < p.equippedWeapon->damageDiceCount; ++i) {
-                        weaponDamage += rollDice(p.equippedWeapon->damageDiceSides);
-                    }
-
-                    damageDealt += weaponDamage;
                     std::cout << "Du angriper med din " << p.equippedWeapon->name << "!\n";
                 } else {
                     std::cout << "Du har ikke valgt et våpen, og slår løs med bare knyttnevene!\n";
                 }
+
+                int damageDealt = rollPlayerMeleeDamage(p, a.crit);
                 m->hp -= damageDealt;
-                if (isCrit) {
+                if (a.crit) {
                     std::cout << "CRITICAL HIT! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
                 } else {
                     std::cout << "Du traff! Du gjorde " << damageDealt << " skade på " << m->name << ".\n";
@@ -211,7 +197,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                     onMonsterDefeated(m, p, currentRoom);
                     return true;
                 }
-            } else if (isFumble) {
+            } else if (a.fumble) {
                 std::cout << "FUMBLE! Du snubler i dine egne argumenter, mister balansen og skader deg selv!\n";
                 p.playerHP -= 2;  //Mister 2HP på en fumble - kan revideres
                 std::cout << "Du tok 2 skade. Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
@@ -242,22 +228,15 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
         if (m->hp > 0) {
             std::cout << m->name << " " << m->attackMessage << "\n";
 
-            int monsterAttackRoll = rollDice(20);
-            int monsterTotalAttack = monsterAttackRoll + m->level;  //Level bonus
-            int currentPlayerAC = p.getTotalAC();
+            AttackRoll b = rollToHit(monsterAttackBonus(*m), p.getTotalAC());
 
-            bool monsterCrit = (monsterAttackRoll == 20);
-            bool monsterFumble = (monsterAttackRoll == 1);
-            bool monsterHits = monsterCrit || (!monsterFumble && monsterTotalAttack >= currentPlayerAC);
+            std::cout << m->name << " triller for å treffe deg... Det fikk " << b.total << " mot din AC " << p.getTotalAC() << ".\n";
 
-            std::cout << m->name << " triller for å treffe deg... Det fikk " << monsterTotalAttack << " mot din AC " << currentPlayerAC << ".\n";
-
-            if (monsterHits) {
-
-                int totalMonsterDamage = m->attackDamage + (monsterCrit ? rollDice(8) : 0);
+            if (b.hit) {
+                int totalMonsterDamage = rollMonsterDamage(*m, b.crit);
                 //Monsteret treffer
                 p.playerHP -= totalMonsterDamage;
-                if (monsterCrit) {
+                if (b.crit) {
                     std::cout << "CRITICAL HIT! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
                 } else {
                     std::cout << "AU! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";

@@ -55,48 +55,48 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     );
     auto openOfficeTwo = std::make_unique<Room>(
         "Kontorlandskapet - gruppe 2",
-        ""
+        "Du trår inn i den delen av kontorlandskapet der støyreduserende hodetelefoner er påbudt verneutstyr. Veggene er tapetsert med gamle sprint-tavler og falmede 'Keep Calm and git push --force'-plakater. En enslig vifte durer i hjørnet i et tappert, men forgjeves forsøk på å kjøle ned luften fra femten overarbeidede utvikler-laptoper. Du kan gå videre mot NORD, eller tilbake mot SØR."
     );
 
     auto northernCorridorOne = std::make_unique<Room>(
         "Den nordre korridoren - vest",
-        ""
+        "Du står i den nordvestre enden av hovedkorridoren. Gulvbelegget er slitt etter utallige sprint-retrospektiver og hastige turer til kaffemaskinen. Mot VEST er det en dør merket med et piktogram av en kjønnsnøytral strekfigur med en laptop. Du kan gå sørover inn i kontorlandskapet, eller følge korridoren mot ØST."
     );
     auto restroomsIT = std::make_unique<Room>(
-        "Unisex restrooms for the IT department",
-        ""
+        "Unisex restrooms for IT-avdelingen",
+        "Overraskende rent, med dempet, behagelig belysning og en duft av billig håndsåpe og eksistensiell ro. På innsiden av båsdøren har noen risset inn '/* TODO: Vask hender */' med en nøkkel. Dette er det eneste stedet i bygget hvor ingen spør deg om et kjapt estimat. Utgangen er tilbake gjennom DØR."
     );
     auto northernCorridorMid = std::make_unique<Room>(
         "Den nordre korridoren - senter",
-        ""
+        "Midtpunktet i den nordre korridoren. Langs veggen ligger to møterom: 'THE HOTFIX HOTEL' og '503: SERVICE UNAVAILABLE'. Rett mot NORD finner du heisdørene, mens korridoren strekker seg videre mot VEST og ØST."
     );
     auto theHotfixHotel = std::make_unique<Room>(
         "The Hotfix Hotel",
-        ""
+        "Et kaotisk lite møterom som bærer preg av å ha blitt tatt i bruk på fem minutters varsel en fredag ettermiddag. Halvspiste energibarer ligger strødd rundt på bordet, og på veggen henger en lapp hvor det står: 'Midlertidig løsning implementert i 2021 – ikke rør!'. Utgangen er tilbake gjennom DØR."
     );
     auto serviceUnavailable = std::make_unique<Room>(
         "503: Service Unavailable",
-        ""
+        "Rommet er stappfullt av gamle serverrack, blinkende switcher og tykke bunter med patchekabler som henger som lianer fra taket. Det durer øredøvende fra kjøleviftene, og en rød varsellampe blinker taktfast i hjørnet. Et skilt på veggen sier: 'Per fra drift er på ferie. Prøv igjen senere.' Utgangen er tilbake gjennom DØR."
     );
     auto elevatorFromIT = std::make_unique<Room>(
         "Personheis",
-        ""
+        "En trang stålheis som lukter svakt av våt ull og kald kaffe. Panelknappene er slitte, og displayet over døren viser bare et kryptisk 'NaN' i stedet for etasjenummer. Du kan gå ut igjen mot SØR."
     );
     auto northernCorridorTwo = std::make_unique<Room>(
         "Den nordre korridoren - øst",
-        ""
+        "Den østlige enden av den nordre korridoren. Her er det litt stillere, og gjennom et lite vindu ser du ut mot en grå bakgård. Korridoren går tilbake mot VEST, eller du kan bevege deg sørover inn mot resten av kontorlandskapet."
     );
     auto openOfficeThree = std::make_unique<Room>(
         "Kontorlandskapet - gruppe 3",
-        ""
+        "Her sitter frontend-gjengen. Pultene er mistenkelig ryddige, og belysningen er justert til en behagelig, estetisk korrekt fargetemperatur. På en tavle henger det utallige fargeprøver og en opphetet diskusjon om padding på 4px versus 6px. Korridoren ligger mot VEST, mens landskapet fortsetter mot SØR."
     );
     auto openOfficeFour = std::make_unique<Room>(
         "Kontorlandskapet - gruppe 4",
-        ""
+        "Det innerste hjørnet av kontorlandskapet, preget av tomme pizzabokser og mekaniske tastaturer med altfor høy klikkelyd. Luften vibrerer svakt av koffein og eksistensiell tvil rundt teknisk gjeld. Du kan gå mot NORD til gruppe 3, eller mot ØST mot trappegangen."
     );
     auto stairwellFromIT = std::make_unique<Room>(
         "Trappegangen",
-        ""
+        "En betongtrapp med gjenklang og et ekkelt, kaldt trekk. På veggen henger et falmet branninstruks-skilt og en plakat som oppfordrer til å ta trappene for helsens skyld. Ingen tar trappene."
     );
 
     auto corridorEast = std::make_unique<Room>(
@@ -129,7 +129,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     auto doorSupply  = makeDoor("supply", true, "1357");
     auto doorCopy    = makeDoor("copy", true, "adgangskort");
     auto doorBikeshed = makeDoor("bikeshed");
-    auto doorRestroomIT = makeDoor("restroom", true, "");
+    auto doorRestroomIT = makeDoor("restroom", false, "");
     auto doorHotfix = makeDoor("hotfix");
     auto doorServiceUnavailable = makeDoor("service");
     auto doorElevator = makeDoor("lift");
@@ -249,6 +249,12 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         ""
     };
 
+    restroomsIT->exits["dør"] = {
+        northernCorridorOne.get(),
+        doorRestroomIT,
+        ""
+    };
+
     //Korridor nord midtparti <-> heis, Hotfix Hotel, Service Unavailable, korridor nord øst
     northernCorridorMid->exits["nord"] = {
         elevatorFromIT.get(),
@@ -258,6 +264,21 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     northernCorridorMid->exits["hotfixhotel"] = {
         theHotfixHotel.get(),
         doorHotfix,
+        ""
+    };
+    theHotfixHotel->exits["dør"] = {
+        northernCorridorMid.get(),
+        doorHotfix,
+        ""
+    };
+    serviceUnavailable->exits["dør"] = {
+        northernCorridorMid.get(),
+        doorServiceUnavailable,
+        ""
+    };
+    elevatorFromIT->exits["dør"] = {
+        northernCorridorMid.get(),
+        doorElevator,
         ""
     };
     northernCorridorMid->exits["serviceunavailable"] = {
@@ -272,6 +293,13 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     };
     northernCorridorMid->exits["øst"] = {
         northernCorridorTwo.get(),
+        nullptr,
+        ""
+    };
+
+    //Nordre korridor øst <-> nordre korridor midt
+    northernCorridorTwo->exits["vest"] = {
+        northernCorridorMid.get(),
         nullptr,
         ""
     };
@@ -386,22 +414,23 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
 
     //Nordre korridor - vest
-    northernCorridorOne->scenery["restrooms"] = "";
+    northernCorridorOne->scenery["restrooms"] = "Døren til IT-avdelingens toaletter. Under skiltet henger det en laminert lapp: 'Vennligst ikke flush ned uferdige branches her'.";
 
     //Nordre korridor - midt
     northernCorridorMid->scenery["the hotfix hotel"] = "Døren inn til møterommet 'The Hotfix Hotel' (" + hotfixHotelAddr + ")";
     northernCorridorMid->scenery["service unavailable"] = "Døren inn til møterommet '503: Service Unavailable' (" + serviceUnavailableAddr + "). Dette møterommet virker å være permanent booket av Per fra drift.";
-    northernCorridorMid->scenery["elevator"] = "Heisen ser aldri ut til å være i riktig etasje når du trenger den. På heisdøren har noen hengt et ark hvor det står: ''";
+    northernCorridorMid->scenery["elevator"] = "Heisen ser aldri ut til å være i riktig etasje når du trenger den. På heisdøren har noen hengt et ark hvor det står: 'UTE AV DRIFT – Går i uendelig løkke mellom 2. og 3. etasje. Ticket er opprettet (JIRA-404).'";
 
 
     //Nordre korridor - øst
 
 
     //The Hotfix Hotel
-
+    theHotfixHotel->scenery["lapp"] = "Bordet er dekket av kafferinger og krøllete post-it-lapper med kryptiske stikkord som 'rollback?', 'hvem godkjente PR?' og 'skyld på DNS'.";
+    theHotfixHotel->scenery["bord"] = theHotfixHotel->scenery["lapp"];
 
     //503: Service Unavailable
-
+    serviceUnavailable->scenery["servere"] = "Tårn på tårn med blinkende dioder. En av serverne har en gul post-it-lapp klistret over strømknappen med teksten: 'HVIS DENNE SKRUS AV, SLUTTER LØNNSUTBETALINGENE Å VIRKE'.";
 
 
     //Korridoren mot øst
@@ -446,6 +475,9 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     allRooms.push_back(std::move(northernCorridorOne));
     allRooms.push_back(std::move(northernCorridorMid));
     allRooms.push_back(std::move(northernCorridorTwo));
+    allRooms.push_back(std::move(openOfficeThree));
+    allRooms.push_back(std::move(openOfficeFour));
+    allRooms.push_back(std::move(stairwellFromIT));
     allRooms.push_back(std::move(theHotfixHotel));
     allRooms.push_back(std::move(serviceUnavailable));
     allRooms.push_back(std::move(restroomsIT));

@@ -24,7 +24,7 @@ struct StatusEffect {
 };
 
 inline constexpr int kXpToLevelUp[] = {25, 60, 110, 170};
-in xpNeededForLevel(int level);
+int xpNeededForLevel(int level);
 
 struct player {
     std::string name;  //Trenger en start game funksjon som ber om spillerens navn

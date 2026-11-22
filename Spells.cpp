@@ -259,7 +259,7 @@ castResult castSpell(
             return castResult::Escaped;
         
         case spellSpecial::Identify:
-            std::cout << " " << target->name << " | level " << target->level << " | HP " << target->hp << "/" << target->maxHp << " | AC " << target->monsterAC << " | skade " << target->attackDamage << "\n";
+            std::cout << " " << target->name << " | level " << target->level << " | HP " << target->hp << "/" << target->maxHp << " | AC " << target->monsterAC << " | skade " << damageText(*target) << "\n";
             return castResult::Cast;
         
         case spellSpecial::Ping: {

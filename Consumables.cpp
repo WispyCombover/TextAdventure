@@ -17,7 +17,7 @@ void useConsumable(player& p, const item& it) {
         std::cout << it.consumeText << "\n";
     }
 
-    switch (if.effect) {
+    switch (it.effect) {
         case itemEffect::healHp: {
             int oldHp = p.playerHP;
             p.playerHP = std::min(p.playerMaxHP, p.playerHP + amount);
@@ -35,7 +35,7 @@ void useConsumable(player& p, const item& it) {
         case itemEffect::caffeineRush: {
             p.playerHP = std::min(p.playerMaxHP, p.playerHP + amount);
             p.addEffect(StatusType::caffeineRush, "Koffeinsjokk", 3, 2);
-            std::cout << "Du får +" amount << " HP og [Koffeinsjokk] (+2 angrep/skade) i 3 runder!\n";
+            std::cout << "Du får +" << amount << " HP og [Koffeinsjokk] (+2 angrep/skade) i 3 runder!\n";
             break;
         }
         
@@ -69,7 +69,7 @@ bool drinkItem(player& p, std::vector<std::shared_ptr<item>>& inventory, const s
         return true;
     }
 
-    if (selected->name == "kaffekopp") {
+    if (toLowerNorwegian(selected->name) == "kaffekopp") {
         if (!selected->isFilled) {
             std::cout << "Koppen er dessverre tom. Du må finne en kaffemaskin for å fylle den.\n";
             return false;
