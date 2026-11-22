@@ -95,7 +95,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         ""
     );
     auto stairwellFromIT = std::make_unique<Room>(
-        "Trappeganen",
+        "Trappegangen",
         ""
     );
 
@@ -238,6 +238,43 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         nullptr,
         ""
     };
+    northernCorridorOne->exits["øst"] = {
+        northernCorridorMid.get(),
+        nullptr,
+        ""
+    };
+    northernCorridorOne->exits["dør"] = {
+        restroomsIT.get(),
+        doorRestroomIT,
+        ""
+    };
+
+    //Korridor nord midtparti <-> heis, Hotfix Hotel, Service Unavailable, korridor nord øst
+    northernCorridorMid->exits["nord"] = {
+        elevatorFromIT.get(),
+        doorElevator,
+        ""
+    };
+    northernCorridorMid->exits["hotfixhotel"] = {
+        theHotfixHotel.get(),
+        doorHotfix,
+        ""
+    };
+    northernCorridorMid->exits["serviceunavailable"] = {
+        serviceUnavailable.get(),
+        doorServiceUnavailable,
+        ""
+    };
+    northernCorridorMid->exits["vest"] = {
+        northernCorridorOne.get(),
+        nullptr,
+        ""
+    };
+    northernCorridorMid->exits["øst"] = {
+        northernCorridorTwo.get(),
+        nullptr,
+        ""
+    };
 
 
     //Korridor øst <-> Kopirom (to navn, SAMME dør)
@@ -277,11 +314,16 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
 
     salaSegfault->items.push_back(getItem("adgangskort"));  //Tror adgangskortene må gjøres spesifikke, men enn så lenge har vi ett!
 
+    supplyRoom->items.push_back(getItem("kopipapir"));
+
     
 
     // RANDOM ENCOUNTERS
     monsterManual manual;
     corridorEast->occupant = manual.getRandomMonster(1);  // Spawner et tilfeldig level 1 monster i østkorridoren
+    northernCorridorOne->occupant = manual.getRandomMonster(1);
+    openOfficeTwo->occupant = manual.getRandomMonster(1);
+
 
     // FAST ENCOUNTER
     salaSegfault->occupant = manual.getMonsterBlueprint(2, "Rogue Pointer");
@@ -343,6 +385,24 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     //Kontorlandskapet - gruppe 2
 
 
+    //Nordre korridor - vest
+    northernCorridorOne->scenery["restrooms"] = "";
+
+    //Nordre korridor - midt
+    northernCorridorMid->scenery["the hotfix hotel"] = "Døren inn til møterommet 'The Hotfix Hotel' (" + hotfixHotelAddr + ")";
+    northernCorridorMid->scenery["service unavailable"] = "Døren inn til møterommet '503: Service Unavailable' (" + serviceUnavailableAddr + "). Dette møterommet virker å være permanent booket av Per fra drift.";
+    northernCorridorMid->scenery["elevator"] = "Heisen ser aldri ut til å være i riktig etasje når du trenger den. På heisdøren har noen hengt et ark hvor det står: ''";
+
+
+    //Nordre korridor - øst
+
+
+    //The Hotfix Hotel
+
+
+    //503: Service Unavailable
+
+
 
     //Korridoren mot øst
     corridorEast->scenery["kaffemaskin"] = "En industriell trakter som har sett bedre dager. Den putrer illevarslende, og kannen er full av beksvart væske.";
@@ -384,6 +444,12 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     allRooms.push_back(std::move(openOfficeOne));
     allRooms.push_back(std::move(openOfficeTwo));
     allRooms.push_back(std::move(northernCorridorOne));
+    allRooms.push_back(std::move(northernCorridorMid));
+    allRooms.push_back(std::move(northernCorridorTwo));
+    allRooms.push_back(std::move(theHotfixHotel));
+    allRooms.push_back(std::move(serviceUnavailable));
+    allRooms.push_back(std::move(restroomsIT));
+    allRooms.push_back(std::move(elevatorFromIT));
     allRooms.push_back(std::move(corridorEast));
     allRooms.push_back(std::move(copyRoomOne));
     allRooms.push_back(std::move(theBikeshed));

@@ -26,6 +26,7 @@
 // -Sub-quests og quest-givers. En som sender spilleren til kjelleren, fordi det er naturligvis der postmottaket er, for å hente ... (trenger å brainstorme quest-idéer)
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Damage type piercing/slashing/bludgeoning/acid/fire/...WIP
+// -Hvor skal jeg gjemme spellbooken?
 // -Nøkkelkort og adgangskoder....WIP
 // -Puzzles! Klart vi må ha puzzles!
 // -Datamaskiner som står på, på skjermen vises en oversikt over de faktiske filene under /user/.../documents på spillerens PC (kommer sikkerhet til å få hetta av denne?)

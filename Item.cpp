@@ -312,7 +312,14 @@ namespace {
         },
 
         // ====== MISC ======
-
+                {
+            .name = "kopipapir",            //Til 'PC LOAD LETTER' puzzle: reward = new spell for spellbook
+            .description = "",
+            .value = 500,
+            .currency = "kB",
+            .type = "misc",
+            .isQuestItem = false            //Denne er missable
+        },
 
         // ====== CRAFTING ITEMS ======
 
