@@ -4,6 +4,7 @@
 #include "Utils.h"
 #include "Monster.h"
 #include "Spells.h"
+#include "Room.h"
 #include <iostream>
 #include <algorithm>
 
@@ -84,58 +85,91 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
             AttackRoll toss = rollToHit(playerAttackBonus(p), m->monsterAC);
 
             if (toss.hit) {
-                int damage = 0;
                 const int diceMultiplier = toss.crit ? 2 : 1;
-
                 if (toss.crit) std::cout << "CRITICAL HIT! Et perfekt kast!\n";
 
-                // Base bludgeoning damage
+                //Base damage (bludgeoning, piercing, lightning, slashing)
+                int baseDamage = 0;
                 for (int i = 0; i < thrownItem->damageDiceCount * diceMultiplier; ++i) {
-                    damage += rollDice(thrownItem->damageDiceSides);
+                    baseDamage += rollDice(thrownItem->damageDiceSides);
                 }
-                damage = applyDamageModifiers(damage, thrownItem->damageType, *m);
-                if (thrownItem->isFilled) {
-                    //Koppen er full: gjør ekstra acid damage  Hmmm, dette fungerer for nå, men ønsker å utvide med flere forskjellige throwables!
-                    int acidDamage = 0;
-                    for (int i = 0; i < diceMultiplier; ++i) acidDamage += rollDice(6);
+                baseDamage = applyDamageModifiers(baseDamage, thrownItem->damageType, *m);
+                int totalDamage = baseDamage;
 
-                    acidDamage = applyDamageModifiers(acidDamage, "acid", *m);
-                    damage += acidDamage;
-                    std::cout << "PLASK! " << thrownItem->name << " var full av glovarm kontorkaffe!\n";
-                    std::cout << "Det gjør " << acidDamage << " ekstra ACID-skade på " << m->name << ".\n";
-
-                    //AOE - Glatt gulv - reduserer monsterets AC
-                    int acReduction = 2;
-                    m->monsterAC -= acReduction;
-                    std::cout << "Gulvet blir såpeglatt av sølet! " << m->name << " mister " << acReduction << " AC. (Ny AC: " << m->monsterAC << ").\n";
-                } else if (thrownItem->isContainer) {
-                    std::cout << thrownItem->name << " var tom og treffer med et tørt 'KLONK'!\n";
+                //Meldinger ved treff
+                if (!thrownItem->throwHitText.empty()) {
+                    std::cout << thrownItem->throwHitText << "\n";
+                } else {
+                    std::cout << "Du treffer " << m->name << " med " << thrownItem->name << " for " << baseDamage << " " << thrownItem->damageType << "-skade!\n";
                 }
-                m->hp -= damage;
-                std::cout << "Totalt gjorde kastet " << damage << " skade på " << m->name << ".\n";
+
+                //Ekstra damage
+                bool triggersExtra = (thrownItem->extraDiceCount > 0) && (!thrownItem->isContainer || thrownItem->isFilled);
+
+                if (triggersExtra) {
+                    int extraDamage = 0;
+                    for (int i = 0; i < thrownItem->extraDiceCount * diceMultiplier; ++i) {
+                        extraDamage += rollDice(thrownItem->extraDiceSides);
+                    }
+                    extraDamage = applyDamageModifiers(extraDamage, thrownItem->extraDamageType, *m);
+                    totalDamage += extraDamage;
+
+                    if (!thrownItem->throwFilledText.empty()) {
+                        std::cout << thrownItem->throwFilledText << "\n";
+                    }
+                    std::cout << "Det gjør " << extraDamage << " ekstra " << thrownItem->extraDamageType << "-skade på " << m->name << "!\n";
+
+                    //Eventuell AC-reduksjon fra AOE eller annet
+                    if (thrownItem->throwAcReduction > 0) {
+                        m->monsterAC = std::max(0, m->monsterAC - thrownItem->throwAcReduction);
+                        if (!thrownItem->throwAcReductionText.empty()) {
+                            std::cout << m->name << " mister " << thrownItem->throwAcReduction << " AC! (Ny AC: " << m->monsterAC << ").\n";
+                        }
+                    }
+                } else if (thrownItem->isContainer && !thrownItem->isFilled) {
+                    if (!thrownItem->throwEmptyText.empty()) {
+                        std::cout << thrownItem->throwEmptyText << "\n";
+                    } else {
+                        std::cout << thrownItem->name << " var tom og treffer med et tørt 'KLONK'!\n";
+                    }
+                }
+
+                m->hp -= totalDamage;
+                std::cout << "Totalt gjorde kastet " << totalDamage << " skade på " << m->name << ".\n";
+
             } else {
                 std::cout << "Du bommet grovt! " << thrownItem->name << " seilte forbi monsteret.\n";
             }
+
+            //Blir gjenstanden ødelagt eller tømt etter kastet?
             if (p.equippedWeapon == thrownItem) {
                 p.equippedWeapon = nullptr;
             }
-            //Sjanse for at koppen knuser 60%?  Hmmm, dette fungerer for nå, men ønsker å utvide med flere forskjellige throwables!
-            if (rollDice(10) <= 6) {
-                std::cout << "KRAASJ! Din " << thrownItem->name << " knuste i tusen knas når den traff!\n";
 
-                if (!thrownItem->isFilled) {
-                //Tom kopp genererer 1d8 caltrops på bakken - kan ikke en full kopp også knuse?
-                    int caltropsCount = rollDice(8);
-                    std::cout << "Skårene etter porselenet sprer seg og danner " << caltropsCount << " spisse caltrops på gulvet!\n";
-                    //Logikk for AOE-skade dersom monsteret beveger på seg (tråkker på caltropsene)
+            if (thrownItem->destroyOnThrow) {
+                std::cout << "KRAASJ! Din " << thrownItem->name << " ble ødelagt i sammenstøtet!\n";
+
+                if (thrownItem->spawnsHazardOnThrow) {
+                    currentRoom->addHazard(
+                        thrownItem->hazardName,
+                        thrownItem->hazardDiceCount,
+                        thrownItem->hazardDiceSides,
+                        thrownItem->hazardDamageType,
+                        thrownItem->hazardCharges
+                    );
+                    std::cout << "Rester etter " << thrownItem->name << " sprer seg og danner " << thrownItem->hazardName << " på gulvet!\n";
                 }
-                inventory.erase(it);  //Fjerner koppen fra inventaret
+                inventory.erase(it);
             } else {
-                std::cout << "Koppen rullet mirakuløst nok hel avgårde etter at den landet.\n";
-                emptyContainer(*thrownItem);
+                //Gjenstanden overlevde kastet og lander på gulvet
+                if (thrownItem->isContainer && thrownItem->isFilled) {
+                    emptyContainer(*thrownItem);
+                }
+                std::cout << thrownItem->name << " landet på gulvet i rommet.\n";
                 currentRoom->items.push_back(*thrownItem);
                 inventory.erase(it);
             }
+
             if (m->hp <= 0) {
                 std::cout << "Du beseiret " << m->name << " med et velrettet kast! Veien videre er klar.\n";
                 onMonsterDefeated(m, p, currentRoom);

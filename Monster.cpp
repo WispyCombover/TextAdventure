@@ -59,7 +59,7 @@ monsterManual::monsterManual() {
         .damageDiceSides = 6, 
         .xpReward = 10, 
         .monsterAC = 14,
-        .weaknesses = {"sonic"}
+        .weaknesses = {"sonic"},
         .attackMessage = "Angriper i mørket, får deg til å snuble og kaster en 'Compilation Error' rett i ansiktet ditt!",
         .minDataReward = 200,
         .maxDataReward = 600,

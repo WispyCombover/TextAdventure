@@ -11,3 +11,7 @@ void Room::addExit(std::initializer_list<std::string> directions, Room* neighbor
         exits[direction].destination = neighbor;
     }
 }
+
+void Room::addHazard(const std::string& hazardName, int diceCount, int diceSides, const std::string& dmgType, int charges) {
+    hazards.push_back({hazardName, diceCount, diceSides, dmgType, charges});
+}

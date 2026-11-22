@@ -48,7 +48,16 @@ namespace {
             .extraDamageType = "acid",
             .isFilled = false,
             .throwable = true,
-            .isContainer = true
+            .isContainer = true,
+            .throwFilledText = "PLASK! Koppen var full av glovarm kontorkaffe!",
+            .throwEmptyText = "Koppen var tom og treffer med et tørt 'KLONK'!",
+            .throwAcReduction = 2,
+            .throwAcReductionText = "Gulvet blir såpeglatt av kaffesølet!",
+            .hazardName = "caltrops",
+            .hazardDiceCount = 1,
+            .hazardDiceSides = 4,
+            .hazardDamageType = "piercing",
+            .hazardCharges = 3
         },
         {
             .name = "penn",
@@ -132,14 +141,17 @@ namespace {
         },
         {
             .name = "overklokket usb-killer",
-            .description = "Du har koblet en gammel strømforsyning rett inn i den mystiske minnepinnen. Et livsfarlig, engangs cyber-våpen som steker kretskort og monstre.",
-            .value = 50,
-            .currency = "MB",
+            .description = "Et livsfarlig, engangs cyber-våpen.",
             .type = "weapon",
-            .damageDiceSides = 12,
-            .damageDiceCount = 2,
-            .damageType = "Lightning",
-            .throwable = true
+            .damageDiceSides = 4,
+            .damageDiceCount = 1,
+            .damageType = "Bludgeoning",
+            .extraDiceSides = 12,
+            .extraDiceCount = 2,
+            .extraDamageType = "Lightning",
+            .throwable = true,
+            .throwHitText = "BZZZT! USB-pinnen treffer og utløser en kraftig kortslutning!",
+            .destroyOnThrow = true
         },
         {
             .name = "deodorant og lighter",
@@ -151,6 +163,19 @@ namespace {
             .damageDiceCount = 2,
             .damageType = "Fire",
             .throwable = false
+        },
+        {
+            .name = "boks med trykkluft",
+            .description = "Til å blåse støv ut av tastaturer. Iskald om du snur den opp-ned.",
+            .type = "weapon",
+            .damageDiceSides = 4,
+            .damageDiceCount = 1,
+            .damageType = "Cold",
+            .throwable = true,
+            .throwHitText = "PSSSSJH! En sky av iskald gass dekker sensorene til fienden!",
+            .throwAcReduction = 3,
+            .throwAcReductionText = "Fienden er midlertidig blendet av frosttåke!",
+            .destroyOnThrow = true
         },
 
         // ====== CONSUMABLES ======

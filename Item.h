@@ -55,6 +55,18 @@ struct item {
     bool isQuestItem = false;  //Sett denne til true på kritiske items
     bool isContainer = false;
     std::string contents = "";
+
+    std::string throwHitText = "";          //Melding ved treff (tom = standardmelding)
+    std::string throwFilledText = "";       //Melding dersom isContainer && isFilled
+    std::string throwEmptyText = "";        //Melding dersom isContainer && !isFilled
+    int throwAcReduction = 0;               //F.eks 2 for glatt gulv - AOE
+    std::string throwAcReductionText = "";  //Melding når AC reduseres
+    bool destroyOnThrow = false;            //True dersom det er engangsting
+    std::string hazardName = "";
+    int hazardDiceCount = 0;
+    int hazardDiceSides = 4;
+    std::string hazardDamageType = "";
+    int hazardCharges = 0;
 };
 
 const Recipe* findRecipe(const std::string& itemA, const std::string& itemB);

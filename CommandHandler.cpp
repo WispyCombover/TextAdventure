@@ -490,6 +490,13 @@ void printRoomDescription(const Room *room)
             std::cout << "- " << item.name << "\n";
         }
     }
+    //Sjekker hazards i rommet
+    if (!room->hazards.empty()) {
+        std::cout << "På gulvet ligger det strødd: ";
+        for (size_t i = 0; i < room->hazards.size(); ++i) {
+            std::cout << room->hazards[i].name << (i + 1 < room->hazards.size() ? ", " : ".\n");
+        }
+    }
     if (!room->npcs.empty())
     {
         std::cout << "\nDu ser følgende skikkelser her:\n";
