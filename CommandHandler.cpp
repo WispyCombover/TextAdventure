@@ -629,6 +629,15 @@ namespace
             p.lastRoom = currentRoom;
             currentRoom = exit.destination;
             printRoomDescription(currentRoom);
+
+            //Exploration XP - kun første gang rommet oppdages/besøkes
+            if (!currentRoom->visited) {
+                currentRoom->visited = true;
+                if (currentRoom->discoveryXP > 0) {
+                    std::cout << "\n[UTFORSKET] Du oppdaget " << currentRoom->name << "! (*" << currentRoom->discoveryXP << " XP)\n";
+                p.gainXp(currentRoom->discoveryXP);
+                }
+            }
         }
         else
         {

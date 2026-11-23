@@ -13,7 +13,7 @@ namespace {
 
 constexpr const char* kSaveFile  = "savefile.txt";
 constexpr const char* kSaveMagic = "MIMIRSAVE";
-constexpr int kSaveVersion = 2;     // Øk denne når formatet endres
+constexpr int kSaveVersion = 3;     // Øk denne når formatet endres
 constexpr int kArmourSlots = 5;     // slot 1..5 - se ArmourSlot i Item.h
 
 // ===================== LAGRINGSFIL DATA  =====================
@@ -37,6 +37,7 @@ struct DoorSave {
 
 struct RoomSave {
     std::string name;
+    bool visited = false;
     bool hasMonster = false;
     std::string monsterName;
     int monsterLevel = 0;
@@ -156,6 +157,7 @@ bool readSave(std::istream& in, SaveData& d) {
     for (size_t i = 0; i < roomCount && r.ok(); ++i) {
         RoomSave rs;
         rs.name = r.line();
+        rs.visited = (r.num() != 0);
 
         rs.hasMonster = (r.num() != 0);
         if (rs.hasMonster) {
@@ -292,6 +294,7 @@ void writeSave(std::ostream& out,
     out << allRooms.size() << "\n";
     for (const auto& room : allRooms) {
         out << room->name << "\n";
+        out << (room->visited ? 1 : 0) << "\n";
 
         if (room->occupant) {
             out << 1 << "\n" << room->occupant->name << "\n"
@@ -429,6 +432,8 @@ bool loadGame(player& p,
         Room* room = findRoom(allRooms, rs.name);
         if (!room) continue;
 
+        room->visited = rs.visited;
+
         if (!rs.hasMonster) {
             room->occupant = nullptr;
         } else if (room->occupant) {
@@ -464,6 +469,7 @@ bool loadGame(player& p,
         }
     }
 
+    savedRoom->visited = true;
     currentRoom = savedRoom;
     return true;
 }
