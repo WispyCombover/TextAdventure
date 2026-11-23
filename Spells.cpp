@@ -311,6 +311,7 @@ castResult castSpell(
                 for (size_t i = 0; i < target->weaknesses.size(); ++i) {
                     std::cout << target->weaknesses[i] << (i + 1 < target->weaknesses.size() ? ", " : "");
                 }
+                std::cout << "\n";
             }
             return castResult::Cast;
         

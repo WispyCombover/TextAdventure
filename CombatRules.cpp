@@ -65,7 +65,7 @@ int rollPlayerMeleeDamage(const player& p, const monster& m, bool crit) {
     int totalDamage = applyDamageModifiers(primaryDmg, w.damageType, m);
 
     if (w.extraDiceCount > 0) {
-        if (toLowerNorwegian(w.name) != "kaffekoppe" || w.isFilled) {
+        if (toLowerNorwegian(w.name) != "kaffekopp" || w.isFilled) {
             int extraDmg = rollDiceSum(w.extraDiceCount, w.extraDiceSides, crit);
             totalDamage += applyDamageModifiers(extraDmg, w.extraDamageType, m);
         }
