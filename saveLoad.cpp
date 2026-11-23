@@ -1,6 +1,7 @@
 #include "saveLoad.h"
 #include "Monster.h"
 #include "NPC.h"
+#include "Spells.h"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -13,7 +14,7 @@ namespace {
 
 constexpr const char* kSaveFile  = "savefile.txt";
 constexpr const char* kSaveMagic = "MIMIRSAVE";
-constexpr int kSaveVersion = 3;     // Øk denne når formatet endres
+constexpr int kSaveVersion = 4;     // Øk denne når formatet endres
 constexpr int kArmourSlots = 5;     // slot 1..5 - se ArmourSlot i Item.h
 
 // ===================== LAGRINGSFIL DATA  =====================
@@ -65,6 +66,7 @@ struct SaveData {
     int armourIdx[kArmourSlots] = {-1, -1, -1, -1, -1};
     std::vector<DoorSave> doors;
     std::vector<RoomSave> rooms;
+    std::vector<std::string> spells;
 };
 
 // ===================== LASTING =====================
@@ -137,6 +139,9 @@ bool readSave(std::istream& in, SaveData& d) {
     d.ac         = static_cast<int>(r.num());
     d.dataKB     = r.num();
     d.room       = r.line();
+    
+    size_t spellCount = r.count();
+    for (size_t i = 0; i < spellCount && r.ok(); ++i) d.spells.push_back(r.line());
 
     size_t invCount = r.count();
     for (size_t i = 0; i < invCount && r.ok(); ++i) d.inventory.push_back(readItem(r));
@@ -275,6 +280,8 @@ void writeSave(std::ostream& out,
     out << p.playerAC << "\n";
     out << p.dataBalanceKB << "\n";
     out << currentRoom->name << "\n";
+    out << p.knownSpells.size() << "\n";
+    for (const auto& s : p.knownSpells) out << s << "\n";
 
     out << inventory.size() << "\n";
     for (const auto& itemPtr : inventory) writeItem(out, *itemPtr);
@@ -395,6 +402,8 @@ bool loadGame(player& p,
     p.playerBaseDamage = d.baseDamage;
     p.playerAC       = d.ac;
     p.dataBalanceKB  = d.dataKB;
+    p.knownSpells.clear();
+    for (const auto& s : d.spells) if (findSpell(s)) p.knownSpells.insert(s);
 
     // Midlertidig tilstand lagres ikke
     p.activeEffects.clear();

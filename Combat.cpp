@@ -53,7 +53,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
     while (m->hp > 0 && p.playerHP > 0) {
         std::string prompt = "Hva gjør du? [angrip / flykt / kast <gjenstand> ";
         if (hasDrinkable(inventory)) prompt += " / drikk <gjenstand>";
-        if (hasSpellbook(inventory)) prompt += " / cast <formel>";
+        if (hasSpellbook(inventory)) prompt += " / cast <formel> / bok";
         prompt += "]\n> ";
         std::cout << prompt;
 
@@ -209,6 +209,10 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 onMonsterDefeated(m, p, currentRoom);
                 return true;
             }
+        }
+        else if (combatInput == "bok" || combatInput == "spellbook") {
+            listSpells(p, inventory);
+            continue;
         }
         else if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
             AttackRoll a = rollToHit(playerAttackBonus(p), m->monsterAC);

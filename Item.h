@@ -69,6 +69,7 @@ struct item {
     int hazardCharges = 0;
     int breakChancePercent = 100;
     bool spawnsHazardOnThrow = false;
+    std::string teachesSpell = "";          //Brukes kun av item->type 'spellpage'
 };
 
 const Recipe* findRecipe(const std::string& itemA, const std::string& itemB);

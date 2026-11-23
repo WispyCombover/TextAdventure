@@ -8,6 +8,7 @@
 #include "Player.h"
 #include "Item.h"
 #include "Consumables.h"
+#include "Spells.h"
 #include <iostream>
 #include <algorithm>
 #include <string>
@@ -706,6 +707,9 @@ namespace
             useConsumable(p, *selectedItem);
             inventory.erase(it);
         }
+        else if (lowerType == "spellpage") {
+            readSpellPage(p, inventory, selectedItem->name);
+        }
         else
         {
             std::cout << "Du vet ikke helt hvordan du skal bruke " << selectedItem->name << " her.\n";
@@ -1098,6 +1102,27 @@ bool processCommand(
         handleCode(target, currentRoom);
     }
 
+    else if (lowerInput == "bok" || lowerInput == "spellbook" || lowerInput == "trylleformler" || lowerInput == "spells") {
+        listSpells(p, inventory);
+    }
+    else if (verb == "les" || verb == "read") {
+        if (target.empty()) std::cout << "Hva vil du lese?\n";
+        else readSpellPage(p, inventory, target);
+    }
+    else if (lowerInput == "cast" || lowerInput.rfind("cast ", 0) == 0) {
+        if (lowerInput == "cast") {
+            listSpells(p, inventory);
+        } else {
+            castResult r = castSpell(p, lowerInput.substr(5), nullptr, currentRoom, inventory);
+            if (r == castResult::Escaped) {
+                currentRoom = p.lastRoom;
+                printRoomDescription(currentRoom);
+            } else if (r == castResult::PlayerDied) {
+                std::cout << "\n=== GAME OVER ===\nDu døde av din egen trylleformel.\n";
+                return false;
+            }
+        }
+    }
     else if (lowerInput == "hjelp" || lowerInput == "help" || lowerInput == "?")
     {
         std::cout << "<TITTEL PÅ SPILL HER> er et humoristisk teksteventyr bygget på lesten av klassisk fantasy og med 'lette' D&D-regler.\n";
@@ -1113,6 +1138,8 @@ bool processCommand(
         std::cout << "Save/save/lagre - Lagrer spillet der du står.\n";
         std::cout << "Load/load/last - Laster inn tidligere lagret spill.\n";
         std::cout << "Status/stats/utstyr/gear - Viser din nåværende status.\n";
+        std::cout << "Bok/spellbook - åpner trylleformelboken og viser deg hvilke spells du har lært.\n";
+        std::cout << "Les <side> - setter en funnet side inn i boken.\n";
         std::cout << "Cast - bruker magi! Men du trenger en spellbook først.\n";
         std::cout << "Kombiner <ting 1> med <ting2> - Lar deg sette ting sammen til nye ting-\n";
         std::cout << "Undersøk <ting> - lar deg undersøke noe nærmere. Kanskje er det noe gjemt der?\n";

@@ -63,7 +63,7 @@ std::cout << "deg resolutt og bestemt. Endelig en oppgave som er deg verdig!\n";
 std::cout << "--------------------------------------------------------------------\n";
 
 //SPILLER-AUTENTISERING (NAVN)
-std::cout << "[MIMIR]: 'Før jeg gir deg tilgang til produksjonsmiljøet, må jeg\n";
+std::cout << "\n[MIMIR]: 'Før jeg gir deg tilgang til produksjonsmiljøet, må jeg\n";
 std::cout << "loggføre hvem som er på vakt.'\n";
 
 while (true) {

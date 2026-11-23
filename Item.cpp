@@ -134,7 +134,7 @@ namespace {
             .throwable = true
         },
         {
-            .name = "usb-minnepinne merket 'ikkje rør'",
+            .name = "usb-minnepinne merket 'ikke rør'",
             .description = "En slitt 4GB minnepinne funnet teipet fast under en server. Ingen vet hva som er på den, men den blir varm når du holder den.",
             .value = 10,
             .currency = "MB",
@@ -472,7 +472,18 @@ namespace {
             .currency = "kB",
             .type = "password",
             .isQuestItem = true
-        }
+        },
+
+        // ====== SPELLBOOK PAGES ======
+
+        {
+        .name = "løs side (grep)",
+        .description = "Et utrevet ark fra en gammel manual, fullt av margnotater i tre forskjellige håndskrifter.",
+        .value = 0,
+        .currency = "kB",
+        .type = "spellpage",
+        .teachesSpell = "grep"
+        },
     };
 }  // namespace
 

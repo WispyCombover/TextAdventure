@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "Item.h"
 #include <map>
+#include <set>
 
 class Room;
 
@@ -42,6 +43,8 @@ struct player {
     int caffeineTurns = 0;
     bool sudoActive = false;   //Settes av sudo, forbrukes av spell
     std::shared_ptr<item> equippedWeapon = nullptr;
+
+    std::set<std::string> knownSpells;      //Selvforklarende - kjente spells
 
     std::vector<StatusEffect> activeEffects;
 

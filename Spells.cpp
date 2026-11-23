@@ -157,7 +157,48 @@ const std::vector<spell> spellDatabase = {
     }
 };
 
+const std::vector<std::string> kStarterSpells = { "ls -la" };
+
 } //namespace
+
+bool isSpellKnown(const player& p, const spell& s) {
+    if (std::find(kStarterSpells.begin(), kStarterSpells.end(), s.name) != kStarterSpells.end()) return true;
+    return p.knownSpells.count(s.name) > 0;
+}
+
+bool readSpellPage(player& p, std::vector<std::shared_ptr<item>>& inventory, const std::string& itemName) {
+    const std::string wanted = toLowerNorwegian(trim(itemName));
+    auto it = std::find_if(inventory.begin(), inventory.end(), [&](const std::shared_ptr<item>& i) {
+        return toLowerNorwegian(i->name) == wanted;
+    });
+    if (it == inventory.end()) {
+        std::cout << "Du har ingen '" << trim(itemName) << "' i sekken.\n";
+        return false;
+    }
+    const item& spellbookPage = **it;
+    if (spellbookPage.teachesSpell.empty()) {
+        std::cout << "Du myser på " << spellbookPage.name << ", men finner ingenting du kan lære av den.\n";
+        return false;
+    }
+    if (!hasSpellbook(inventory)) {
+        std::cout << "Du har ingen bok å sette siden inn i.\n";
+        return false;
+    }
+    const spell* s = findSpell(spellbookPage.teachesSpell);
+    if (!s) return false;
+    if (isSpellKnown(p, *s)) {
+        std::cout << "Du kan allerede '" << s->name << "'. Siden er overflødig og tar bare opp plass i sekken.\n";
+        return false;
+    }
+
+    p.knownSpells.insert(s->name);
+    std::cout << "Du setter siden inn i boken. Skriften svømmer foran øynene dine, og blir sakte leselig: '" << s->name << "' (level " << s->level << ").\n";
+    if (p.playerLvl < s->level) {
+        std::cout << "Du skjønner ikke helt hvordan den virker ennå. Den krever level " << s->level << ".\n";
+    }
+    inventory.erase(it);    //Hmm, sletter dette siden dersom den ikke blir satt inn i boken også? Litt dumt, den bør jo være tradable.
+    return true;
+}
 
 const std::vector<spell>& spellList() {
     return spellDatabase;
@@ -177,15 +218,20 @@ bool hasSpellbook(const std::vector<std::shared_ptr<item>>& inventory) {
 
 void listSpells(const player& p, const std::vector<std::shared_ptr<item>>& inventory) {
     if (!hasSpellbook(inventory)) {
-        std::cout << "Du kan ingen trylleformler. Kanskje det finnes en bok et sted?\n";
+        std::cout << "Du har ingen trylleformelbok. Kanskje det finnes en et sted?\n";
         return;
     }
     std::cout << "\n--- Necronomicon Manualis --- (Mana: " << p.playerMana << "/" << p.playerMaxMana << ")\n";
+    int known = 0, missing = 0;
     for (const auto& s : spellDatabase) {
-        if (p.playerLvl >= s.level) {
-            std::cout << "[LVL " << s.level << "] ??? (side limt sammen av kaffe)\n";
-        }
+        if (!isSpellKnown(p, s)) { ++missing; continue; }
+        ++known;
+        std::cout << "[LVL " << s.level << "] " << s.name << " (" << s.manaCost << " mana)";
+        if (p.playerLvl < s.level) std::cout << "  -- LÅST: krever level " << s.level;
+        std::cout << "\n    " << s.description << "\n";
     }
+    if (known == 0) std::cout << "Alle sidene er tomme.\n";
+    if (missing > 0) std::cout << "\n" << missing << " sider er tomme, eller limt sammen av kaffe. Løse sider må finnes og leses (les <side>).\n";
     std::cout << "\nBruk: cast <trylleformel>\n";
 }
 
@@ -202,7 +248,7 @@ castResult castSpell(
     }
 
     const spell* s = findSpell(spellName);
-    if (!s) {
+    if (!s || !isSpellKnown(p, *s)) {
         std::cout << "bash: " << trim(spellName) << ": command not found. (Skriv 'cast' for å se formlene dine.)\n";
         return castResult::NotFound;
     }

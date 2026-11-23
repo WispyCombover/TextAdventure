@@ -33,6 +33,9 @@ struct spell {
     int recoilDamage = 0;       //Skade på caster
 
     bool needsTarget = false;
+
+    bool isSpellKnown(const player& p, const spell& s);
+    bool readSpellPage(player& p, std::vector<std::shared_ptr<item>>& inventory, const std::string& itemName);
     spellSpecial special = spellSpecial::None;
 
     std::string castMessage;
