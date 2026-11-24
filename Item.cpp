@@ -477,12 +477,100 @@ namespace {
         // ====== SPELLBOOK PAGES ======
 
         {
-        .name = "løs side (grep)",
-        .description = "Et utrevet ark fra en gammel manual, fullt av margnotater i tre forskjellige håndskrifter.",
-        .value = 0,
-        .currency = "kB",
-        .type = "spellpage",
-        .teachesSpell = "grep"
+            .name = "løs side (grep)",
+            .description = "Et utrevet ark fra en gammel manual, fullt av margnotater i tre forskjellige håndskrifter.",
+            .value = 256,
+            .currency = "kB",
+            .type = "spellpage",
+            .teachesSpell = "grep"
+        },
+        {
+            .name = "løs side (ping)",
+            .description = "Et ark med to små datamaskiner som vinker til hverandre over en stiplet linje. Noen har skrevet «svarer ikke?» i margen og strøket det ut tre ganger.",
+            .value = 256, 
+            .currency = "kB", 
+            .type = "spellpage", 
+            .teachesSpell = "ping"
+        },
+        {
+            .name = "løs side (ls -la)",
+            .description = "En filliste skrevet ut på papir, så lang at den har rullet seg sammen av seg selv. Nederst står det: «Ingenting er skjult for den som spør pent.»",
+            .value = 256, 
+            .currency = "kB", 
+            .type = "spellpage", 
+            .teachesSpell = "ls -la"
+        },
+        {
+            .name = "løs side (git blame)",
+            .description = "En commit-logg på papir, med ett enkelt navn understreket i rød tusj. I margen har noen tegnet en pil og skrevet: «DET VAR DEG.»",
+            .value = 512, 
+            .currency = "kB", 
+            .type = "spellpage", 
+            .teachesSpell = "git blame"
+        },
+        {
+            .name = "løs side (git stash)",
+            .description = "Et ark merket «Midlertidig. Ryddes opp i senere.» Papiret har tydeligvis ligget i en skuff siden 2019, og ingen har ryddet opp i noe som helst.",
+            .value = 1, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "git stash"
+        },
+        {
+            .name = "løs side (sudo)",
+            .description = "En gul lapp med én setning: «Du er ikke i sudoers-filen. Dette vil bli rapportert.» Under står det, med blyant: «Ikke hvis du sier det riktig.»",
+            .value = 2, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "sudo"
+        },
+        {
+            .name = "løs side (ssh)",
+            .description = "Et ark med en liten nøkkel tegnet i margen og en liste over servere ingen har tilgang til lenger. Nederst står det: «Når du ikke vet hvor du skal, er alle steder trygge steder.»",
+            .value = 2, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "ssh"
+        },
+        {
+            .name = "løs side (chmod 777)",
+            .description = "En side fra en gammel sikkerhetsmanual, med ordet ADVARSEL understreket fire ganger. Under står tallet 777, og noen har tegnet et smilefjes ved siden av.",
+            .value = 3, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "chmod 777"
+        },
+        {
+            .name = "løs side (ctrl+z)",
+            .description = "Et rotete utkast der alt er strøket over, og så strøket under igjen. I margen står det, med stadig større skrift: «Angre. Angre! ANGRE!»",
+            .value = 3, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "ctrl+z"
+        },
+        {
+            .name = "løs side (kill -9)",
+            .description = "Et ark med ett eneste ord, SIGKILL, skrevet med så hard hånd at pennen har revet hull i papiret. Det lukter svakt av svidd prosess.",
+            .value = 4, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "kill -9"
+        },
+        {
+            .name = "løs side (rm -rf /)",
+            .description = "Et ark stemplet ALDRI KJØR DENNE i rødt. Tre generasjoner sysadmins har brettet hjørnet på siden likevel. Sekken din føles litt lettere bare av å holde den.",
+            .value = 8, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "rm -rf /"
+        },
+        {
+            .name = "løs side (git push --force)",
+            .description = "En kaffeflekket side revet ut av en retrospektiv-rapport. «Aldri deploy på en fredag» står det, og under: «Gjort det. Fredag. Aldri igjen.»",
+            .value = 16, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "git push --force"
         },
     };
 }  // namespace
