@@ -63,7 +63,10 @@ enum class castResult {
 
 const std::vector<spell>& spellList();
 const spell* findSpell(const std::string& name);
+
 bool hasSpellbook(const std::vector<std::shared_ptr<item>>& inventory);
+bool isSpellKnown(const player& p, const spell& s);
+bool readSpellPage(player& p, std::vector<std::shared_ptr<item>>& inventory, const std::string& itemName);
 
 void listSpells(const player& p, const std::vector<std::shared_ptr<item>>& inventory);
 
@@ -72,7 +75,7 @@ castResult castSpell(
     player& p,
     const std::string& spellName,
     monster* target,
-    const Room* currentRoom,
+    Room* currentRoom, // Fjernet 'const' her
     std::vector<std::shared_ptr<item>>& inventory
 );
 

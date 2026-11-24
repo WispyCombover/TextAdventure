@@ -325,7 +325,7 @@ castResult castSpell(
     player& p,
     const std::string& spellName,
     monster* target,
-    const Room* currentRoom,
+    Room* currentRoom, 
     std::vector<std::shared_ptr<item>>& inventory)
 {
     if (!hasSpellbook(inventory)) {
