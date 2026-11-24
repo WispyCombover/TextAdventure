@@ -74,5 +74,5 @@ int rollPlayerMeleeDamage(const player& p, const monster& m, bool crit) {
 }
 
 int rollMonsterDamage(const monster& m, bool crit) {
-    return rollDiceSum(m.damageDiceCount, m.damageDiceSides, crit) + m.attackDamage;
+    return std::max(0, rollDiceSum(m.damageDiceCount, m.damageDiceSides, crit) + m.attackDamage);
 }

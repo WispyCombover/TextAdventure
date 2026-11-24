@@ -14,7 +14,9 @@ class Room;
 enum class StatusType {
     caffeineRush,           // +2 på hit-dice og dmg
     focused,                // +2 på spell-attack / redusert manakost
-    sugarCrash              // -2 på hit-dice
+    sugarCrash,
+    firewalled,
+    chrooted              // -2 på hit-dice
 };
 
 struct StatusEffect {

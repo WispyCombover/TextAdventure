@@ -15,7 +15,11 @@ enum class spellSpecial {
     Escape,         //Flykter tilbake til forrige rom (ssh)
     Identify,       //Viser monsterets stats (ls -la)
     Ping,           //Sjekker nabo-rom for monstre
-    Grep            //Lister opp ting i rommet
+    Grep,           //Lister opp ting i rommet
+    Nmap,           //Monstre i nabo-rom + skjulte ting her
+    Locate,         //Gjenstander i nabo-rom
+    Sandwich,       //Heler kun hvis sudo er aktiv
+    ForkBomb        //Legger ut en skadelig hazard i rommet
 };
 
 struct spell {
@@ -32,12 +36,14 @@ struct spell {
     int targetDamageBoost = 0;  //Buff til monster
     int recoilDamage = 0;       //Skade på caster
 
+    std::string requiresItem = "";                  //Krever en item i sekken
+    StatusType statusType = StatusType::focused;    //Status på spiller
+    std::string statusName = "";
+    int statusTurns = 0;
+    int statusMagnitude = 0;
+
     bool needsTarget = false;
-
-    bool isSpellKnown(const player& p, const spell& s);
-    bool readSpellPage(player& p, std::vector<std::shared_ptr<item>>& inventory, const std::string& itemName);
     spellSpecial special = spellSpecial::None;
-
     std::string castMessage;
     std::string fizzleMessage;  //Når man ikke har nok mana
 };
@@ -51,7 +57,8 @@ enum class castResult {
     Cast,           //Great success! Runden er brukt
     Fumbled,        //Segfault! Runden er brukt
     Escaped,        //Spilleren flyktet
-    PlayerDied
+    PlayerDied,
+    MissingItem
 };
 
 const std::vector<spell>& spellList();

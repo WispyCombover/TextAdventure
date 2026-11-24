@@ -572,6 +572,70 @@ namespace {
             .type = "spellpage", 
             .teachesSpell = "git push --force"
         },
+        { 
+            .name = "løs side (iptables -j drop)",
+            .description = "Et ark med en murvegg tegnet i margen og én regel: «Alt som ikke er tillatt, er forbudt.» Noen har føyd til: «Inkludert deg.»",
+            .value = 1, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "iptables -j drop" 
+        },
+        { 
+            .name = "løs side (nmap)",
+            .description = "En skriveroppgave full av IP-adresser, med to av dem sirklet inn og «hvorfor svarer DEN?» skrevet ved siden av.",
+            .value = 1, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "nmap" 
+        },
+        { 
+            .name = "løs side (chroot)",
+            .description = "Et ark brettet til en liten boks. Det står «IKKE ÅPNE» på innsiden av lokket. Utenpå står det ingenting.",
+            .value = 6, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "chroot" 
+        },
+        { 
+            .name = "løs side (sudo make me a sandwich)",
+            .description = "En tegneserierute revet ut av en bok. Den ene personen sier: «Lag en sandwich.» Den andre: «Lag den selv.» Så: «sudo.» Så: «Okay.»",
+            .value = 4, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "sudo make me a sandwich" 
+        },
+        { 
+            .name = "løs side (locate)",
+            .description = "En utskrift av en søkeindeks. Nederst: «Sist oppdatert: for lenge siden.» Den lukter støv og gammel toner.",
+            .value = 4, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "locate" 
+        },
+        { 
+            .name = "løs side (git revert)",
+            .description = "En side fra en retrospektiv, der noen har skrevet «Vi skulle ha reverta på mandag» med stadig større bokstaver.",
+            .value = 12, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "git revert" 
+        },
+        { 
+            .name = "løs side (fork bomb)",
+            .description = "Et ark med bare tretten tegn skrevet midt på. Papiret har blitt litt varmt, og det vokser stadig flere identiske ark ut av stabelen.",
+            .value = 12, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "fork bomb" 
+        },
+        { 
+            .name = "løs side (rubber duck debugging)",
+            .description = "En side med en tegning av en gummiand og teksten: «Den dømmer deg ikke. Den finner bare feilen mens du snakker.»",
+            .value = 10, 
+            .currency = "MB", 
+            .type = "spellpage", 
+            .teachesSpell = "rubber duck debugging" 
+        },
     };
 }  // namespace
 

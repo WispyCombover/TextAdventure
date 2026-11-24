@@ -296,29 +296,34 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
                 return true;
             }
             
-            std::cout << m->name << " " << m->attackMessage << "\n";
-
-            AttackRoll b = rollToHit(monsterAttackBonus(*m), p.getTotalAC());
-
-            std::cout << m->name << " triller for å treffe deg... Det fikk " << b.total << " mot din AC " << p.getTotalAC() << ".\n";
-
-            if (b.hit) {
-                int totalMonsterDamage = rollMonsterDamage(*m, b.crit);
-                //Monsteret treffer
-                p.playerHP -= totalMonsterDamage;
-                if (b.crit) {
-                    std::cout << "CRITICAL HIT! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
-                } else {
-                    std::cout << "AU! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
-                }
-                if (p.playerHP <= 0) {
-                    std::cout << "\n=== GAME OVER ===\n";
-                    std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet og logger deg ut!\n";
-                    return false;
-                }      
+            if (p.getEffectBonus(StatusType::chrooted) > 0) {
+                std::cout << m->name << " kaster seg mot veggene i chroot-fengselet og kommer ingen vei. Angrepet forsvinner ut i intet.\n";
             } else {
-                std::cout << "Flaks! Du dukker unna angrepet til " << m->name << ".\n";
+                std::cout << m->name << " " << m->attackMessage << "\n";
+
+                AttackRoll b = rollToHit(monsterAttackBonus(*m), p.getTotalAC());
+
+                std::cout << m->name << " triller for å treffe deg... Det fikk " << b.total << " mot din AC " << p.getTotalAC() << ".\n";
+
+                if (b.hit) {
+                    int totalMonsterDamage = rollMonsterDamage(*m, b.crit);
+                    //Monsteret treffer
+                    p.playerHP -= totalMonsterDamage;
+                    if (b.crit) {
+                        std::cout << "CRITICAL HIT! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
+                    } else {
+                        std::cout << "AU! Du tok " << totalMonsterDamage << " skade! Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
+                    }
+                    if (p.playerHP <= 0) {
+                        std::cout << "\n=== GAME OVER ===\n";
+                        std::cout << "Deadlinemonsteret vant denne gangen. Mimir er skuffet og logger deg ut!\n";
+                        return false;
+                    }      
+                } else {
+                    std::cout << "Flaks! Du dukker unna angrepet til " << m->name << ".\n";
+                }
             }
+            
         }
         if (!p.activeEffects.empty()) {
             std::cout << "Aktive effekter: ";

@@ -22,6 +22,7 @@ int player::getTotalAC() const {
             total += armourPiece->acBonus;
         }
     }
+    total += getEffectBonus(StatusType::firewalled);
     return total;
 }
 

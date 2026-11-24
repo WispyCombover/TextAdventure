@@ -83,6 +83,27 @@ const std::vector<spell> spellDatabase = {
         .castMessage = "Du uttaler det magiske ordet. Virkeligheten nøler, og gir så etter: 'OK. Du er root. Ikke gjør noe dumt.'",
         .fizzleMessage = "Du er ikke i sudoers-filen. Denne hendelesen vil bli rapportert."
     },
+    {
+        .name = "iptables -j drop",
+        .description = "Dropper all trafikk som ikke er eksplisitt tillatt. Virker også mot angrep, møteinnkallinger og invitasjoner til teambuilding.",
+        .level = 2,
+        .manaCost = 3,
+        .statusType = StatusType::firewalled,
+        .statusName = "Brannmur",
+        .statusTurns = 4,
+        .statusMagnitude = 3,
+        .castMessage = "Du hvisker 'iptables -j DROP'. Luften rundt deg stivner til en usynlig brannmur av regler ingen forstår.",
+        .fizzleMessage = "iptables: Permission denied (you must be root). (Ikke nok mana.)"
+    },
+    {
+        .name = "nmap",
+        .description = "Skanner nabolaget etter åpne porter, sovende prosesser og ting folk helst ikke ville at du skulle se. Helt lovlig, så lenge du spør pent.",
+        .level = 2,
+        .manaCost = 2,
+        .special = spellSpecial::Nmap,
+        .castMessage = "Du kjører 'nmap -sV' mot rommene rundt deg. Små lysprikker tegner et kart i lufta:",
+        .fizzleMessage = "nmap: Du har ikke nok mana til å skanne. (Mana: 0)"
+    },
 
     // ====== LEVEL 3 ======
     {
@@ -141,8 +162,41 @@ const std::vector<spell> spellDatabase = {
         .castMessage = "Du skriver kommandoen og trykker Enter før samvittigheten rekker å gripe inn. Gulvet, veggene og sekken din begynner å forsvinne...",
         .fizzleMessage = "rm: it is dangerous to operate recursively on '/'. Heldigvis. Du har ikke nok mana.)"
     },
+    {
+        .name = "chroot",
+        .description = "Sperrer monsteret inne i en katalog der det verken kan se, nå eller skade noe utenfor. Ingen har helt forstått hvordan man kommer ut igjen, heller ikke du.",
+        .level = 4,
+        .manaCost = 6,
+        .statusType = StatusType::chrooted,
+        .statusName = "Chroot-fengsel",
+        .statusTurns = 2,
+        .statusMagnitude = 1,
+        .needsTarget = true,
+        .castMessage = "Du skriver 'chroot /dev/null' og monsteret trekkes inn i en katalog uten utganger.",
+        .fizzleMessage = "chroot: Operation not permitted. (Ikke nok mana.)"
+    },
+    {
+        .name = "sudo make me a sandwich",
+        .description = "Uten sudo svarer terminalen: 'Lag den selv.' Med sudo dukker det opp en sandwich fra intet. Ingen vet hvem som lager dem, eller hvor skinken kommer fra. Fungerer kun hvis du først har gjort deg til root.",
+        .level = 4,
+        .manaCost = 4,
+        .healDiceCount = 4,
+        .healDiceSides = 6,
+        .special = spellSpecial::Sandwich,
+        .castMessage = "Du hvisker: 'sudo make me a sandwich'.",
+        .fizzleMessage = "make: *** No rule to make target 'sandwich'. (Ikke nok mana.)"
+    },
+    {
+        .name = "locate",
+        .description = "Slår opp i en søkeindeks som sist ble oppdatert i 2017. Finner stort sett alt som lå der for lenge siden.",
+        .level = 4,
+        .manaCost = 3,
+        .special = spellSpecial::Locate,
+        .castMessage = "Du skriver 'locate', og rommene rundt deg svarer fra en indeks som er sju år gammel:",
+        .fizzleMessage = "locate: updatedb has not been run. (Ikke nok mana.)"
+    },
 
-    // ====== LEVEL 6 ======
+    // ====== LEVEL 5 ======
     {
         .name = "git push --force",
         .description = "Overskriver historien og alle andres arbeid. Veldig effektivt. Veldig upopulært.",
@@ -154,7 +208,39 @@ const std::vector<spell> spellDatabase = {
         .needsTarget = true,
         .castMessage = "Du force-pusher rett til main. Monsteret får øyeblikkelig merge-konflikter i selve eksistensen. Teamit ditt hater deg.",
         .fizzleMessage = "! [rejected] main -> main (ikke nok mana)"
-    }
+    },
+    {
+        .name = "git revert",
+        .description = "Lager en ny commit som angrer en gammel. Fungerer på sår, men aldri på kollegaers kommentarer i code review.",
+        .level = 5,
+        .manaCost = 8,
+        .healDiceCount = 5,
+        .healDiceSides = 8,
+        .castMessage = "Du kjører 'git revert HEAD'. Skadene blir en ny commit i historien, og en friskere versjon av deg blir sjekket ut.",
+        .fizzleMessage = "error: could not revert. (Ikke nok mana.)"
+    },
+    {
+        .name = "fork bomb",
+        .description = ":(){ :|:& };: - Tretten tegn og et helt operativsystem på kne. Skaden kommer over tid, og stopper ikke bare fordi du ber pent.",
+        .level = 5,
+        .manaCost = 8,
+        .needsTarget = true,
+        .special = spellSpecial::ForkBomb,
+        .castMessage = "Du mumler ':(){ :|:& };:' og prosessene begynner å formere seg i hjørnene av rommet.",
+        .fizzleMessage = "bash: fork: retry: Resource temporarily unavailable. (Ikke nok mana.)"
+    },
+    {
+        .name = "rubber duck debugging",
+        .description = "Forklar problemet høyt for en gummiand, og noe skjer med alle som hører på. Krever, naturlig nok, en gummiand i sekken.",
+        .level = 5,
+        .manaCost = 5,
+        .acReduction = 4,
+        .targetDamageBoost = -3,
+        .requiresItem = "liten gummiand",
+        .needsTarget = true,
+        .castMessage = "Du setter anda på bakken og forklarer monsteret koden linje for linje. Midt i en setning innser det at logikken ikke holder. Anda nikker anerkjennende.",
+        .fizzleMessage = "Anda venter tålmodig. Du har ikke nok mana til å forklare det."
+    },
 };
 
 const std::vector<std::string> kStarterSpells = { "ls -la" };
@@ -263,6 +349,17 @@ castResult castSpell(
         return castResult::NoTarget;
     }
 
+    if (!s->requiresItem.empty()) {
+        const std::string needed = toLowerNorwegian(s->requiresItem);
+        bool has = std::any_of(inventory.begin(), inventory.end(), [&](const std::shared_ptr<item>& i) {
+            return toLowerNorwegian(i->name) == needed;
+        });
+        if (!has) {
+            std::cout << "Du trenger '" << s->requiresItem << "' for å bruke '" << s->name << "'.\n";
+            return castResult::MissingItem;
+        }
+    }
+
     const bool sudoWasActive = p.sudoActive;
     const int cost = (sudoWasActive && s->special != spellSpecial::Sudo) ? 0 : s->manaCost;
 
@@ -297,6 +394,60 @@ castResult castSpell(
 
     // ------ Spesialeffekter ------
     switch (s->special) {
+        case spellSpecial::Nmap: {
+            bool foundAny = false;
+            if (currentRoom) {
+                for (const auto& [dir, ex] : currentRoom->exits) {
+                    if (ex.destination && ex.destination->occupant) {
+                        const monster& mon = *ex.destination->occupant;
+                        std::cout << " [" << dir << "] " << mon.name << " | level " << mon.level << " | HP " << mon.hp << "/" << mon.maxHp << "\n";
+                        foundAny = true;
+                    }
+                }
+                for (const auto& [key, itemName] : currentRoom->hiddenItems) {
+                    std::cout << " [skjult tjeneste] Noe lytter bak '" << key << "'.\n";
+                    foundAny = true;
+                }
+            }
+            if (!foundAny) std::cout << " Alle porter er lukket. Ingenting svarer.\n";
+            return castResult::Cast;
+        }
+
+        case spellSpecial::Locate: {
+            bool foundAny = false;
+            if (currentRoom) {
+                for (const auto& [dir, ex] : currentRoom->exits) {
+                    if (!ex.destination || ex.destination->items.empty()) continue;
+                    foundAny = true;
+                    if (ex.destination->visited) {
+                        std::cout << " [" << dir << "] ";
+                        const auto& its = ex.destination->items;
+                        for (size_t i = 0; i < its.size(); ++i) 
+                            std::cout << its[i].name << (i + 1 < its.size() ? ", " : "");
+                        std::cout << "\n";
+                    } else {
+                        std::cout << " [" << dir << "] " << ex.destination->items.size()
+                            << " gjenstand(er) i et rom du ikke har besøkt.\n";
+                    }
+                }
+            }
+            if (!foundAny) std::cout << " locate: ingen treff i indeksen.\n";
+            return castResult::Cast;
+        }
+
+        case spellSpecial::Sandwich:
+            if (!sudoWasActive) {
+                std::cout << "'Lag den selv,' svarer terminalen. Mana og tid er tapt.\n";
+                return castResult::Cast;
+            }
+            std::cout << "'Okay.' Noe som ligner et ostesmørbrød materialiserer seg i hendene dine.\n";
+            break;
+
+        case spellSpecial::ForkBomb:
+            if (currentRoom) currentRoom->addHazard("en forkbomb", 2, 6, "Lightning", 4);
+            std::cout << "Prosessene formerer seg raskere enn noen rekker å telle. Rommet blir et stort prosess-tre.\n";
+            return castResult::Cast;
+
         case spellSpecial::Escape:
             if (p.lastRoom == nullptr) {
                 std::cout << "ssh: connect to host: No route to host. Det er ingen steder å logge inn.\n";
@@ -372,9 +523,17 @@ castResult castSpell(
         std::cout << target->name << " mister " << s->acReduction << " AC. (Ny AC: " << target->monsterAC << ")\n";
     }
 
-    if (s->targetDamageBoost > 0 && target) {
+    if (s->targetDamageBoost != 0 && target) {
         target->attackDamage += s->targetDamageBoost;
-        std::cout << target->name << " slår nå " << s->targetDamageBoost << " hardere. Det der var kanskje ikke så lurt.\n";
+        if (s->targetDamageBoost > 0)
+            std::cout << target->name << " slår nå " << s->targetDamageBoost << " hardere. Det der var kanskje ikke så lurt.\n";
+        else
+            std::cout << target->name << " slår nå " << -s->targetDamageBoost << " svakere. Anda nikker anerkjennende.\n";
+    }
+
+    if (s->statusTurns > 0) {
+        p.addEffect(s->statusType, s->statusName, s->statusTurns, s->statusMagnitude);
+        std::cout << "[Status] " << s->statusName << " aktiv i " << s->statusTurns << " runder.\n";
     }
 
     if (s->healDiceCount > 0) {
