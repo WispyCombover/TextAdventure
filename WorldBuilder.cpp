@@ -24,7 +24,9 @@ static std::shared_ptr<Room::Door> makeDoor(const std::string& id, bool locked =
 }
 
 Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) {
-    //BYGG ROMMENE HER
+
+    //ROMMENE BYGGES HER
+
     auto spawnRoom = std::make_unique<Room>(
         "Møterommet",
         "Møterommet er som møterom flest. Du ser et bord med åtte stoler rundt. I taket henger en prosjektor, og på veggen henger et lerret.\n På bordet står det en tom og godt brukt kaffekopp som noen har glemt igjen, og det ligger en gammel bic penn ved siden av.\n  I et hjørne står en gammel whiteboard-tavle med nesten uleselige skriblerier, og det kommer et svakt lyst gjennom de frostede glassveggene på hver side av døren som leder ut."
@@ -35,7 +37,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     );
     auto rubberDuckSanctum = std::make_unique<Room>(
         "Rubber Duck Sanctum",
-        "Du river opp døren og avbryter et intenst enmannsmøte. Lyset er dempet, og midt på konferanseborde står en diger, gul gummiand på en liten fløyelspute, belyst av en skrivebordslampe. Ved bordenden sitter en tydelig utslitt utvikler med bustete hår og stirrende blikk, som stopper brått midt i en setning og ser forfjamset på deg. Du kan gå ut igjen gjennom DØR."
+        "Du river opp døren og avbryter et intenst enmannsmøte. Lyset er dempet, og midt på konferansebordet står en diger, gul gummiand på en liten fløyelspute, belyst av en skrivebordslampe. Ved bordenden sitter en tydelig utslitt utvikler med bustete hår og stirrende blikk, som stopper brått midt i en setning og ser forfjamset på deg. Du kan gå ut igjen gjennom DØR."
     );
     auto salaSegfault = std::make_unique<Room>(
         "Sala Segfault",
@@ -156,7 +158,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     rubberDuckSanctum->exits["dør"] = {
         corridor.get(), 
         doorDuck,
-        "Døren tilbake til den knirkende korridoren."
+        "Døren tilbake til den knirkende korridoren. På døren henger et midtsidebilde av en gummiand. Nederst på bildet ser du teksten 'Frøken Februar 2016'."
     };
 
     //Korridor <-> Sala Segfault
@@ -216,6 +218,8 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         nullptr, 
         "" 
     };
+
+    //Kontorlandskap 1 <-> kontorlandskap 2
     openOfficeOne->exits["nord"] = {
         openOfficeTwo.get(),
         nullptr,
@@ -232,7 +236,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
         ""
     };
 
-    //Korridor nord <-> kontorlandskap gruppe to, rom mot vest (aner ikke hva enda) og nordre korridor videre mot øst.
+    //Korridor nord <-> kontorlandskap gruppe to, unisex toalett mot vest og nordre korridor videre mot øst.
     northernCorridorOne->exits["sør"] = {
         openOfficeTwo.get(),
         nullptr,
@@ -256,7 +260,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     };
 
     //Korridor nord midtparti <-> heis, Hotfix Hotel, Service Unavailable, korridor nord øst
-    northernCorridorMid->exits["nord"] = {
+    northernCorridorMid->exits["sør"] = {
         elevatorFromIT.get(),
         doorElevator,
         ""
@@ -264,7 +268,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     northernCorridorMid->exits["hotfixhotel"] = {
         theHotfixHotel.get(),
         doorHotfix,
-        ""
+        "" + hotfixHotelAddr
     };
     theHotfixHotel->exits["dør"] = {
         northernCorridorMid.get(),
@@ -274,7 +278,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     serviceUnavailable->exits["dør"] = {
         northernCorridorMid.get(),
         doorServiceUnavailable,
-        ""
+        "" 
     };
     elevatorFromIT->exits["dør"] = {
         northernCorridorMid.get(),
@@ -284,7 +288,7 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     northernCorridorMid->exits["serviceunavailable"] = {
         serviceUnavailable.get(),
         doorServiceUnavailable,
-        ""
+        "" + serviceUnavailableAddr
     };
     northernCorridorMid->exits["vest"] = {
         northernCorridorOne.get(),
