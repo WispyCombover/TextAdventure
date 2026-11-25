@@ -2,6 +2,15 @@
 #include "Item.h"
 #include "Utils.h"
 
+std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
+    auto veteran = std::make_unique<NPC>();
+    veteran->name = "";
+    veteran->description = "";
+    veteran->isMerchant = false;
+
+    //DIALOG HER
+}
+
 std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p) {
     auto voice = std::make_unique<NPC>();
     voice->name = "Stemme fra kopirommet";

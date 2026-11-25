@@ -237,6 +237,7 @@ void handleCode(const std::string &codeInput, Room *currentRoom)
         std::cout << "Hvilken kode vil du taste inn? (F.eks. '1234')\n";
         return;
     }
+    
     //Finn alle utganger i rommet som har en numerisk kdoe som keyName
     Room::Exit *matchingExit = nullptr;
     bool hasAnyKeypadDoor = false;
