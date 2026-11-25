@@ -1151,6 +1151,14 @@ bool processCommand(
         std::cout << "De neste femten minuttene tilbringer du hulkende i nærmeste hjørne.\n";
         std::cout << "Tårevåt og en smule snørrete bestemmer du deg deretter for å stramme deg opp, og for å gi det et nytt forsøk.\n";
     }
+    else if (lowerInput == "xyzzy" || lowerInput == "plurgh")
+    {
+        std::cout << "Ingenting skjer.\n";
+    }
+    else if (lowerInput == "42")
+    {
+        std::cout << "The answer to life, the universe and everything. And also 'what is six by nine?'\n";
+    }
     else
     {
         std::cout << "Ukjent kommando. Prøv 'gå [retning]', 'ta [gjenstand]', 'inventory', eller 'avslutt'.\n";

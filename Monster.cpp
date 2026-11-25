@@ -132,6 +132,25 @@ monsterManual::monsterManual() {
 
     // LEVEL 3
     blueprintDatabase[3].push_back({
+        .name = "The Retention Policy",
+        .description = "A paper minotaur...",
+        .level = 3,
+        .hp = 55,
+        .maxHp = 55,
+        .attackDamage = 2,
+        .damageDiceCount = 2,
+        .damageDiceSides = 8,
+        .xpReward = 22,
+        .monsterAC = 15,
+        .weaknesses = {"fire", "acid"},
+        .attackMessage = "",
+        .minDataReward = 600,
+        .maxDataReward = 1400,
+        .lootTable = {
+            { getItem("the mythical man-month"), 100}
+        }
+    });
+    blueprintDatabase[3].push_back({
         .name = "The DNS Daemon",
         .description = "Ingen vet hva det er, eller hvor det kommer fra, men alt slutter å fungere når det våkner.",
         .level = 3, 

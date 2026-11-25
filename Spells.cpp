@@ -307,17 +307,39 @@ void listSpells(const player& p, const std::vector<std::shared_ptr<item>>& inven
         std::cout << "Du har ingen trylleformelbok. Kanskje det finnes en et sted?\n";
         return;
     }
+
     std::cout << "\n--- Necronomicon Manualis --- (Mana: " << p.playerMana << "/" << p.playerMaxMana << ")\n";
+
+    int maxLevel = 0;
+    for (const auto& s : spellDatabase) maxLevel = std::max(maxLevel, s.level);
+
     int known = 0, missing = 0;
-    for (const auto& s : spellDatabase) {
-        if (!isSpellKnown(p, s)) { ++missing; continue; }
-        ++known;
-        std::cout << "[LVL " << s.level << "] " << s.name << " (" << s.manaCost << " mana)";
-        if (p.playerLvl < s.level) std::cout << "  -- LÅST: krever level " << s.level;
-        std::cout << "\n    " << s.description << "\n";
+    for (int lvl = 1; lvl <= maxLevel; ++lvl) {
+        std::vector<const spell*> learned;
+        for (const auto& s : spellDatabase) {
+            if (s.level != lvl) continue;
+            if (isSpellKnown(p, s)) learned.push_back(&s);
+            else ++missing;
+        }
+        if (learned.empty()) continue;
+
+        known += static_cast<int>(learned.size());
+
+        std::cout << "\n== LEVEL " << lvl;
+        if (p.playerLvl < lvl) std::cout << " (LÅST: du er level " << p.playerLvl << ")";
+        std::cout << " ==\n";
+
+        std::sort(learned.begin(), learned.end(), [](const spell* a, const spell* b) { return a->manaCost < b->manaCost; });
+
+        for (const spell* s : learned) {
+            std::cout << " " << s->name << " (" << s->manaCost << " mana)\n" << "     " << s->description << "\n";
+        }
     }
-    if (known == 0) std::cout << "Alle sidene er tomme.\n";
-    if (missing > 0) std::cout << "\n" << missing << " sider er tomme, eller limt sammen av kaffe. Løse sider må finnes og leses (les <side>).\n";
+
+    if (known == 0) std::cout << "Alle sider er tomme.\n";
+    if (missing > 0) {
+        std::cout << "\n" << missing << " sider er tomme, eller limt sammen av kaffe. " << "Løse sider må finnes og leses (les <side>).\n";
+    }
     std::cout << "\nBruk: cast <trylleformel>\n";
 }
 
