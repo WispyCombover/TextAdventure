@@ -9,6 +9,10 @@ std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
     veteran->isMerchant = false;
 
     //DIALOG HER
+    // P: Hei du gamle og vise - har du tips til hvordan jeg kan nedkjempe <monster>?
+    // NPC: Kanskje. Men da må du først gjøre noe for meg...
+    // P: Hvordan kan jeg hjelpe deg?
+    // NPC: Du må komme deg ned til nederste etasje, vandre gjennom papirarkivets labyrint, overvinne strabasen i midten, og bringe tilbake min kopi av <obskur IT-nerdereferanse> som ved en feiltagelse/prank ble sendt til arkivering...
 }
 
 std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p) {
