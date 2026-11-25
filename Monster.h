@@ -25,6 +25,7 @@ struct monster {
     std::vector<std::string> weaknesses;        //Slik kan ekstra damagtypes faktisk ha noe å si, og valg av våpen blir et strategisk poeng
     std::vector<std::string> resistances;
     std::string attackMessage;
+    bool isUniqueBoss = false;
 
     //LOOT
     long long minDataReward = 0;  // I ant kB

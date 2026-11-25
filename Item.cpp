@@ -636,6 +636,14 @@ namespace {
             .type = "spellpage", 
             .teachesSpell = "rubber duck debugging" 
         },
+        {
+            .name = "løs side (regex sanitize)",
+            .description = "Et krøllete ark dekket av kryptiske tegn som ^[a-zA-Z0-9_]+$. I margen står det med rød tusj: 'ALDRI stol på input fra brukeren – spesielt ikke hvis han heter Bobby.'",
+            .value = 6,
+            .currency = "MB",
+            .type = "spellpage",
+            .teachesSpell = "regex sanitize"
+        }
     };
 }  // namespace
 

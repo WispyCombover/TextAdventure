@@ -147,6 +147,17 @@ const std::vector<spell> spellDatabase = {
         .castMessage = "Du hveser 'SIGKILL' mellom sammenbitte tenner.",
         .fizzleMessage = "kill: (PID): No such process. (Og ingen mana.)"
     },
+    {
+        .name = "regex sanitize",
+        .description = "Renser input for farlige tegn og SQL-injeksjoner.",
+        .level = 3,
+        .manaCost = 7,
+        .damageDiceCount = 3,
+        .damageDiceSides = 6,
+        .needsTarget = true,
+        .castMessage = R"(Du slynger et regulært uttrykk mot fienden: 's/['";--]//g!' Alle uautoriserte spesialtegn blir strippet bort i et gnistregn av syntaksvalidering!)",
+        .fizzleMessage = "Regex compilation failed: Ikke nok mana."
+    },
 
     // ====== LEVEL 4 ======
     {
