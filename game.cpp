@@ -22,7 +22,7 @@
 #include "Spells.h"
 
 //TO-DO AND WISHLIST:
-// -Sub-quests og quest-givers. En som sender spilleren til kjelleren, fordi det er naturligvis der postmottaket er, for å hente ... (trenger å brainstorme quest-idéer)
+// -Sub-quests og quest-givers. 
 // -Interactables (som kaffemaskinen, datamaskiner, etc...)
 // -Hvor skal jeg gjemme spellbooken?
 // -Puzzles! Klart vi må ha puzzles!

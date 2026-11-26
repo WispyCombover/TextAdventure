@@ -1159,6 +1159,11 @@ bool processCommand(
     {
         std::cout << "The answer to life, the universe and everything. And also 'what is six by nine?'\n";
     }
+
+    else if (lowerInput == "all your base" || lowerInput == "all your base are belong to us")
+    {
+        std::cout << "They set up us the bomb!\n";
+    }
     else
     {
         std::cout << "Ukjent kommando. Prøv 'gå [retning]', 'ta [gjenstand]', 'inventory', eller 'avslutt'.\n";

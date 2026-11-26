@@ -128,9 +128,9 @@ namespace {
                     .damageDiceSides = 6,
                     .xpReward = 20,
                     .monsterAC = 12,
-                    .isUniqueBoss = true, // Kun i Sala Segfault
-                    .attackMessage = "Hopper til en uallokert minneadresse og kaster en 'Segmentation Fault (core dumped)' rett i brystet ditt!",
                     .weaknesses = {"lightning"},
+                    .attackMessage = "Hopper til en uallokert minneadresse og kaster en 'Segmentation Fault (core dumped)' rett i brystet ditt!",
+                    .isUniqueBoss = true, // Kun i Sala Segfault
                     .minDataReward = 500,
                     .maxDataReward = 1300,
                     .lootTable = {
@@ -243,8 +243,8 @@ namespace {
                     .damageDiceSides = 6,
                     .xpReward = 225,
                     .monsterAC = 18,
-                    .isUniqueBoss = true,
                     .attackMessage = "Kaster 'ASAP-panikk' over deg, spiser opp nattesøvnen din, og tvinger deg til å rulle ut uferdig kode i produksjon!",
+                    .isUniqueBoss = true,
                     .lootTable = {
                         { getItem("produksjonsnøklene"), 100 },
                         { getItem("gammel smultring"), 5 }
@@ -262,7 +262,7 @@ monsterManual::monsterManual()
     rng = std::mt19937(rd());
 }
 
-std::unique_ptr monsterManual::getMonsterBlueprint(int level, const std::string &name)
+std::unique_ptr<monster> monsterManual::getMonsterBlueprint(int level, const std::string &name)
 {
     const auto &db = getMonsterDatabase();
     auto it = db.find(level);
@@ -273,14 +273,14 @@ std::unique_ptr monsterManual::getMonsterBlueprint(int level, const std::string 
         {
             if (toLowerNorwegian(m.name) == wanted)
             {
-                return std::make_unique(m);
+                return std::make_unique<monster>(m);
             }
         }
     }
     return nullptr;
 }
 
-std::unique_ptr monsterManual::getRandomMonster(int level)
+std::unique_ptr<monster> monsterManual::getRandomMonster(int level)
 {
     const auto &db = getMonsterDatabase();
     auto it = db.find(level);
@@ -302,5 +302,5 @@ std::unique_ptr monsterManual::getRandomMonster(int level)
         return nullptr;
     }
     std::uniform_int_distribution<size_t> dist(0, pool.size() - 1);
-    return std::make_unique(*pool[dist(rng)]);
+    return std::make_unique<monster>(*pool[dist(rng)]);
 }

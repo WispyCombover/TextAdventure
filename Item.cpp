@@ -24,7 +24,7 @@ namespace {
         },
         {
             .ingredient1 = "defekt strømforsyning",
-            .ingredient2 = "usb-minnepinne merket 'ikkje rør'",
+            .ingredient2 = "usb-minnepinne merket 'ikke rør'",
             .resultItem = "overklokket usb-killer",
             .craftText = "Du lodder ledningene fra strømforsyningen rett inn på USB-pinnen med ren viljestyrke. Den lukter svidd ozon!"
         }
@@ -471,6 +471,15 @@ namespace {
             .value = 0,
             .currency = "kB",
             .type = "password",
+            .isQuestItem = true
+        },
+        {
+
+            .name = "the mythical man-month",
+            .description = "",
+            .value = 0,
+            .currency = "kB",
+            .type = "quest",
             .isQuestItem = true
         },
 
