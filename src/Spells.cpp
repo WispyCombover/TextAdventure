@@ -154,6 +154,7 @@ const std::vector<spell> spellDatabase = {
         .manaCost = 7,
         .damageDiceCount = 3,
         .damageDiceSides = 6,
+        .damageType = "sanitize",
         .needsTarget = true,
         .castMessage = R"(Du slynger et regulært uttrykk mot fienden: 's/['";--]//g!' Alle uautoriserte spesialtegn blir strippet bort i et gnistregn av syntaksvalidering!)",
         .fizzleMessage = "Regex compilation failed: Ikke nok mana."
@@ -547,6 +548,26 @@ castResult castSpell(
     // ------ Generelle effekter -------
     if (s->damageDiceCount > 0 && target) {
         int dmg = rollDamage(s->damageDiceCount, s->damageDiceSides);
+
+        if (!s->damageType.empty()) {
+            const std::string dtype = toLowerNorwegian(s->damageType);
+
+            bool isWeak = std::any_of(target->weaknesses.begin(), target->weaknesses.end(), [&](const std::string& w) {
+                return toLowerNorwegian(w) == dtype;
+            });
+            bool isResistant = std::any_of(target->resistances.begin(), target->resistances.end(), [&](const std::string& r) {
+                return toLowerNorwegian(r) == dtype;
+            });
+
+            if (isWeak) {
+                dmg *= 2;
+                std::cout << "Det er supereffektivt! (" << s->damageType << ")\n";    
+            } else if (isResistant) {
+                dmg = std::max(1, dmg / 2);
+                std::cout << target->name << " mostår deler av skaden. (" << s->damageType << ")\n";
+            }
+        }
+
         target->hp -= dmg;
         std::cout << "Trylleformelen gjør " << dmg << " skade på " << target->name << ".\n";
     }

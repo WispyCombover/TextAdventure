@@ -35,6 +35,7 @@ struct spell {
     int acReduction = 0;        //Reduserer monster AC
     int targetDamageBoost = 0;  //Buff til monster
     int recoilDamage = 0;       //Skade på caster
+    std::string damageType = "";
 
     std::string requiresItem = "";                  //Krever en item i sekken
     StatusType statusType = StatusType::focused;    //Status på spiller

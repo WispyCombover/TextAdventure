@@ -48,3 +48,5 @@ struct RoomBlueprint {
 
 const std::vector<DoorBlueprint>& getFloor1Doors();
 const std::vector<RoomBlueprint>& getFloor1Rooms();
+const std::vector<DoorBlueprint>& getFloor_2Doors();
+const std::vector<RoomBlueprint>& getFloor_2Rooms();

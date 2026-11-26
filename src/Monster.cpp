@@ -113,7 +113,7 @@ namespace {
                     .maxDataReward = 1000,
                     .lootTable = {
                         { getItem("mango loco"), 60 },
-                        { getItem("deodorant og lighter"), 20 },
+                        { getItem("deodorant og lighter"), 30 },
                         { getItem("løs side (git blame)"), 10 }
                     }
                 },
@@ -142,27 +142,6 @@ namespace {
 
             // ================= LEVEL 3 =================
             { 3, {
-                {
-                    .name = "The Retention Policy",
-                    .description = "En kolossal minotaur vevd sammen av gulnede A4-ark, stifter og uoppsigelige arkivforskrifter.",
-                    .level = 3,
-                    .hp = 55,
-                    .maxHp = 55,
-                    .attackDamage = 2,
-                    .damageDiceCount = 2,
-                    .damageDiceSides = 8,
-                    .xpReward = 22,
-                    .monsterAC = 15,
-                    .weaknesses = {"fire", "acid"},
-                    .attackMessage = "Begraver deg under ti års lovpålagt dokumentasjon som ingen har lov til å kaste!",
-                    .isUniqueBoss = true, // Boss i papirarkivet
-                    .minDataReward = 600,
-                    .maxDataReward = 1400,
-                    .lootTable = {
-                        { getItem("the mythical man-month"), 100 },
-                        { getItem("løs side (locate)"), 50 }
-                    }
-                },
                 {
                     .name = "The DNS Daemon",
                     .description = "Ingen vet hva det er, eller hvor det kommer fra, men alt slutter å fungere når det våkner.",
@@ -209,6 +188,27 @@ namespace {
             // ================= LEVEL 4 =================
             { 4, {
                 {
+                    .name = "The Retention Policy",
+                    .description = "En kolossal minotaur vevd sammen av gulnede A4-ark, stifter og uoppsigelige arkivforskrifter.",
+                    .level = 4,
+                    .hp = 55,
+                    .maxHp = 55,
+                    .attackDamage = 2,
+                    .damageDiceCount = 2,
+                    .damageDiceSides = 8,
+                    .xpReward = 35,
+                    .monsterAC = 15,
+                    .weaknesses = {"fire", "acid"},
+                    .attackMessage = "Begraver deg under ti års lovpålagt dokumentasjon som ingen har lov til å kaste!",
+                    .isUniqueBoss = true, // Boss i papirarkivet
+                    .minDataReward = 600,
+                    .maxDataReward = 1400,
+                    .lootTable = {
+                        { getItem("the mythical man-month"), 100 },
+                        { getItem("løs side (locate)"), 50 }
+                    }
+                },
+                {
                     .name = "Bobby Tables (The Dropper of Databases)",
                     .description = "En beryktet skikkelse som bærer på et skilt hvor det står: '; DROP TABLE Monsters;--'.",
                     .level = 4,
@@ -231,11 +231,17 @@ namespace {
                 }
             }},
             // ================= LEVEL 5 =================
+            { 6, {
+
+
+
+            }},
+            // ================= LEVEL 6 =================
             { 5, {
                 {
                     .name = "The Deadline Monster",
                     .description = "En kolossal, tikkende skygge som blir større og rødere for hvert sekund som går. Den har en hær av uleste e-poster og kaffekopper rundt seg.",
-                    .level = 5,
+                    .level = 6,
                     .hp = 150,
                     .maxHp = 150,
                     .attackDamage = 4,

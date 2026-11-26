@@ -301,6 +301,18 @@ namespace {
             .effectFlatBonus = 1,
             .consumeText = "Den er seig som viskelær, men gir deg akkurat nok kalorier til å fortsette."
         },
+        {
+            .name = "veteranens nødtermos",
+            .description = "En militærgrønn termos fra 1994 med en bulk på siden og et klistremerke: «FEIL = FUNKSJON». Gjenoppretter 3d4 + 4 Mana.",
+            .value = 2, 
+            .currency = "MB", 
+            .type = "consumable",
+            .effect = itemEffect::restoreMana,
+            .effectDiceSides = 4, 
+            .effectDiceCount = 3, 
+            .effectFlatBonus = 4,
+            .consumeText = "Du skrur av lokket. Dampen smaker av 1994, brent bønne og ren sta. Hodet klarner som om noen har tatt en full backup av hjernen din."
+        },
 
         // ====== ARMOUR / SHIELDS ======
         // Light armour
@@ -476,7 +488,7 @@ namespace {
         {
 
             .name = "the mythical man-month",
-            .description = "",
+            .description = "Første utgave, 1975. Ryggen er teipet med gaffateip, og margene er fulle av håndskrevne notater i blå kulepenn, hvert av dem avsluttet med «Jeg sa det.» Mellom side 16 og 17 ligger en kaffeflekk fra 1994.",
             .value = 0,
             .currency = "kB",
             .type = "quest",

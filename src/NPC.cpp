@@ -17,6 +17,9 @@ std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
         {
             {.playerText = "Hei, du gamle og vise! Har du tips til hvordan jeg kan nedkjempe Deadlinemonsteret™?", .nextNodeIndex = 1},
             {.playerText = "Hvem er du egentlig?", .nextNodeIndex = 4},
+            {.playerText = "Jeg fant tilfeldigvis dette nede i arkivet ... (gi ham The Mythical Man-Month)", .nextNodeIndex = 7,
+            .giveItemName = "løs side (chroot)",
+            .requiresItem = "the mythical man-month", .takesItem = "the mythical man-month", .setsState = 2},
             {.playerText = "Beklager forstyrrelsen. (Avslutt samtalen)", .nextNodeIndex = -1}
         }
     });
@@ -42,7 +45,7 @@ std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
 
     // Node 3: oppdraget er akseptert
     vet->dialogueTree.push_back(dialogueNode{
-        "Bra. Ta trappen. Heisen har vært ute av drift siden 2014, og det er den eneste tingen i bygget med en nøyaktig oppetidslogg. Ikke les noe av det du finner på veien. Det smitter.",
+        "Bra. Ta trappen. Heisen har vært ute av drift siden 2014, og det er den eneste tingen i bygget med en nøyaktig oppetidslogg. Og husk: papir brenner, og ingenting får et arkiv til å gulne fortere enn syre. Kaffe, for eksempel. Ikke les noe av det du finner på veien. Det smitter.",
         {
             {.playerText = "Har du noe jeg kan ha med meg ned?", .nextNodeIndex = 6, .giveItemName = "gammel cat5-kabel"},
             {.playerText = "Jeg er på vei! (Avslutt samtalen)", .nextNodeIndex = -1}

@@ -14,7 +14,7 @@ namespace {
 
 constexpr const char* kSaveFile  = "savefile.txt";
 constexpr const char* kSaveMagic = "MIMIRSAVE";
-constexpr int kSaveVersion = 4;     // Øk denne når formatet endres
+constexpr int kSaveVersion = 5;     // Versjonering
 constexpr int kArmourSlots = 5;     // slot 1..5 - se ArmourSlot i Item.h
 
 // ===================== LAGRINGSFIL DATA  =====================
@@ -28,6 +28,7 @@ struct NpcSave {
     std::string name;
     std::string given;              
     std::vector<ItemSave> shop;
+    int questState = 0;
 };
 
 struct DoorSave {
@@ -182,6 +183,7 @@ bool readSave(std::istream& in, SaveData& d) {
             NpcSave ns;
             ns.name  = r.line();
             ns.given = r.line();
+            ns.questState = static_cast<int>(r.num());
             size_t shopCount = r.count();
             for (size_t s = 0; s < shopCount && r.ok(); ++s) ns.shop.push_back(readItem(r));
             rs.npcs.push_back(ns);
@@ -318,7 +320,7 @@ void writeSave(std::ostream& out,
 
         out << room->npcs.size() << "\n";
         for (const auto& npc : room->npcs) {
-            out << npc->name << "\n" << givenFlags(*npc) << "\n";
+            out << npc->name << "\n" << givenFlags(*npc) << "\n" << npc->questState << "\n";
             out << npc->shopInventory.size() << "\n";
             for (const auto& it : npc->shopInventory) writeItem(out, it);
         }
@@ -471,6 +473,7 @@ bool loadGame(player& p,
         for (auto& npc : npcs) {
             const NpcSave* ns = findNpcSave(rs, npc->name);
             applyGivenFlags(*npc, ns->given);
+            npc->questState = ns->questState;
             if (npc->isMerchant) {
                 npc->shopInventory.clear();
                 for (const auto& is : ns->shop) npc->shopInventory.push_back(makeItem(is));

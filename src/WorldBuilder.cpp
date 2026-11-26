@@ -40,6 +40,10 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
     std::vector<DoorBlueprint> allDoors;
     std::vector<RoomBlueprint> allBlueprints;
 
+    //Etaseje U2 - papirarkivet
+    appendAll(allBlueprints, getFloor_2Rooms());
+
+    //Etasje 1 - IT
     appendAll(allDoors, getFloor1Doors());
     appendAll(allBlueprints, getFloor1Rooms());
 

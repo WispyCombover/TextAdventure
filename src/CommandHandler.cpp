@@ -551,20 +551,34 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
     }
 
     int currentNode = 0;
+    if (foundNPC->questState >= 0 && static_cast<size_t>(foundNPC->questState) < foundNPC->startNodeForState.size())
+    {
+        currentNode = foundNPC->startNodeForState[foundNPC->questState];
+    }
+
+    auto findInInventory = [&inventory](const std::string &name) {
+        const std::string wanted = toLowerNorwegian(name);
+        return std::find_if(inventory.begin(), inventory.end(), [&wanted](const std::shared_ptr<item> &i) {
+            return toLowerNorwegian(i->name) == wanted;
+        });
+    };
+
     while (currentNode != -1 && static_cast<size_t>(currentNode) < foundNPC->dialogueTree.size())
     {
         auto &node = foundNPC->dialogueTree[currentNode];
         std::cout << "\n[" << foundNPC->name << "]: \"" << node.npcText << "\"\n";
 
-        if (node.options.empty())
+        std::vector<dialogueOption *> visible;
+        for (auto &opt : node.options)
         {
-            break;
+            if (opt.requiresState != -1 && opt.requiresState != foundNPC->questState) continue;
+            if (!opt.requiresItem.empty() && findInInventory(opt.requiresItem) == inventory.end()) continue;
+            visible.push_back(&opt);
         }
+        if (visible.empty()) break;
 
-        for (size_t i = 0; i < node.options.size(); ++i)
-        {
-            std::cout << (i + 1) << ". " << node.options[i].playerText << "\n";
-        }
+        for (size_t i = 0; i < visible.size(); ++i)
+            std::cout << (i + 1) << ". " << visible[i]->playerText << "\n";
         std::cout << "Ditt svar (tall): > ";
 
         int choice;
@@ -577,9 +591,9 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
         }
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-        if (choice > 0 && static_cast<size_t>(choice) <= node.options.size())
+        if (choice > 0 && static_cast<size_t>(choice) <= visible.size())
         {
-            auto &chosenOption = node.options[choice - 1];
+            dialogueOption &chosenOption = *visible[choice - 1];
 
             if (chosenOption.opensShop && foundNPC->isMerchant)
             {
@@ -590,12 +604,23 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
                 handleShop(*foundNPC, p, inventory);
                 break;
             }
-            if (!chosenOption.giveItemName.empty() && !chosenOption.itemGiven) {
+            if (!chosenOption.takesItem.empty())
+            {
+                auto it = findInInventory(chosenOption.takesItem);
+                if (it != inventory.end())
+                {
+                    std::cout << "\n[Du ga fra deg: " << (*it)->name << "]\n";
+                    inventory.erase(it);
+                }
+            }
+            if (!chosenOption.giveItemName.empty() && !chosenOption.itemGiven)
+            {
                 item reward = getItem(chosenOption.giveItemName);
                 inventory.push_back(std::make_shared<item>(reward));
                 std::cout << "\n[Du mottok: " << reward.name << "!]\n";
                 chosenOption.itemGiven = true;
             }
+            if (chosenOption.setsState != -1) foundNPC->questState = chosenOption.setsState;
             currentNode = chosenOption.nextNodeIndex;
         }
         else

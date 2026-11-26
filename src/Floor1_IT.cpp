@@ -40,7 +40,7 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
         {
             .id = "corridor",
             .name = "Korridoren",
-            .description = "En lang, smal korridor med falmede tapeter og knirkende gulvplanker som en herlig kontrast mot glassvinduer inn mot møterommene. Det er dører inn til to andre møterom langs veggen: 'RUBBER DUCK SANCTUM' og 'SALA SEGFAULT'.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot.",
+            .description = "En lang, smal korridor med falmede tapeter og knirkende gulvplanker som en herlig kontrast mot glassvinduer inn mot møterommene. Det er dører inn til to andre møterom langs veggen: 'RUBBER DUCK SANCTUM' og 'SALA SEGFAULT'.\nKorridoren fortsetter mot VEST og mot ØST, og du kan også gå tilbake til møterommet du nettopp forlot (SPAWN).",
             .discoveryXP = 5,
             .exits = {
                 { "kaffekoppens krypt", "spawn", "spawn", "Fra denne siden kan du se dørskiltet som viser navnet på møterommet samt romnummeret. Dette rommet heter 'Kaffekoppens Krypt' og har nummer: ", true },
@@ -143,10 +143,9 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
                 { "sør", "open_office_one" },
                 { "nord", "northern_corridor_one" }
             },
-            .items = { "hvit monster", "lunken kaffe fra i går" },
             .scenery = {
                 { {"pult", "kaffekopp"}, "På den innerste pulten står en halvfull pappkopp ved siden av en stabel med uåpnede Jira-tickets.", "lunken kaffe fra i går" },
-                { {"bokser"}, "Under pulten ligger en liten pyramide av tomme energidrikk-bokser. Én av dem kjennes mistenkelig tung ut!", "hvit monster" }
+                { {"bokser"}, "Under pulten står en liten pyramide av tomme energidrikk-bokser. Én av dem kjennes mistenkelig tung ut!", "hvit monster" }
             },
             .randomMonsterLevel = 1
         },
@@ -161,14 +160,14 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
                 { "dør", "restrooms_it", "restroom" }
             },
             .scenery = {
-                { {"restrooms"}, "Døren til IT-avdelingens toaletter. Under skiltet henger det en laminert lapp: 'Vennligst ikke flush ned uferdige branches her'." }
+                { {"restrooms", "toalett", "toaletter"}, "Døren til IT-avdelingens toaletter. Under skiltet henger det en laminert lapp: 'Vennligst ikke flush ned uferdige branches her'." }
             },
             .randomMonsterLevel = 1
         },
         {
             .id = "restrooms_it",
             .name = "Unisex restrooms for IT-avdelingen",
-            .description = "Overraskende rent, med dempet, behagelig belysning og en duft av billig håndsåpe og eksistensiell ro. På innsiden av båsdøren har noen risset inn '/* TODO: Vask hender */' med en nøkkel. Dette er det eneste stedet i bygget hvor ingen spør deg om et kjapt estimat. Utgangen er tilbake gjennom DØR.",
+            .description = "Overraskende rent, med dempet, behagelig belysning og en duft av billig håndsåpe og eksistensiell ro. På innsiden av den ene båsdøren har noen risset inn '/* TODO: Vask hender */' med en nøkkel. Dette er det eneste stedet i bygget hvor ingen spør deg om et kjapt estimat. Utgangen er tilbake gjennom DØR.",
             .discoveryXP = 5,
             .exits = {
                 { "dør", "northern_corridor_one", "restroom" }
@@ -180,7 +179,7 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
         {
             .id = "northern_corridor_mid",
             .name = "Den nordre korridoren - senter",
-            .description = "Midtpunktet i den nordre korridoren. Langs veggen ligger to møterom: 'THE HOTFIX HOTEL' og '503: SERVICE UNAVAILABLE'. Rett mot NORD finner du heisdørene, mens korridoren strekker seg videre mot VEST og ØST.",
+            .description = "Midtpunktet i den nordre korridoren. Langs veggen ligger to møterom: 'THE HOTFIX HOTEL' og '503: SERVICE UNAVAILABLE'. Rett mot SØR finner du heisdørene, mens korridoren strekker seg videre mot VEST og ØST.",
             .discoveryXP = 5,
             .exits = {
                 { "sør", "elevator_f1", "lift" },
@@ -190,9 +189,9 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
                 { "øst", "northern_corridor_two" }
             },
             .scenery = {
-                { {"the hotfix hotel"}, "Døren inn til møterommet 'The Hotfix Hotel' ({ADDR})", "", "the_hotfix_hotel" },
+                { {"the hotfix hotel", "hotfix hotel"}, "Døren inn til møterommet 'The Hotfix Hotel' ({ADDR})", "", "the_hotfix_hotel" },
                 { {"service unavailable"}, "Døren inn til møterommet '503: Service Unavailable' ({ADDR}). Dette møterommet virker å være permanent booket av Per fra drift.", "", "service_unavailable" },
-                { {"elevator"}, "Heisen ser aldri ut til å være i riktig etasje når du trenger den. På heisdøren har noen hengt et ark hvor det står: 'UTE AV DRIFT – Går i uendelig løkke mellom 2. og 3. etasje. Ticket er opprettet (JIRA-404).'" }
+                { {"elevator", "heis", "heisdører", "heisdør"}, "Heisen ser aldri ut til å være i riktig etasje når du trenger den. På heisdøren har noen hengt et ark hvor det står: 'UTE AV DRIFT – Går i uendelig løkke mellom 2. og 3. etasje. Ticket er opprettet (JIRA-404).'" }
             }
         },
         {
@@ -207,12 +206,13 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
                 { {"lapp"}, "Bordet er dekket av kafferinger og krøllete post-it-lapper med kryptiske stikkord som 'rollback?', 'hvem godkjente PR?' og 'skyld på DNS'." },
                 { {"bord", "energibar"}, "Blant krøllete post-it-lapper og tomme kaffekopper ligger det en halvspist energibar som noen glemte midt i en krise.", "halvspist energibar" },
                 { {"stol"}, "Over stolryggen henger en slitt hettegenser som lukter svakt av svette og nattarbeid.", "utslitt eventhettegenser" }
-            }
+            },
+            .npcFactories = { createOldWiseVeteran }
         },
         {
             .id = "service_unavailable",
             .name = "503: Service Unavailable",
-            .description = "Rommet er stappfullt av gamle serverrack, blinkende switcher og tykke bunter med patchekabler som henger som lianer fra taket. Det durer øredøvende fra kjøleviftene, og en rød varsellampe blinker taktfast i hjørnet. Et skilt på veggen sier: 'Per fra drift er på ferie. Prøv igjen senere.' Utgangen er tilbake gjennom DØR.",
+            .description = "Dette rommet var en gang et møterom, men nå er rommet stappfullt av gamle serverrack, blinkende switcher og tykke bunter med patchekabler som henger som lianer fra taket. Det durer øredøvende fra kjøleviftene, og en rød varsellampe blinker taktfast i hjørnet. Et skilt på veggen sier: 'Per fra drift er på ferie. Prøv igjen senere.' Utgangen er tilbake gjennom DØR.",
             .discoveryXP = 15,
             .exits = {
                 { "dør", "northern_corridor_mid", "service" }
@@ -226,7 +226,7 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
         {
             .id = "elevator_f1",
             .name = "Personheis",
-            .description = "En trang stålheis som lukter svakt av våt ull og kald kaffe. Panelknappene er slitte, og displayet over døren viser bare et kryptisk 'NaN' i stedet for etasjenummer. Du kan gå ut igjen mot SØR.",
+            .description = "En trang stålheis som lukter svakt av våt ull og kald kaffe. Panelknappene er slitte, og displayet over døren viser bare et kryptisk 'NaN' i stedet for etasjenummer. Du kan gå ut igjen gjennom DØR.",
             .discoveryXP = 5,
             .exits = {
                 { "dør", "northern_corridor_mid", "lift" }
@@ -245,20 +245,21 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
         {
             .id = "open_office_three",
             .name = "Kontorlandskapet - gruppe 3",
-            .description = "Her sitter frontend-gjengen. Pultene er mistenkelig ryddige, og belysningen er justert til en behagelig, estetisk korrekt fargetemperatur. På en tavle henger det utallige fargeprøver og en opphetet diskusjon om padding på 4px versus 6px. Korridoren ligger mot VEST, mens landskapet fortsetter mot SØR.",
+            .description = "Her sitter frontend-gjengen. Pultene er mistenkelig ryddige, og belysningen er justert til en behagelig, estetisk korrekt fargetemperatur. På en tavle henger det utallige fargeprøver og en opphetet diskusjon om padding på 4px versus 6px. I et hjørne har noen bygget et alter til Steve Jobs. Korridoren ligger mot NORD, mens landskapet fortsetter mot SØR.",
             .discoveryXP = 5,
             .exits = {
                 { "nord", "northern_corridor_two" },
                 { "sør", "open_office_four" }
             },
             .scenery = {
+                { {"alter", "steve jobs"}, "En pidestall i børstet aluminium, belyst av én enkelt spot med eksakt 4000K fargetemperatur. Oppå ligger en svart pologenser, et halvt oppspist eple og en AirPods-eske uten ladestatus. Et messingskilt i San Francisco-font sier: 'Du holder den feil."},
                 { {"skuff"}, "En minimalistisk hvit skuffeseksjon under en pult. Den står på gløtt.", "blålysbriller" }
             }
         },
         {
             .id = "open_office_four",
             .name = "Kontorlandskapet - gruppe 4",
-            .description = "Det innerste hjørnet av kontorlandskapet, preget av tomme pizzabokser og mekaniske tastaturer med altfor høy klikkelyd. Luften vibrerer svakt av koffein og eksistensiell tvil rundt teknisk gjeld. Du kan gå mot NORD til gruppe 3, eller mot ØST mot trappegangen.",
+            .description = "Det innerste hjørnet av kontorlandskapet, preget av tomme pizzabokser og mekaniske tastaturer med altfor høy klikkelyd. Luften vibrerer svakt av koffein og eksistensiell tvil rundt teknisk gjeld. Du kan gå mot NORD til gruppe 3, eller mot SØR mot trappegangen.",
             .discoveryXP = 5,
             .exits = {
                 { "nord", "open_office_three" },
@@ -274,7 +275,8 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
             .description = "En betongtrapp med gjenklang og et ekkelt, kaldt trekk. På veggen henger et falmet branninstruks-skilt og en plakat som oppfordrer til å ta trappene for helsens skyld. Ingen tar trappene.",
             .discoveryXP = 5,
             .exits = {
-            { "nord", "open_office_four", "stairs" }
+            { "nord", "open_office_four", "stairs" },
+            { "ned", "archive_gate", "", "Trappen fortsetter nedover i mørket. Et håndskrevet skilt: 'ARKIVET – kun for autorisert personell'."}
             }
         },
         {
@@ -321,7 +323,8 @@ const std::vector<RoomBlueprint>& getFloor1Rooms() {
             .description = "Et lite møterom der en opphetet diskusjon pågår. På whiteboarden står det 'VALG AV FARGE PÅ LOGG-KNAPP' understreket tre ganger, omringet av komplekse arkitekturdiagrammer. Døren tilbake til korridoren er mot NORD.",
             .discoveryXP = 5,
             .exits = {
-                { "dør", "corridor_east", "bikeshed", "Døren ut igjen til korridoren og kaffekroken." }
+                { "dør", "corridor_east", "bikeshed", "Døren ut igjen til korridoren og kaffekroken." },
+                { "nord", "corridor_east", "bikeshed", "Døren ut igjen til korridoren og kaffekroken." }
             },
             .scenery = {
                 { {"whiteboard", "tavle"}, "Tavlen er dekket av en 14-stegs prosess for å avgjøre om knappen skal være #FF0000 eller #EE0000. Nederst står det 'Må avklares i styringsgruppen'." },
