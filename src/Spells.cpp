@@ -618,5 +618,9 @@ castResult castSpell(
         if (p.playerHP <= 0) return castResult::PlayerDied;
     }
 
+    if (p.spec == Specialization::Backend && damage > 0) {
+        damage += 2;
+    }
+
     return castResult::Cast;
 }

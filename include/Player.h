@@ -29,6 +29,20 @@ struct StatusEffect {
 inline constexpr int kXpToLevelUp[] = {25, 60, 110, 170};
 int xpNeededForLevel(int level);
 
+enum class Background {
+    None,
+    SelfTaught,         //Selvlært koder ( INT / DEX )
+    Support,            //Drift og support ( STR / CON )
+    Student             //Informatikkstudent ( CON / INT)
+};
+
+enum class Specialization {
+    None,
+    Backend,
+    Frontend,
+    Sysadmin
+};
+
 struct player {
     std::string name;  //Trenger en start game funksjon som ber om spillerens navn
     int playerLvl = 1;
@@ -45,10 +59,26 @@ struct player {
     int caffeineTurns = 0;
     bool sudoActive = false;   //Settes av sudo, forbrukes av spell
     std::shared_ptr<item> equippedWeapon = nullptr;
-
     std::set<std::string> knownSpells;      //Selvforklarende - kjente spells
-
     std::vector<StatusEffect> activeEffects;
+
+    // === STATS ===
+    int str = 10;
+    int dex = 10;
+    int con = 10;
+    int intel = 10;
+
+    Background background = Background::None;
+    Specialization spec = Specialization::None;
+
+    void chooseBackground();
+    void chooseSpecialization();
+
+
+    int getModifier(int statValue) const {
+        return (statValue - 10) / 2;
+    }
+
 
     void addEffect(StatusType type, const std::string& name, int turns, int magnitude) {
         for (auto& eff : activeEffects) {
@@ -99,4 +129,8 @@ struct player {
     std::map<int, std::shared_ptr<item>> equippedArmour;
 
     int getTotalAC() const;
+
+    std::string getBackgroundName() const;
+    std::string getSpecializationName() const;
+    void printStats() const;
 };

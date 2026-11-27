@@ -46,7 +46,8 @@ AttackRoll rollToHit(int attackBonus, int targetAC) {
 int playerAttackBonus(const player& p) {
     return p.playerLvl
         + p.getEffectBonus(StatusType::caffeineRush)
-        + p.getEffectBonus(StatusType::sugarCrash);
+        + p.getEffectBonus(StatusType::sugarCrash)
+        + p.getModifier(p.str);  //Burde nok skille mellom slag og kast slik at vi også kan bruke + getModifier(p.dex);
 }
 
 int monsterAttackBonus(const monster& m) {
@@ -55,6 +56,10 @@ int monsterAttackBonus(const monster& m) {
 
 int rollPlayerMeleeDamage(const player& p, const monster& m, bool crit) {
     int flatBonus = p.playerBaseDamage + p.getEffectBonus(StatusType::caffeineRush);
+
+    if (p.spec == Specialization::Sysadmin) {
+        flatBonus += 2;
+    }
 
     if (!p.equippedWeapon) {
         return applyDamageModifiers(flatBonus, "bludgeoning", m);

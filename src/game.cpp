@@ -89,6 +89,7 @@ while (true) {
 
     std::string cleanCmd = toLowerNorwegian(startCmd);
     if (cleanCmd == "start") {
+        p.chooseBackground();
         std::cout << "\nInitialiserer sesjon for " << p.name << "...\n";
         std::cout << "Skriv 'hjelp' for kommandoer (eller 'panikk' for å gråte stille).\n\n";
         break;
