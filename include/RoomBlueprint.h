@@ -3,6 +3,7 @@
 #include <vector>
 #include <functional>
 #include <memory>
+#include <utility>
 #include "Room.h"
 #include "Player.h"
 #include "NPC.h"
@@ -44,6 +45,9 @@ struct RoomBlueprint {
     int fixedMonsterLevel = 0;
     std::string fixedMonsterName = "";
     std::vector<std::function<std::unique_ptr<NPC>(const player&)>> npcFactories;
+
+    int monsterChancePercent = 100;
+    std::vector<std::pair<int, std::string>> monsterPool;
 };
 
 const std::vector<DoorBlueprint>& getFloor1Doors();

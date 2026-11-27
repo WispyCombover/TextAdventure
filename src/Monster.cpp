@@ -137,6 +137,28 @@ namespace {
                         { getItem("anti-statisk armlenke"), 100 },
                         { getItem("hvit monster"), 75 }
                     }
+                },
+                {
+                    .name = "The Paper Jam",
+                    .description = "En sammenfiltret klump av krøllete A4-ark som svever i gangen og klemmer alt som kommer for nær.",
+                    .level = 2, 
+                    .hp = 22, 
+                    .maxHp = 22,
+                    .attackDamage = 1, 
+                    .damageDiceCount = 1, 
+                    .damageDiceSides = 6,
+                    .xpReward = 15, 
+                    .monsterAC = 13,
+                    .weaknesses = {"fire"},
+                    .attackMessage = "Klemmer deg inn mellom to ruller og trekker deg gjennom en fuser på 200 grader!",
+                    .isUniqueBoss = true, // holdes utenfor tilfeldig-poolen
+                    .minDataReward = 300, 
+                    .maxDataReward = 800,
+                    .lootTable = {
+                        { getItem("makuleringspose"), 50 },
+                        { getItem("stiftemaskin"), 30 },
+                        { getItem("lunken kaffe fra i går"), 35 }
+                    }
                 }
             }},
 
@@ -181,6 +203,50 @@ namespace {
                         { getItem("usb-minnepinne merket 'ikke rør'"), 30 },
                         { getItem("kevlar-forsterket laptopsekk"), 20 },
                         { getItem("løs side (git revert)"), 12 }
+                    }
+                },
+                {
+                    .name = "Stale Backup Tape",
+                    .description = "Meterlange magnetbånd har viklet seg rundt en bandstasjon fra 1998 og nekter å spole tilbake.",
+                    .level = 3, 
+                    .hp = 34, 
+                    .maxHp = 34,
+                    .attackDamage = 1, 
+                    .damageDiceCount = 2, 
+                    .damageDiceSides = 4,
+                    .xpReward = 24, 
+                    .monsterAC = 14,
+                    .weaknesses = {"lightning"},
+                    .attackMessage = "Spoler seg rundt armene dine og prøver å gjenopprette deg til en tilstand fra 1998!",
+                    .isUniqueBoss = true,
+                    .minDataReward = 700, 
+                    .maxDataReward = 1500,
+                    .lootTable = {
+                        { getItem("sikkerhetskopi"), 60 },
+                        { getItem("vhs-kassett"), 30 },
+                        { getItem("hvit monster"), 40 }
+                    }
+                },
+                {
+                    .name = "final_v3_ENDELIG(2).docx",
+                    .description = "Et dokument som aldri blir ferdig. Hver gang du tror du har skadet det, dukker det opp en ny versjon i margen.",
+                    .level = 3, 
+                    .hp = 30, 
+                    .maxHp = 30,
+                    .attackDamage = 2, 
+                    .damageDiceCount = 1, 
+                    .damageDiceSides = 8,
+                    .xpReward = 26, 
+                    .monsterAC = 15,
+                    .weaknesses = {"fire"},
+                    .attackMessage = "Setter alle dine ferdige oppgaver tilbake til «utkast» og ber deg «bare gi det en siste gjennomgang»!",
+                    .isUniqueBoss = true,
+                    .minDataReward = 700, 
+                    .maxDataReward = 1500,
+                    .lootTable = {
+                        { getItem("gummistempel"), 40 },
+                        { getItem("dokumentmappe"), 50 },
+                        { getItem("post-it"), 40 }
                     }
                 }
             }},
@@ -231,13 +297,75 @@ namespace {
                 }
             }},
             // ================= LEVEL 5 =================
-            { 6, {
-
-
-
+            { 5, {
+                {
+                    .name = "The Memory Leak Hydra",
+                    .description = "Et slimete uhyre laget av overopphetede RAM-brikker. For hvert hode du kutter av allokerer den to nye uten å rydde opp etter seg.",
+                    .level = 5,
+                    .hp = 75,
+                    .maxHp = 75,
+                    .attackDamage = 2,
+                    .damageDiceCount = 3,
+                    .damageDiceSides = 6,
+                    .xpReward = 75,
+                    .monsterAC = 17,
+                    .weaknesses = {"acid", "slashing"},
+                    .attackMessage = "Sluker 99% av kapasiteten din og tvinger deg til å bevege deg i sirup!",
+                    .minDataReward = 2500,
+                    .maxDataReward = 5000,
+                    .lootTable = {
+                        { getItem("hvit monster"), 70 },
+                        { getItem("boks med trykkluft"), 40 },
+                        { getItem("løs side (kill-9)"), 20 }
+                    }
+                },
+                {
+                    .name = "The Infinite Loop Swarm",
+                    .description = "En øredøvende sverm av løpske while(true)-prosesser som spinner i ring til viftene dine hyler.",
+                    .level = 5,
+                    .hp = 60,
+                    .maxHp = 60,
+                    .attackDamage = 3,
+                    .damageDiceCount = 2,
+                    .damageDiceSides = 8,
+                    .xpReward = 70,
+                    .monsterAC = 19,
+                    .weaknesses = {"lightning", "fire"},
+                    .attackMessage = "Kjører samme angrep om og om og om igjen uten noen utgangsbetingelse!",
+                    .minDataReward = 2200,
+                    .maxDataReward = 4800,
+                    .lootTable = {
+                        { getItem("mango loco"), 65 },
+                        { getItem("kald filterkaffe"), 50 },
+                        { getItem("løs side (ctrl+c)"), 20 }
+                    }
+                },
+                {
+                    .name = "The Legacy Monolith",
+                    .description = "En kolossal, uoversiktlig steinkloss av udokumentert spagettikode fra 2004. Ingen tør å refaktorere den, i frykt for at hele bygget skal rase sammen.",
+                    .level = 5,
+                    .hp = 110,
+                    .maxHp = 110,
+                    .attackDamage = 3,
+                    .damageDiceCount = 3,
+                    .damageDiceSides = 8,
+                    .xpReward = 130,
+                    .monsterAC = 18,
+                    .weaknesses = {"fire", "sonic"},
+                    .resistances = {"bludgeoning"},
+                    .attackMessage = "Utløser en kjedereaksjon av uforklarlige sideeffekter i helt andre deler av rommet!",
+                    .isUniqueBoss = true,
+                    .minDataReward = 4000,
+                    .maxDataReward = 8000,
+                    .lootTable = {
+                        { getItem("brannmur-kappe (enterprise firewall)"), 100 },
+                        { getItem("kevlar-forsterket laptopsekk"), 50 },
+                        { getItem("løs side (rm -rf)"), 35 }
+                    }
+                }
             }},
             // ================= LEVEL 6 =================
-            { 5, {
+            { 6, {
                 {
                     .name = "The Deadline Monster",
                     .description = "En kolossal, tikkende skygge som blir større og rødere for hvert sekund som går. Den har en hær av uleste e-poster og kaffekopper rundt seg.",

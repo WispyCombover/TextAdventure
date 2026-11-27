@@ -46,3 +46,4 @@ std::unique_ptr<NPC> createSlitenSenior(const player& p);
 std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p);
 std::unique_ptr<NPC> createFreedSecops(const player& p);
 std::unique_ptr<NPC> createOldWiseVeteran(const player& p);
+std::unique_ptr<NPC> createIntern(const player& p);

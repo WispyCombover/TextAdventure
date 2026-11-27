@@ -447,7 +447,7 @@ bool loadGame(player& p,
 
         if (!rs.hasMonster) {
             room->occupant = nullptr;
-        } else if (room->occupant) {
+        } else {
             auto saved = manual.getMonsterBlueprint(rs.monsterLevel, rs.monsterName);
             if (saved) {
                 saved->hp = std::clamp(rs.monsterHp, 1, saved->maxHp);

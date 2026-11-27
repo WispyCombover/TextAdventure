@@ -1,3 +1,8 @@
+#include <unordered_map>
+#include <stdexcept>
+#include <sstream>
+#include <iomanip>
+#include <cstdint>
 #include "WorldBuilder.h"
 #include "RoomBlueprint.h"
 #include "Item.h"
@@ -5,11 +10,8 @@
 #include "NPC.h"
 #include "Player.h"
 #include "Room.h"
-#include <unordered_map>
-#include <stdexcept>
-#include <sstream>
-#include <iomanip>
-#include <cstdint>
+#include "Utils.h"
+
 
 static std::string getMemoryAddress(const Room* roomPtr) {
     std::ostringstream oss;
@@ -79,7 +81,12 @@ Room* buildWorld(std::vector<std::unique_ptr<Room>>& allRooms, const player& p) 
             }
         }
 
-        if (bp.randomMonsterLevel > 0) {
+        if (!bp.monsterPool.empty()) {
+            if (rollDice(100) <= bp.monsterChancePercent) {
+                const auto& pick = bp.monsterPool[rollDice(static_cast<int>(bp.monsterPool.size())) - 1];
+                room->occupant = manual.getMonsterBlueprint(pick.first, pick.second);
+            }
+        } else if (bp.randomMonsterLevel > 0) {
             room->occupant = manual.getRandomMonster(bp.randomMonsterLevel);
         } else if (bp.fixedMonsterLevel > 0) {
             room->occupant = manual.getMonsterBlueprint(bp.fixedMonsterLevel, bp.fixedMonsterName);

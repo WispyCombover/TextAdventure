@@ -2,6 +2,72 @@
 #include "Item.h"
 #include "Utils.h"
 
+// ====== PRAKTIKANTEN ======
+
+std::unique_ptr<NPC> createPraktikant(const player& p) {
+    auto intern = std::make_unique<NPC>();
+    intern->name = "Praktikanten (siden 2009)";
+    intern->description = "En blek, tynn ung mann i en falmet «Velkommen til teamet!»-t-skjorte. Det ligger støv på skuldrene hans, og han blinker sjeldnere enn det er trygt.";
+    intern->isMerchant = true;
+
+    std::string playerName = p.name.empty() ? "du" : p.name;
+
+    // Node 0
+    intern->dialogueTree.push_back({
+        "*Praktikanten ser opp fra en skjerm som viser en e-post.* Er du fra HR? ... Nei? ... Åh. Det er greit. Jeg har ventet så lenge at jeg har begynt å like det.",
+        {
+            {.playerText = "Hvem er du?", .nextNodeIndex = 1},
+            {.playerText = "Hva venter du på?", .nextNodeIndex = 2},
+            {.playerText = "Kjøper du noe av det jeg finner her nede?", .nextNodeIndex = 3, .opensShop = true},
+            {.playerText = "Jeg må videre. (Avslutt samtalen)", .nextNodeIndex = -1}
+        }
+    });
+
+    // Node 1
+    intern->dialogueTree.push_back({
+        "Jeg er praktikanten. Jeg heter egentlig Sindre, men alle har glemt det, inkludert meg. Jeg kom ned i 2009 for å hente én mappe. Så fikk jeg en e-post fra HR: «Vent her, vi kommer tilbake til deg.»",
+        {
+            {.playerText = "Og så?", .nextNodeIndex = 2},
+            {.playerText = "Det var lenge siden. (Avslutt samtalen)", .nextNodeIndex = -1}
+        }
+    });
+
+    // Node 2
+    intern->dialogueTree.push_back({
+        "Svar på søknaden min om fast stilling. Jeg sendte den 14. mars 2009. På portalen står det fortsatt «Under behandling». Jeg har begynt å tro at det er en prosess, ikke et utfall.",
+        {
+            {.playerText = "Jeg kan nevne det for noen hvis jeg ser dem.", .nextNodeIndex = 4, .giveItemName = "veteranens nødtermos"},
+            {.playerText = "Kanskje det er på tide å gi opp?", .nextNodeIndex = 5},
+            {.playerText = "Lykke til. (Avslutt samtalen)", .nextNodeIndex = -1}
+        }
+    });
+
+    // Node 3: butikk
+    intern->dialogueTree.push_back({
+        "Papir, mapper, alt som lukter arkiv? Jeg betaler i det jeg har. Det vil si kaffe, og litt tid.",
+        {{.playerText = "(Avslutt samtale)", .nextNodeIndex = -1}}
+    });
+
+    // Node 4: termosen
+    intern->dialogueTree.push_back({
+        "*Han blir stille, så trekker han en militærgrønn termos frem fra under pulten.* Den tilhører Odd, ham med genseren. Han glemte den her i 2011. Ta den, " + playerName + ". Og si fra til ham at jeg lever. Eller at jeg i alle fall er her.",
+        {{.playerText = "Det skal jeg gjøre. (Avslutt samtalen)", .nextNodeIndex = -1}}
+    });
+
+    // Node 5: ikke gi opp
+    intern->dialogueTree.push_back({
+        "Gi opp? Og hva skal jeg si til mamma? At jeg ikke fikk fast stilling fordi jeg sluttet å vente? Nei. Jeg har kommet så langt at jeg nå er best på å vente.",
+        {{.playerText = "Det er faktisk ganske imponerende. (Avslutt samtalen)", .nextNodeIndex = -1}}
+    });
+
+    intern->shopInventory.push_back(getItem("lunken kaffe fra i går"));
+    intern->shopInventory.push_back(getItem("gammel smultring"));
+
+    return intern;
+}
+
+// ====== GAMMEL VISMANN =======
+
 std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
     auto vet = std::make_unique<NPC>();
     vet->name = "Odd, den gamle systemarkitekten";
@@ -123,6 +189,8 @@ std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
     return vet;
 }
 
+// ====== STEMMEN FRA KOPIROMMET ======
+
 std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p) {
     auto voice = std::make_unique<NPC>();
     voice->name = "Stemme fra kopirommet";
@@ -161,6 +229,8 @@ std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p) {
     return voice;
 }
 
+// ====== SECOPS-ANALYTIKEREN ======
+
 std::unique_ptr<NPC> createFreedSecops(const player& p) {
     auto secops = std::make_unique<NPC>();
     secops->name = "Utslitt SecOps-analytiker";
@@ -198,6 +268,8 @@ std::unique_ptr<NPC> createFreedSecops(const player& p) {
 
     return secops;
 }
+
+// ====== SLITEN SENIOR ======
 
 std::unique_ptr<NPC> createSlitenSenior(const player& p) {
     auto senior = std::make_unique<NPC>();
@@ -245,6 +317,9 @@ std::unique_ptr<NPC> createSlitenSenior(const player& p) {
 
     return senior;    
 }
+
+// ====== BRANNMUR-GURUEN ======
+
 std::unique_ptr<NPC> createFirewallGuru(const player& p) {
     auto guru = std::make_unique<NPC>();
     guru->name = "Brannmur-Guruen";

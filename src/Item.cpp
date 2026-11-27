@@ -664,6 +664,116 @@ namespace {
             .currency = "MB",
             .type = "spellpage",
             .teachesSpell = "regex sanitize"
+        },
+
+        // ====== ARKIV-SKROT ======
+        { 
+            .name = "hullkort", 
+            .description = "Et hullkort med et mønster som sikkert betyr noe. Alle som kunne lese det er pensjonert, flyttet til hytta, eller begge deler.",
+            .value = 40, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "dokumentmappe", 
+            .description = "En forvitret mappe merket «final_v2_NY_ENDELIG». Inni ligger ett ark med teksten «Se vedlegg».",
+            .value = 30, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "diskett", 
+            .description = "Rommer 1,44 MB. Etiketten sier «PRIVAT – IKKE SLETT». Du er ganske sikker på at den ikke har vært lesbar siden Clinton.",
+            .value = 300, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "zip-disk", 
+            .description = "En 100 MB zip-disk merket «Click of Death». Å sette den i en maskin er en beslutning du bare angrer på én gang.",
+            .value = 1, 
+            .currency = "MB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "stiftemaskin", 
+            .description = "En rusten stiftemaskin i tung stål. Den har holdt sammen flere prosjekter enn noen prosjektleder.",
+            .value = 25, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "ansattkort", 
+            .description = "Et utløpt ansattkort fra 1999. Bildet viser en smilende mann med bart. Navnet er overstrøket, og noen har skrevet «IKKE LENGER ANSATT (LYKKE TIL)».",
+            .value = 80, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "arkivperm", 
+            .description = "En tung perm merket «KUN FOR INTERNT BRUK». Den lander med et dunk som kan høres i tre etasjer. Perfekt til kasting.",
+            .value = 120, 
+            .currency = "kB", 
+            .type = "junk",
+            .damageDiceSides = 6, 
+            .damageDiceCount = 1, 
+            .damageType = "bludgeoning",
+            .throwable = true,
+            .throwHitText = "Permen treffer med et dumpt «THUD», og en liten sky av støv og utdaterte rutiner stiger opp." 
+        },
+        { 
+            .name = "telefonkatalog", 
+            .description = "Oslo, 1988. Tung, støvete og full av folk som ikke bor der lenger. Egner seg bedre som slagvåpen enn som oppslagsverk.",
+            .value = 250, 
+            .currency = "kB", 
+            .type = "junk",
+            .damageDiceSides = 8, 
+            .damageDiceCount = 1, 
+            .damageType = "bludgeoning",
+            .throwable = true,
+            .throwHitText = "Katalogen treffer med et dunk som slår luften ut av alle som noen gang har ønsket seg et telefonnummer." 
+        },
+        { 
+            .name = "makuleringspose", 
+            .description = "En klar plastpose full av remser. Med tid og tålmodighet kunne du nesten satt sammen igjen hva som sto der. Det har du ikke.",
+            .value = 20, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "vhs-kassett", 
+            .description = "Merket «Opplæring i brannsikkerhet (1992)». Du føler deg plutselig mistenkelig skyldig i noe.",
+            .value = 200, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "sikkerhetskopi", 
+            .description = "En båndkassett merket «BACKUP (IKKE SLETT)». Datoen er 2009. Ingen vet hva som ligger på den, og ingen tør å spørre.",
+            .value = 500, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "gummistempel", 
+            .description = "Et gummistempel med teksten «GODKJENT». Trolig det mektigste våpenet i enhver byråkratisk organisasjon.",
+            .value = 400, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "organisasjonskart", 
+            .description = "Et kaffeflekket organisasjonskart der alle rapporterer til seg selv. Øverst står det «DIREKTØR». Under står det «DIREKTØR». Så «DIREKTØR».",
+            .value = 150, 
+            .currency = "kB", 
+            .type = "junk" 
+        },
+        { 
+            .name = "post-it", 
+            .description = "En gul lapp med teksten «Husk backup!». Skrevet i 2006. Ingen husket.",
+            .value = 10, 
+            .currency = "kB", 
+            .type = "junk" 
         }
     };
 }  // namespace
