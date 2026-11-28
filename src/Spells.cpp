@@ -547,7 +547,11 @@ castResult castSpell(
 
     // ------ Generelle effekter -------
     if (s->damageDiceCount > 0 && target) {
-        int dmg = rollDamage(s->damageDiceCount, s->damageDiceSides);
+        int dmg = rollDamage(s->damageDiceCount, s->damageDiceSides) + std::max(0, p.getModifier(p.intel));
+
+        if (p.spec == Specialization::Backend) {
+            dmg += 2;
+        }
 
         if (!s->damageType.empty()) {
             const std::string dtype = toLowerNorwegian(s->damageType);
@@ -616,10 +620,6 @@ castResult castSpell(
         p.playerHP -= s->recoilDamage;
         std::cout << "Tilbakeslag! Du tar " << s->recoilDamage << " skade. Din HP: " << p.playerHP << "/" << p.playerMaxHP << "\n";
         if (p.playerHP <= 0) return castResult::PlayerDied;
-    }
-
-    if (p.spec == Specialization::Backend && damage > 0) {
-        damage += 2;
     }
 
     return castResult::Cast;

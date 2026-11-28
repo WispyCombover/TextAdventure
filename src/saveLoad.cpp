@@ -14,7 +14,7 @@ namespace {
 
 constexpr const char* kSaveFile  = "savefile.txt";
 constexpr const char* kSaveMagic = "MIMIRSAVE";
-constexpr int kSaveVersion = 5;     // Versjonering
+constexpr int kSaveVersion = 6;     // Versjonering
 constexpr int kArmourSlots = 5;     // slot 1..5 - se ArmourSlot i Item.h
 
 // ===================== LAGRINGSFIL DATA  =====================
@@ -68,6 +68,13 @@ struct SaveData {
     std::vector<DoorSave> doors;
     std::vector<RoomSave> rooms;
     std::vector<std::string> spells;
+
+    int str = 10;
+    int dex = 10;
+    int con = 10;
+    int intel = 10;
+    int background = 0;
+    int spec = 0;
 };
 
 // ===================== LASTING =====================
@@ -139,6 +146,12 @@ bool readSave(std::istream& in, SaveData& d) {
     d.baseDamage = static_cast<int>(r.num());
     d.ac         = static_cast<int>(r.num());
     d.dataKB     = r.num();
+    d.str        = static_cast<int>(r.num());
+    d.dex        = static_cast<int>(r.num());
+    d.con        = static_cast<int>(r.num());
+    d.intel      = static_cast<int>(r.num());
+    d.background = static_cast<int>(r.num());
+    d.spec       = static_cast<int>(r.num());
     d.room       = r.line();
     
     size_t spellCount = r.count();
@@ -281,6 +294,12 @@ void writeSave(std::ostream& out,
     out << p.playerBaseDamage << "\n";
     out << p.playerAC << "\n";
     out << p.dataBalanceKB << "\n";
+    out << p.str << "\n";
+    out << p.dex << "\n";
+    out << p.con << "\n";
+    out << p.intel << "\n";
+    out << static_cast<int>(p.background) << "\n";
+    out << static_cast<int>(p.spec) << "\n";
     out << currentRoom->name << "\n";
     out << p.knownSpells.size() << "\n";
     for (const auto& s : p.knownSpells) out << s << "\n";
@@ -404,6 +423,12 @@ bool loadGame(player& p,
     p.playerBaseDamage = d.baseDamage;
     p.playerAC       = d.ac;
     p.dataBalanceKB  = d.dataKB;
+    p.str            = d.str;
+    p.dex            = d.dex;
+    p.con            = d.con;
+    p.intel          = d.intel;
+    p.background     = static_cast<Background>(d.background);
+    p.spec           = static_cast<Specialization>(d.spec);
     p.knownSpells.clear();
     for (const auto& s : d.spells) if (findSpell(s)) p.knownSpells.insert(s);
 

@@ -43,11 +43,23 @@ AttackRoll rollToHit(int attackBonus, int targetAC) {
     return r;
 }
 
-int playerAttackBonus(const player& p) {
+int playerMeleeAttackBonus(const player& p) {
     return p.playerLvl
         + p.getEffectBonus(StatusType::caffeineRush)
         + p.getEffectBonus(StatusType::sugarCrash)
-        + p.getModifier(p.str);  //Burde nok skille mellom slag og kast slik at vi også kan bruke + getModifier(p.dex);
+        + p.getModifier(p.str);  
+}
+
+int playerThrowAttackBonus(const player& p) {
+    int bonus = p.playerLvl
+        + p.getEffectBonus(StatusType::caffeineRush)
+        + p.getEffectBonus(StatusType::sugarCrash)
+        + p.getModifier(p.dex);
+
+    if (p.spec == Specialization::Frontend) {
+        bonus += 2;
+    }
+    return bonus;
 }
 
 int monsterAttackBonus(const monster& m) {
@@ -55,7 +67,9 @@ int monsterAttackBonus(const monster& m) {
 }
 
 int rollPlayerMeleeDamage(const player& p, const monster& m, bool crit) {
-    int flatBonus = p.playerBaseDamage + p.getEffectBonus(StatusType::caffeineRush);
+    int flatBonus = p.playerBaseDamage 
+        + p.getEffectBonus(StatusType::caffeineRush)
+        + p.getModifier(p.str);;
 
     if (p.spec == Specialization::Sysadmin) {
         flatBonus += 2;
@@ -73,6 +87,28 @@ int rollPlayerMeleeDamage(const player& p, const monster& m, bool crit) {
         if (toLowerNorwegian(w.name) != "kaffekopp" || w.isFilled) {
             int extraDmg = rollDiceSum(w.extraDiceCount, w.extraDiceSides, crit);
             totalDamage += applyDamageModifiers(extraDmg, w.extraDamageType, m);
+        }
+    }
+    return totalDamage;
+}
+
+int rollPlayerThrowDamage(const player& p, const item& thrownItem, const monster& m, bool crit) {
+    int flatBonus = p.getModifier(p.dex);
+    if (p.spec == Specialization::Frontend) {
+        flatBonus += 2;
+    }
+
+    int diceCount = (thrownItem.damageDiceCount > 0) ? thrownItem.damageDiceCount : 1;
+    int diceSides = (thrownItem.damageDiceSides > 0) ? thrownItem.damageDiceSides : 4;
+    std::string dmgType = thrownItem.damageType.empty() ? "bludgeoning" : thrownItem.damageType;
+
+    int baseDmg = rollDiceSum(diceCount, diceSides, crit) + flatBonus;
+    int totalDamage = applyDamageModifiers(std::max(1, baseDmg), dmgType, m);
+
+    if (thrownItem.extraDiceCount > 0) {
+        if (toLowerNorwegian(thrownItem.name) != "kaffekopp" || thrownItem.isFilled) {
+            int extraDmg = rollDiceSum(thrownItem.extraDiceCount, thrownItem.extraDiceSides, crit);
+            totalDamage += applyDamageModifiers(extraDmg, thrownItem.extraDamageType, m);
         }
     }
     return totalDamage;

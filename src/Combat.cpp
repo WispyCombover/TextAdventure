@@ -82,44 +82,27 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
 
             std::cout << "Du sikter og kaster din " << thrownItem->name << " hardt mot " << m->name << "!\n";
 
-            AttackRoll toss = rollToHit(playerAttackBonus(p), m->monsterAC);
+            AttackRoll toss = rollToHit(playerThrowAttackBonus(p), m->monsterAC);
 
             if (toss.hit) {
-                const int diceMultiplier = toss.crit ? 2 : 1;
                 if (toss.crit) std::cout << "CRITICAL HIT! Et perfekt kast!\n";
 
-                //Base damage (bludgeoning, piercing, lightning, slashing)
-                int baseDamage = 0;
-                for (int i = 0; i < thrownItem->damageDiceCount * diceMultiplier; ++i) {
-                    baseDamage += rollDice(thrownItem->damageDiceSides);
-                }
-                baseDamage = applyDamageModifiers(baseDamage, thrownItem->damageType, *m);
-                int totalDamage = baseDamage;
+                int totalDamage = rollPlayerThrowDamage(p, *thrownItem, *m, toss.crit);
 
                 //Meldinger ved treff
                 if (!thrownItem->throwHitText.empty()) {
                     std::cout << thrownItem->throwHitText << "\n";
                 } else {
-                    std::cout << "Du treffer " << m->name << " med " << thrownItem->name << " for " << baseDamage << " " << thrownItem->damageType << "-skade!\n";
+                    std::cout << "Du treffer " << m->name << " med " << thrownItem->name << " for " << totalDamage << " " << thrownItem->damageType << "-skade!\n";
                 }
 
                 //Ekstra damage
                 bool triggersExtra = (thrownItem->extraDiceCount > 0) && (!thrownItem->isContainer || thrownItem->isFilled);
 
                 if (triggersExtra) {
-                    int extraDamage = 0;
-                    for (int i = 0; i < thrownItem->extraDiceCount * diceMultiplier; ++i) {
-                        extraDamage += rollDice(thrownItem->extraDiceSides);
-                    }
-                    extraDamage = applyDamageModifiers(extraDamage, thrownItem->extraDamageType, *m);
-                    totalDamage += extraDamage;
-
                     if (!thrownItem->throwFilledText.empty()) {
                         std::cout << thrownItem->throwFilledText << "\n";
                     }
-                    std::cout << "Det gjør " << extraDamage << " ekstra " << thrownItem->extraDamageType << "-skade på " << m->name << "!\n";
-
-                    //Eventuell AC-reduksjon fra AOE eller annet
                     if (thrownItem->throwAcReduction > 0) {
                         m->monsterAC = std::max(0, m->monsterAC - thrownItem->throwAcReduction);
                         if (!thrownItem->throwAcReductionText.empty()) {
@@ -215,7 +198,7 @@ bool handleCombat(player& p, Room*& currentRoom, std::vector<std::shared_ptr<ite
             continue;
         }
         else if (combatInput == "angrip" || combatInput == "slå" || combatInput == "attack") {
-            AttackRoll a = rollToHit(playerAttackBonus(p), m->monsterAC);
+            AttackRoll a = rollToHit(playerMeleeAttackBonus(p), m->monsterAC);
 
             std::cout << "Du triller en D20 for å treffe... du fikk " << a.roll << " (+ " << a.total - a.roll << " bonus) = " << a.total << " mot AC " << m->monsterAC << ".\n";
 

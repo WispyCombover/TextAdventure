@@ -621,6 +621,11 @@ void handleTalk(const std::string &targetName, Room *currentRoom, player &p, std
                 chosenOption.itemGiven = true;
             }
             if (chosenOption.setsState != -1) foundNPC->questState = chosenOption.setsState;
+            if (chosenOption.xpReward > 0) {
+                std::cout << "\n[OPPDRAG FULLFØRT] Du mottok " << chosenOption.xpReward << " XP!\n";
+                p.gainXp(chosenOption.xpReward);
+                chosenOption.xpReward = 0;
+            }
             currentNode = chosenOption.nextNodeIndex;
         }
         else
@@ -1013,28 +1018,9 @@ bool processCommand(
         handleExamine(target, currentRoom, inventory);
     }
 
-    else if (lowerInput == "status" || lowerInput == "stats" || lowerInput == "utstyr" || lowerInput == "gear")
+    else if (lowerInput == "status" || lowerInput == "stats" || lowerInput == "utstyr" || lowerInput == "gear" || lowerInput == "profil")
     {
-        std::cout << "\n=== " << p.name << " (Level " << p.playerLvl << ") ===\n";
-        std::cout << "HP: " << p.playerHP << "/" << p.playerMaxHP << " | XP: " << p.playerXP << " | Total AC: " << p.getTotalAC() << "\n";
-        std::cout << "Våpen: " << (p.equippedWeapon ? p.equippedWeapon->name : "Ingen (knyttnever)") << "\n";
-
-        for (int slot = 1; slot <= 5; ++slot) {
-            std::cout << getSlotName(slot) << ": ";
-            auto it = p.equippedArmour.find(slot);
-            if (it != p.equippedArmour.end() && it-> second !=nullptr) {
-                std::cout << it->second->name << " (+" << it->second->acBonus << " AC)\n";
-            } else {
-                std::cout << "Tom\n";
-            }
-        }
-        if (!p.activeEffects.empty()) {
-            std::cout << "Aktive effekter: ";
-            for (const auto& eff : p.activeEffects) {
-                std::cout << "[" << eff.name << " (" << eff.turnsRemaining << " runder)] ";
-            }
-            std::cout << "\n";
-        }
+        p.printStats();
     }
     else if (verb == "bruk" || verb == "use" || verb == "utstyr" || verb == "equip")
     {

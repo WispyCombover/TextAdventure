@@ -21,8 +21,8 @@ namespace {
                     .monsterAC = 10,
                     .weaknesses = {"slashing"},
                     .attackMessage = "Kaster en 'Git Push Force' som korrumperer filene dine!",
-                    .minDataReward = 128,
-                    .maxDataReward = 512,
+                    .minDataReward = 250,
+                    .maxDataReward = 800,
                     .lootTable = {
                         { getItem("rød monster"), 60 },
                         { getItem("gammel smultring"), 40 },
@@ -40,11 +40,11 @@ namespace {
                     .damageDiceCount = 1,
                     .damageDiceSides = 4,
                     .xpReward = 7,
-                    .monsterAC = 12,
+                    .monsterAC = 11,
                     .weaknesses = {"acid", "fire"},
                     .attackMessage = "Spammer deg med 'Godta alle'-knapper til du mister oversikten!",
-                    .minDataReward = 150,
-                    .maxDataReward = 450,
+                    .minDataReward = 250,
+                    .maxDataReward = 800,
                     .lootTable = {
                         { getItem("mango loco"), 55 },
                         { getItem("kald filterkaffe"), 40 },
@@ -61,11 +61,11 @@ namespace {
                     .damageDiceCount = 1,
                     .damageDiceSides = 6,
                     .xpReward = 10,
-                    .monsterAC = 14,
+                    .monsterAC = 12,
                     .weaknesses = {"sonic"},
                     .attackMessage = "Angriper i mørket, får deg til å snuble og kaster en 'Compilation Error' rett i ansiktet ditt!",
-                    .minDataReward = 200,
-                    .maxDataReward = 600,
+                    .minDataReward = 250,
+                    .maxDataReward = 800,
                     .lootTable = {
                         { getItem("hvit monster"), 60 },
                         { getItem("boks med trykkluft"), 25 },
@@ -88,12 +88,12 @@ namespace {
                     .xpReward = 15,
                     .monsterAC = 14,
                     .attackMessage = "Holder en endeløs monolog og påfører deg 'Feature Creep'-skade over tid!",
-                    .minDataReward = 400,
-                    .maxDataReward = 1000,
+                    .minDataReward = 800,
+                    .maxDataReward = 2000,
                     .lootTable = {
                         { getItem("hvit monster"), 65 },
                         { getItem("støydempende headsett"), 15 },
-                        { getItem("løs side (ping)"), 12 }
+                        { getItem("løs side (ping)"), 30 }
                     }
                 },
                 {
@@ -109,12 +109,12 @@ namespace {
                     .monsterAC = 15,
                     .weaknesses = {"fire"},
                     .attackMessage = "Oppretter tre nye sub-tasks som du MÅ løse med én gang!",
-                    .minDataReward = 400,
-                    .maxDataReward = 1000,
+                    .minDataReward = 800,
+                    .maxDataReward = 2000,
                     .lootTable = {
                         { getItem("mango loco"), 60 },
                         { getItem("deodorant og lighter"), 30 },
-                        { getItem("løs side (git blame)"), 10 }
+                        { getItem("løs side (git blame)"), 30 }
                     }
                 },
                 {
@@ -131,8 +131,8 @@ namespace {
                     .weaknesses = {"lightning"},
                     .attackMessage = "Hopper til en uallokert minneadresse og kaster en 'Segmentation Fault (core dumped)' rett i brystet ditt!",
                     .isUniqueBoss = true, // Kun i Sala Segfault
-                    .minDataReward = 500,
-                    .maxDataReward = 1300,
+                    .minDataReward = 800,
+                    .maxDataReward = 2000,
                     .lootTable = {
                         { getItem("anti-statisk armlenke"), 100 },
                         { getItem("hvit monster"), 75 }
@@ -152,8 +152,8 @@ namespace {
                     .weaknesses = {"fire"},
                     .attackMessage = "Klemmer deg inn mellom to ruller og trekker deg gjennom en fuser på 200 grader!",
                     .isUniqueBoss = true, // holdes utenfor tilfeldig-poolen
-                    .minDataReward = 300, 
-                    .maxDataReward = 800,
+                    .minDataReward = 800, 
+                    .maxDataReward = 2000,
                     .lootTable = {
                         { getItem("makuleringspose"), 50 },
                         { getItem("stiftemaskin"), 30 },
@@ -176,12 +176,12 @@ namespace {
                     .xpReward = 22,
                     .monsterAC = 16,
                     .attackMessage = "Endrer IP-adressen din i skjul, så angrepene dine treffer deg selv i stedet!",
-                    .minDataReward = 700,
-                    .maxDataReward = 1500,
+                    .minDataReward = 2048,
+                    .maxDataReward = 4500,
                     .lootTable = {
                         { getItem("defekt strømforsyning"), 35 },
-                        { getItem("løs side (nmap)"), 15 },
-                        { getItem("løs side (ssh)"), 12 }
+                        { getItem("løs side (nmap)"), 30 },
+                        { getItem("løs side (ssh)"), 25 }
                     }
                 },
                 {
@@ -197,8 +197,8 @@ namespace {
                     .monsterAC = 17,
                     .weaknesses = {"lightning", "acid"},
                     .attackMessage = "Brøler et uforståelig feilsøkings-dump fra 1983 og lammer deg med nostalgi!",
-                    .minDataReward = 1000,
-                    .maxDataReward = 2500,
+                    .minDataReward = 2048,
+                    .maxDataReward = 4500,
                     .lootTable = {
                         { getItem("usb-minnepinne merket 'ikke rør'"), 30 },
                         { getItem("kevlar-forsterket laptopsekk"), 20 },
@@ -219,8 +219,8 @@ namespace {
                     .weaknesses = {"lightning"},
                     .attackMessage = "Spoler seg rundt armene dine og prøver å gjenopprette deg til en tilstand fra 1998!",
                     .isUniqueBoss = true,
-                    .minDataReward = 700, 
-                    .maxDataReward = 1500,
+                    .minDataReward = 2048, 
+                    .maxDataReward = 4500,
                     .lootTable = {
                         { getItem("sikkerhetskopi"), 60 },
                         { getItem("vhs-kassett"), 30 },
@@ -241,8 +241,8 @@ namespace {
                     .weaknesses = {"fire"},
                     .attackMessage = "Setter alle dine ferdige oppgaver tilbake til «utkast» og ber deg «bare gi det en siste gjennomgang»!",
                     .isUniqueBoss = true,
-                    .minDataReward = 700, 
-                    .maxDataReward = 1500,
+                    .minDataReward = 2048, 
+                    .maxDataReward = 4500,
                     .lootTable = {
                         { getItem("gummistempel"), 40 },
                         { getItem("dokumentmappe"), 50 },
@@ -262,16 +262,16 @@ namespace {
                     .attackDamage = 2,
                     .damageDiceCount = 2,
                     .damageDiceSides = 8,
-                    .xpReward = 35,
+                    .xpReward = 55,
                     .monsterAC = 15,
                     .weaknesses = {"fire", "acid"},
                     .attackMessage = "Begraver deg under ti års lovpålagt dokumentasjon som ingen har lov til å kaste!",
                     .isUniqueBoss = true, // Boss i papirarkivet
-                    .minDataReward = 600,
-                    .maxDataReward = 1400,
+                    .minDataReward = 4096,
+                    .maxDataReward = 6144,
                     .lootTable = {
                         { getItem("the mythical man-month"), 100 },
-                        { getItem("løs side (locate)"), 50 }
+                        { getItem("løs side (locate)"), 100 }
                     }
                 },
                 {
@@ -288,8 +288,8 @@ namespace {
                     .weaknesses = {"sanitize"},
                     .attackMessage = "Kaster en SQL-injection som sletter vitale deler av dine essensielle funksjoner!",
                     .isUniqueBoss = true,
-                    .minDataReward = 2000,
-                    .maxDataReward = 4000,
+                    .minDataReward = 4000,
+                    .maxDataReward = 6000,
                     .lootTable = {
                         { getItem("løs side (ctrl+z)"), 100 },
                         { getItem("brannmur-kappe (enterprise firewall)"), 35 }
@@ -316,7 +316,7 @@ namespace {
                     .lootTable = {
                         { getItem("hvit monster"), 70 },
                         { getItem("boks med trykkluft"), 40 },
-                        { getItem("løs side (kill-9)"), 20 }
+                        { getItem("løs side (kill -9)"), 20 }
                     }
                 },
                 {
@@ -337,7 +337,7 @@ namespace {
                     .lootTable = {
                         { getItem("mango loco"), 65 },
                         { getItem("kald filterkaffe"), 50 },
-                        { getItem("løs side (ctrl+c)"), 20 }
+                        { getItem("løs side (ctrl+z)"), 20 }
                     }
                 },
                 {
@@ -360,7 +360,7 @@ namespace {
                     .lootTable = {
                         { getItem("brannmur-kappe (enterprise firewall)"), 100 },
                         { getItem("kevlar-forsterket laptopsekk"), 50 },
-                        { getItem("løs side (rm -rf)"), 35 }
+                        { getItem("løs side (rm -rf /)"), 35 }
                     }
                 }
             }},

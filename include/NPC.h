@@ -16,6 +16,7 @@ struct dialogueOption {
     std::string takesItem = "";     //Fjernes når den blir gitt til NPC
     int requiresState = -1;         // -1 = alltid synlig, ellers må npc.questState == verdien
     int setsState = -1;             // -1 = ingen endring
+    int xpReward = 0;
 };
 
 struct dialogueNode {
@@ -46,4 +47,4 @@ std::unique_ptr<NPC> createSlitenSenior(const player& p);
 std::unique_ptr<NPC> createLockedInSecopsVoice(const player& p);
 std::unique_ptr<NPC> createFreedSecops(const player& p);
 std::unique_ptr<NPC> createOldWiseVeteran(const player& p);
-std::unique_ptr<NPC> createIntern(const player& p);
+std::unique_ptr<NPC> createPraktikant(const player& p);

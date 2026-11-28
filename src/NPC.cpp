@@ -61,7 +61,9 @@ std::unique_ptr<NPC> createPraktikant(const player& p) {
     });
 
     intern->shopInventory.push_back(getItem("lunken kaffe fra i går"));
-    intern->shopInventory.push_back(getItem("gammel smultring"));
+    intern->shopInventory.push_back(getItem("halvspist energibar"));
+    intern->shopInventory.push_back(getItem("taktisk cargobukse"));
+    intern->shopInventory.push_back(getItem("løs side (grep)"));
 
     return intern;
 }
@@ -85,7 +87,7 @@ std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
             {.playerText = "Hvem er du egentlig?", .nextNodeIndex = 4},
             {.playerText = "Jeg fant tilfeldigvis dette nede i arkivet ... (gi ham The Mythical Man-Month)", .nextNodeIndex = 7,
             .giveItemName = "løs side (chroot)",
-            .requiresItem = "the mythical man-month", .takesItem = "the mythical man-month", .setsState = 2},
+            .requiresItem = "the mythical man-month", .takesItem = "the mythical man-month", .setsState = 2, .xpReward = 25},
             {.playerText = "Beklager forstyrrelsen. (Avslutt samtalen)", .nextNodeIndex = -1}
         }
     });
@@ -134,7 +136,7 @@ std::unique_ptr<NPC> createOldWiseVeteran(const player& p) {
         {
             {.playerText = "Jeg har The Mythical Man-Month!", .nextNodeIndex = 7,
              .giveItemName = "løs side (chroot)",
-             .requiresItem = "the mythical man-month", .takesItem = "the mythical man-month", .setsState = 2},
+             .requiresItem = "the mythical man-month", .takesItem = "the mythical man-month", .setsState = 2, .xpReward = 25},
             {.playerText = "Kan du gjenta tipset om labyrinten?", .nextNodeIndex = 6},
             {.playerText = "Ikke ennå. (Avslutt samtalen)", .nextNodeIndex = -1}
         }
@@ -357,7 +359,11 @@ std::unique_ptr<NPC> createFirewallGuru(const player& p) {
 
     //Legg til varer i butikken her
     guru->shopInventory.push_back(getItem("mekanisk tastatur"));
+    guru->shopInventory.push_back(getItem("kevlar-forsterket laptopsekk"));
+    guru->shopInventory.push_back(getItem("brannmur-kappe (enterprise firewall)"));
+    guru->shopInventory.push_back(getItem("boks med trykkluft"));
     guru->shopInventory.push_back(getItem("rød monster"));
+    guru->shopInventory.push_back(getItem("hvit monster"));
 
     return guru;
 }

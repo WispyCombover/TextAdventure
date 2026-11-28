@@ -78,7 +78,7 @@ namespace {
             .value = 3,
             .currency = "MB",
             .type = "weapon",
-            .damageDiceSides = 8,
+            .damageDiceSides = 6,
             .damageDiceCount = 1,
             .damageType = "Bludgeoning",
             .extraDiceSides = 4,
@@ -328,8 +328,8 @@ namespace {
         {
             .name = "Støydempende headsett",        // +1AC
             .description = "Sony WH-1000XM5 med aktiv støykansellering. Du hører ikke angrepene, så de gjør beviselig mindre vondt.",
-            .value = 3,
-            .currency = "MB",
+            .value = 1500,
+            .currency = "kB",
             .type = "armour",
             .acBonus = 1,
             .equipSlot = 1
@@ -395,7 +395,7 @@ namespace {
         {
             .name = "Brannmur-kappe (Enterprise Firewall)", // +4AC
             .description = "En tung kappe vevd av optiske fiberkabler og strenge tilgangslister. Blokkerer 99.9% av uautoriserte treff.",
-            .value = 25,
+            .value = 12,
             .currency = "MB",
             .type = "armour",
             .acBonus = 4,
@@ -404,7 +404,7 @@ namespace {
         {
             .name = "Zero-Trust Rustning",                  // +5AC
             .description = "En heldekkende drakt som krever tofaktor autentisering for hvert eneste sverdslag som prøver å trenge gjennom.",
-            .value = 75,
+            .value = 25,
             .currency = "MB",
             .type = "armour",
             .acBonus = 5,
@@ -413,7 +413,7 @@ namespace {
         {
             .name = "Air-Gapped Serverkabinett",            // +6AC
             .description = "Du har bokstavelig talt tredd et 19-tommers stål-rack over overkroppen. Tungt som bly, men fullstendig immun mot nettverksangrep.",
-            .value = 250,
+            .value = 45,
             .currency = "MB",
             .type = "armour",
             .acBonus = 6,

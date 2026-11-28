@@ -29,11 +29,14 @@ int player::getTotalAC() const {
     return total;
 }
 
-int xpNeededForLevel(int level) {
-    constexpr int n = static_cast<int>(std::size(kXpToLevelUp));
-    if (level < 1) level = 1;
-    if (level <= n) return kXpToLevelUp[level - 1];
-    return static_cast<int>(kXpToLevelUp[n - 1] * std::pow(1.5, level - n));
+int xpNeededForLevel(int currentLvl) {
+    switch (currentLvl) {
+        case 1: return 35;
+        case 2: return 65;
+        case 3: return 95;
+        case 4: return 115;
+        default: return 150 + (currentLvl - 5) * 40;
+    }
 }
 
 void player::chooseBackground() {
@@ -133,4 +136,62 @@ void player::applyLevelUp() {
     if (playerLvl == 3) {
         chooseSpecialization();
     }
+}
+
+std::string player::getBackgroundName() const {
+    switch (background) {
+        case Background::SelfTaught: return "Selvlært koder";
+        case Background::Support:    return "Drift og support";
+        case Background::Student:    return "Informatikkstudent";
+        default:                     return "Ingen";
+    }
+}
+
+std::string player::getSpecializationName() const {
+    switch (spec) {
+        case Specialization::Backend:  return "Backend-utvikler";
+        case Specialization::Frontend: return "Frontend-utvikler";
+        case Specialization::Sysadmin: return "Sysadmin / DevOps";
+        default:                       return "Ingen (Låses opp på lvl 3)";
+    }
+}
+
+void player::printStats() const {
+    auto formatMod = [](int mod) {
+        return (mod >= 0 ? "+" : "") + std::to_string(mod);
+    };
+
+    std::cout << "\n=== " << name << " (Level " << playerLvl << ") ===\n";
+    std::cout << "Bakgrunn:       " << getBackgroundName() << "\n";
+    std::cout << "Spesialisering: " << getSpecializationName() << "\n";
+    std::cout << "HP: " << playerHP << "/" << playerMaxHP
+              << " | Mana: " << playerMana << "/" << playerMaxMana
+              << " | XP: " << playerXP << "/" << xpToNextLevel
+              << " | Total AC: " << getTotalAC() << "\n";
+    std::cout << "------------------------------------------\n";
+    std::cout << "STR: " << str   << " (" << formatMod(getModifier(str))   << ")  |  "
+              << "DEX: " << dex   << " (" << formatMod(getModifier(dex))   << ")\n";
+    std::cout << "CON: " << con   << " (" << formatMod(getModifier(con))   << ")  |  "
+              << "INT: " << intel << " (" << formatMod(getModifier(intel)) << ")\n";
+    std::cout << "------------------------------------------\n";
+    std::cout << "Våpen: " << (equippedWeapon ? equippedWeapon->name : "Ingen (knyttnever)") << "\n";
+
+    for (int slot = 1; slot <= 5; ++slot) {
+        std::cout << getSlotName(slot) << ": ";
+        auto it = equippedArmour.find(slot);
+        if (it != equippedArmour.end() && it->second != nullptr) {
+            std::cout << it->second->name << " (+" << it->second->acBonus << " AC)\n";
+        } else {
+            std::cout << "Tom\n";
+        }
+    }
+
+    if (!activeEffects.empty()) {
+        std::cout << "Aktive effekter: ";
+        for (const auto& eff : activeEffects) {
+            std::cout << "[" << eff.name << " (" << eff.turnsRemaining << " runder)] ";
+        }
+        std::cout << "\n";
+    }
+    std::cout << "==========================================\n";
 }
